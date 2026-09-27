@@ -1,0 +1,69 @@
+README.md
+  h_ef9e838b06a174 1-45
+intro/projects/processing-element/spec/pe.md
+  h_ef9e838b06a174 1-35
+  s_a5b80cbd87a585::t_d8632688466971 36-40
+.editorconfig
+  s_a5b80cbd87a585::t_b95e20bb04a2f5 1-15
+.github/pull_request_template.md
+  s_a5b80cbd87a585::t_bb96779ea5d0f8 1-13
+.github/workflows/checks.yml
+  s_a5b80cbd87a585::t_47563129487cc0 1-16
+.gitignore
+  s_a5b80cbd87a585::t_f3ec78de7ccc10 1-14
+CONTRIBUTING.md
+  s_a5b80cbd87a585::t_b936f4222bed4b 1-57
+Makefile
+  s_a5b80cbd87a585::t_f1679ebe41dc4e 1-46
+intro/README.md
+  s_a5b80cbd87a585::t_f24a6bac8a4964 1-375
+intro/SETUP.md
+  s_a5b80cbd87a585::t_1556fbc63a8cba 1-146
+intro/projects/digital-logic/rtl/day1_combinational.v
+  s_a5b80cbd87a585::t_af815ebab3a10e 1-23
+intro/projects/digital-logic/rtl/logic_basics.sv
+  s_a5b80cbd87a585::t_35a882960f8665 1-29
+intro/projects/digital-logic/tb/day1_combinational_tb.sv
+  s_a5b80cbd87a585::t_2f679f23db8de8 1-49
+intro/projects/digital-logic/tb/logic_basics_tb.sv
+  s_a5b80cbd87a585::t_4d43662fde18ee 1-37
+intro/projects/processing-element/rtl/pe.sv
+  s_a5b80cbd87a585::t_320a1a13b0f884 1-22
+intro/projects/processing-element/tb/pe_tb.sv
+  s_a5b80cbd87a585::t_eb0948d9a39285 1-272
+rtl/README.md
+  s_a5b80cbd87a585::t_1672b23cd1737e 1-114
+scripts/check_docs.py
+  s_a5b80cbd87a585::t_8c8d86f60edc35 1-121
+scripts/code_links.json
+  s_a5b80cbd87a585::t_b522485a68168d 1-90
+scripts/render_waveforms.py
+  s_a5b80cbd87a585::t_0d5de4cd32b047 1-101
+scripts/run_vcs.py
+  s_a5b80cbd87a585::t_61618bc1132478 1-32
+templates/README.md
+  s_a5b80cbd87a585::t_ae7180a32afb63 1-75
+verif/README.md
+  s_a5b80cbd87a585::t_2baed6f2b61e9c 1-176
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "584e1cba37c95789d01305403cd528abd149c395",
+  "prompts": {},
+  "humans": {
+    "h_ef9e838b06a174": {
+      "author": "Zeb Taylor <zceboys@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_a5b80cbd87a585": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0e364-bda8-7841-b010-2b0cebf78deb",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Zeb Taylor <zceboys@gmail.com>"
+    }
+  }
+}
