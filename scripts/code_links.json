@@ -1,0 +1,90 @@
+{
+  "intro/projects/digital-logic/rtl/day1_combinational.v": {
+    "wires": {
+      "start": "^    input wire a,",
+      "end": "^\\);$",
+      "end_offset": -1
+    },
+    "gates": {
+      "start": "^    assign gate_and\\b",
+      "end": "^    assign gate_xnor\\b"
+    },
+    "full_adder": {
+      "start": "^    // Slide 15:",
+      "end": "^    assign carry\\b"
+    },
+    "mux": {
+      "start": "^    // Slide 17:",
+      "end": "^    assign mux_out\\b"
+    },
+    "waveform_exercise": {
+      "start": "^    // Slide 21:",
+      "end": "^    assign out2\\b"
+    }
+  },
+  "intro/projects/digital-logic/rtl/logic_basics.sv": {
+    "combinational": {
+      "start": "^    assign both_high\\b",
+      "end": "^    assign selected\\b"
+    },
+    "register": {
+      "start": "^    // Synchronous, active-high reset",
+      "end": "^    end$"
+    },
+    "fsm": {
+      "start": "^    typedef enum logic",
+      "end": "^    assign busy\\b"
+    }
+  },
+  "intro/projects/digital-logic/tb/day1_combinational_tb.sv": {
+    "slide21_trace": {
+      "start": "^    initial begin$",
+      "end": "^        interval\\(3'b100\\);"
+    },
+    "exhaustive_checks": {
+      "start": "^        // After 80 ns,",
+      "end": "^        \\$finish;"
+    }
+  },
+  "intro/projects/digital-logic/tb/logic_basics_tb.sv": {
+    "checks": {
+      "start": "^        \\$dumpfile\\(",
+      "end": "^        \\$finish;",
+      "start_offset": -1,
+      "end_offset": 1
+    }
+  },
+  "intro/projects/processing-element/rtl/pe.sv": {
+    "interface": {
+      "start": "^    input  logic clk,",
+      "end": "^\\);$",
+      "end_offset": -1
+    },
+    "implementation": {
+      "start": "^\\);$",
+      "end": "^endmodule$",
+      "start_offset": 1,
+      "end_offset": -1
+    }
+  },
+  "intro/projects/processing-element/tb/pe_tb.sv": {
+    "model": {
+      "start": "^    // Reference arithmetic",
+      "end": "^    endtask$"
+    },
+    "checker": {
+      "start": "^    task automatic check_outputs\\b",
+      "end": "^        initialized = 1;",
+      "end_offset": 1
+    },
+    "stimulus": {
+      "start": "^    initial begin : run_tests$",
+      "end": "^        done = 1;",
+      "end_offset": 1
+    },
+    "configurations": {
+      "start": "^module pe_tb;",
+      "end": "^endmodule$"
+    }
+  }
+}

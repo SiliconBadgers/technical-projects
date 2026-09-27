@@ -1,0 +1,16 @@
+name: Scaffold checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install local simulator
+        run: sudo apt-get update && sudo apt-get install -y iverilog
+      - name: Check documentation
+        run: make check
+      - name: Simulate completed examples
+        run: make SIM=iverilog smoke
+      # The PE is a student starter; make pe intentionally fails until completed.

@@ -1,0 +1,14 @@
+# Generated simulation / EDA output
+build/
+**/build/
+*.vcd
+*.fst
+*.fsdb
+*.vpd
+simv
+simv.daidir/
+csrc/
+ucli.key
+*.log
+__pycache__/
+.DS_Store
