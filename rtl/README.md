@@ -2,113 +2,94 @@
 
 [Home](../README.md) · [Shared introduction](../intro/README.md#shared-introduction) · [CAE setup](../intro/SETUP.md) · [Verification](../verif/README.md#verification-track)
 
-Build on the shared PE to create a systolic array. The design guide, roadmap,
-resources, and completion checks are all on this page.
+After the [shared PE checkpoint](../intro/README.md#pe-checkpoint), you'll connect
+processing elements into a systolic array that computes matrix products. Start
+with a 2×2 array, then add parameterization, buffering, and control. You'll build
+the array under `rtl/projects/systolic-array/`; the repository provides the shared
+PE as your starting block.
+
+The track materials are incomplete. We'll add detailed lessons and more resources
+as the project develops.
 
 ## On this page
 
 - [Build a systolic array](#build-a-systolic-array)
-- [Implementation roadmap](#rtl-roadmap)
+- [RTL roadmap](#rtl-roadmap)
 - [Matmul checkpoint](#matmul-checkpoint)
 - [Systolic array checkpoint](#systolic-array-checkpoint)
 - [Resources](#rtl-resources)
 
-The array implementation is still planned. Complete the
-[shared PE](../intro/README.md#pe-checkpoint) first, then add array specifications,
-RTL, and design smoke tests under `rtl/projects/systolic-array/`. Refer to the
-[shared PE contract](../intro/projects/processing-element/spec/pe.md) rather than
-keeping a second copy. Coordinate interface changes with verification.
-
 ## Build a systolic array
 
-**Prerequisite:** the [shared PE checkpoint](../intro/README.md#pe-checkpoint).
-**Outcome:** extend a working PE into a matrix-multiplication design with specified
-cycle behavior and reproducible checks.
+### Understand how data moves through a PE
 
-### Read the starting block
+Each PE accumulates one entry of the result matrix while passing operands to its
+neighbors. For `C = A × B`, PE `(i,j)` needs the pairs `A[i,k]` and `B[k,j]` for
+each `k`. Those operands must arrive together on a valid cycle.
 
-| Open this section | What to understand before connecting PEs |
+Review these parts of your working PE before connecting it to another one:
+
+| Read | What to look for |
 | --- | --- |
-| [PE ports](../intro/projects/processing-element/rtl/pe.sv#L7-L11)<!-- region:interface --> | Operand direction, accumulator width, and the meaning of `valid_out`. |
-| [PE implementation](../intro/projects/processing-element/rtl/pe.sv#L13-L21)<!-- region:implementation --> | The student TODO must be completed before array integration. |
-| [Cycle contract](../intro/projects/processing-element/spec/pe.md#cycle-rules) | Reset, clear, valid data, and bubble behavior at each edge. |
-| [Supplied acceptance cases](../intro/projects/processing-element/tb/pe_tb.sv#L137-L242)<!-- region:stimulus --> | The signed arithmetic, control, timing, and parameter checks required before array integration. |
+| [PE ports](../intro/projects/processing-element/rtl/pe.sv#L7-L11)<!-- region:interface --> | Where operands enter and leave, and how wide the accumulator is. |
+| [Cycle rules](../intro/projects/processing-element/spec/pe.md#cycle-rules) | How reset, clear, valid input, and bubbles affect the registers. |
+| [Arithmetic rules](../intro/projects/processing-element/spec/pe.md#interface-and-arithmetic) | Signed multiplication, sign extension, and accumulator wraparound. |
 
-### First design exercise
+`valid_out` identifies forwarded operands. The array needs separate control to
+identify when a complete matrix result is ready. The PE has no backpressure input
+(a way to ask an upstream sender to wait), so your input schedule must account for
+when each PE can consume data.
 
-Draw two connected PEs. For every cycle, label which operand pair each PE should
-consume and when its output is valid. The shared PE has one input-valid signal
-and no backpressure input, so the array must align useful operand pairs and define
-how bubbles propagate. Check that both operands correspond to the same dot-product
-index before accumulating.
+### Start with two connected PEs
 
-Write the proposed schedule and interface under `rtl/projects/systolic-array/`
-as you develop the interconnect RTL. When the schedule is clear, progress to a 2×2
-array and compare complete matrix results with an independent reference.
+Draw the connections and a cycle-by-cycle operand schedule. Label each operand
+with its matrix indices so you can check that both inputs to a PE have the same
+`k`. Include a bubble (`valid_in = 0`) and follow its effect on the forwarded data
+and valid signal.
 
-### What belongs in this track
+Use that schedule to build the interconnect, then extend it to a 2×2 array. Compare
+every output entry with a matrix product computed independently of your RTL.
+The [matmul checkpoint](#matmul-checkpoint) is your first working-array milestone.
 
-Add array specifications, block diagrams, design RTL, and small design smoke tests
-under `rtl/projects/systolic-array/`. The [verification track](../verif/README.md#verification-track)
-owns the extended checking methodology and regression work. Both tracks should
-reference the same behavior contract and agree on interface changes.
+Keep the array's specification, diagrams, RTL, and small design tests in
+`rtl/projects/systolic-array/`. Document dimensions, numeric widths, operand
+timing, reset/clear behavior, and completion signaling in the specification.
+Work with the verification track from that same specification so the design and
+testbench use the same interface and cycle rules.
 
 ## RTL roadmap
 
-These are proposed stages after the shared introduction. They group the design
-milestones from the team discussion into six stages, consistent with the Day 1
-track outline. Mentors can adjust pacing; these are not fixed weekly deadlines.
+| Stage | What you'll build |
+| --- | --- |
+| 1. PE data movement | Connect PEs and work out the operand schedule. |
+| 2. 2×2 matrix multiplication | Compute full matrix products with a small array. |
+| 3. Parameterized array | Generalize array dimensions and numeric widths. |
+| 4. Input buffering and control | Store incoming data and use a finite-state machine (FSM) to manage the operation. |
+| 5. Output handling | Signal when results are valid and handle backpressure where the interface supports it. |
+| 6. Integration and documentation | Run the regression suite, review the interface, and document how to use the array. |
 
-| Track stage | Build | Current status |
-| --- | --- | --- |
-| 1. PE data movement | Connect working PEs and define operand timing. | Planned |
-| 2. 2×2 matrix multiplication | Complete a small array. | Planned |
-| 3. Parameterized array | Generalize dimensions and numeric widths. | Planned |
-| 4. Input buffering and control | Add input storage, an FSM, and status signals. | Planned |
-| 5. Output handling | Define output validity and backpressure. | Planned |
-| 6. Integration and documentation | Finish regression, interface review, and walkthrough. | Planned |
-
-The [shared PE starter](../intro/README.md#stage-3-implement-a-processing-element) exists,
-but its RTL is intentionally unfinished. No array RTL is present yet. The
-[design guide](#build-a-systolic-array) explains the first implementation exercise.
-
-### Completion checks
-
-The formal checks are [matmul](#matmul-checkpoint) after stage 2 and
-[systolic array](#systolic-array-checkpoint) after stage 6. The intervening
-stages are implementation steps with no separate checkoffs.
-
-### Open design decisions
-
-Agree on array dimensions, numeric formats, input scheduling, latency/throughput
-expectations, reset/flush behavior, and completion signaling. Coordinate those
-requirements with [verification](../verif/README.md#verification-roadmap) before implementing
-checks against them. Record decisions alongside the array specification.
+The checkpoints are [matmul](#matmul-checkpoint) after stage 2 and
+[systolic array](#systolic-array-checkpoint) after stage 6.
 
 ## Matmul checkpoint
 
-Run the completed 2×2 matrix-multiplication implementation and compare all output
-entries against an independent reference on multiple input matrices. Check that
-operands align correctly and completion occurs at the expected time. This is the
-first working matrix-product milestone in the [RTL roadmap](#rtl-roadmap).
+Run your 2×2 implementation on several input matrices and compare every output
+entry with an independent reference. Check operand alignment and the cycle when
+the result becomes ready.
 
 ## Systolic array checkpoint
 
-Run the completed array for the dimensions and numeric formats in its agreed
-specification. Check results, reset/restart, completion signaling, and input/output
-control, including stalls where supported. Check that results are neither lost
-nor duplicated. This is the final implementation milestone in the
-[RTL roadmap](#rtl-roadmap).
+Run your completed array for the dimensions and numeric formats in its
+specification. Check matrix results, reset and restart, completion signaling, and
+input/output control. For interfaces that support stalls, check that pausing and
+resuming transfers preserves every result without loss or duplication.
 
 ## RTL resources
 
 | Resource | Use it for |
 | --- | --- |
-| [Shared SystemVerilog guide](../intro/README.md#stage-2-systemverilog-and-systolic-arrays) | Map combinational and sequential constructs to hardware. |
-| [Shared PE contract](../intro/projects/processing-element/spec/pe.md) | Confirm signed arithmetic, reset, and cycle semantics before reuse. |
-| [NYCU systolic-array lab](https://nycu-caslab.github.io/AAML2024/labs/lab_3.html) | Compare another teaching example with your operand schedule. |
-| [Shared systolic-array readings](../intro/README.md#systolic-arrays) | Review terminology and visual introductions. |
-| [Recommended CAE setup](../intro/SETUP.md#environment-setup) | Run simulation with the shared tool instructions. |
-
-Keep the array's agreed contract in its project directory rather than assuming an external
-example uses the same interfaces or timing.
+| [Shared SystemVerilog guide](../intro/README.md#stage-2-systemverilog-and-systolic-arrays) | Connect combinational and sequential code to the hardware it describes. |
+| [PE specification](../intro/projects/processing-element/spec/pe.md) | Review the block you'll reuse in the array. |
+| [NYCU systolic-array lab](https://nycu-caslab.github.io/AAML2024/labs/lab_3.html) | Compare its dataflow and operand schedule with yours. |
+| [Systolic-array readings](../intro/README.md#systolic-arrays) | Find background explanations and visual introductions. |
+| [CAE setup](../intro/SETUP.md#environment-setup) | Set up simulation and waveform viewing. |
