@@ -1,6 +1,6 @@
 # `sb_systolic_array` Specification
 
-Version 1.0 (2025-09-06). Ports and handshake rules: [`interface.md`](interface.md). Example waveforms: [`cycle_tables.md`](cycle_tables.md).
+Version 1.0 (2025-09-06). RTL: `rtl/sb_systolic_array.sv`. Ports and handshake rules: [`interface.md`](interface.md). Example waveforms: [`cycle_tables.md`](cycle_tables.md).
 
 ## 1. Summary
 
@@ -57,6 +57,16 @@ Registers are write-only, written through the WR channel.
 | `N+1 ..` | — | — | Reserved; write accepted, no effect |
 
 ## 7. Function
+
+### Programming model
+
+1. Reset.
+2. Write weight rows 0 … N-1.
+3. Optionally write `CTRL`.
+4. Send activation vectors on A; take results on R.
+5. The block is idle when `busy` is 0.
+
+### Operation
 
 **Computation.** For each accepted `x`:
 
@@ -137,8 +147,21 @@ y[n] = max(y[n], 0)                if RELU_EN = 1
 | AS5 | `rst_n` is released synchronously to `clk`. |
 | AS6 | `a_valid` does not depend combinationally on `wr_ready`. |
 
-## 11. Open questions
+## 11. Known limitations
 
-| ID | Question | Raised by | Answer |
+| ID | Limitation |
+|---|---|
+| L1 | Registers cannot be read. |
+| L2 | A continuous activation stream delays writes indefinitely. |
+
+## 12. Open questions
+
+| ID | Question | Owner | Answer |
 |---|---|---|---|
 | | | | |
+
+## 13. Revision history
+
+| Version | Date | Change |
+|---|---|---|
+| 1.0 | 2025-09-06 | First release |
