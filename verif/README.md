@@ -4,11 +4,15 @@ Step 3 of the [UVM training](https://github.com/ihagedo/uvm-training): after the
 
 ## Projects
 
-| Project | Design | You build |
-|---|---|---|
-| [`systolic_array`](projects/systolic_array/README.md) | 4 × 4 int8 systolic array with valid/ready channels | Three agents, a reference model, scoreboard, coverage, and a test plan |
+Do them in this order:
 
-Each project has its own labs under `projects/<project>/docs/labs/`.
+| # | Project | Design | You build | Time |
+|---|---|---|---|---|
+| 1 | [`sync_fifo`](projects/sync_fifo/README.md) | Synchronous FIFO with valid/ready on both sides, flags and flush | Write and read agents, a queue model, scoreboard, coverage, a test plan | 1–2 weeks |
+| 2 | [`apb_regs`](projects/apb_regs/README.md) | APB4 register block with a timer and an interrupt | An APB agent, a UVM register model, a timer model, coverage, a test plan | ~2 weeks |
+| 3 | [`systolic_array`](projects/systolic_array/README.md) | 4 × 4 int8 systolic array with valid/ready channels | Three agents, a reference model, scoreboard, coverage, a test plan | 6 weeks |
+
+Each project has its own labs under `projects/<project>/docs/labs/` and a hidden set of seeded bugs for the final bug hunt.
 
 ## Your branch
 
