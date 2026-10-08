@@ -2,12 +2,13 @@
 # File:        regress.py
 # Author:      Isaac Hagedorn
 # Date:        2025-05-17
-# Description: Runs every test x seed in a regression list against one simulator binary and merges coverage. A run passes on exit status 0, the PASS banner and 0 UVM errors/fatals.
+# Description: Runs every test x seed in a regression list against one simulator build and merges coverage. A run passes on exit status 0, the PASS banner and 0 UVM errors/fatals.
 import argparse
 import concurrent.futures as cf
 import json
 import os
 import re
+import shlex
 import shutil
 import subprocess
 import sys
@@ -26,12 +27,12 @@ def read_list(path, default_seeds):
     return tests
 
 
-def run_one(binary, test, seed, outdir, verbosity, plusargs, timeout):
+def run_one(template, test, seed, outdir, verbosity, plusargs, timeout):
     rundir = os.path.join(outdir, f"{test}_s{seed}")
     os.makedirs(rundir, exist_ok=True)
     cov = os.path.join(rundir, "coverage.dat")
-    cmd = [binary, f"+UVM_TESTNAME={test}", f"+verilator+seed+{seed}",
-           f"+UVM_VERBOSITY={verbosity}", f"+verilator+coverage+file+{cov}"] + plusargs
+    cmd = shlex.split(template.replace("{test}", test).replace("{seed}", str(seed))
+                      .replace("{verb}", verbosity).replace("{cov}", cov)) + plusargs
     t0 = time.time()
     try:
         p = subprocess.run(cmd, cwd=rundir, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
@@ -44,14 +45,15 @@ def run_one(binary, test, seed, outdir, verbosity, plusargs, timeout):
         fh.write(log)
 
     def count(sev):
-        m = re.search(rf"^{sev} :\s*(\d+)", log, re.M)
+        m = re.search(rf"^(?:# )?{sev} :\s*(\d+)", log, re.M)
         return int(m.group(1)) if m else None
 
     n_err, n_fatal = count("UVM_ERROR"), count("UVM_FATAL")
     passed = ("*** TEST PASSED ***" in log and n_err == 0 and n_fatal == 0 and not timed_out and rc == 0)
     m = re.search(r"\[SB\] compared (\d+)", log)
-    first = re.search(r"^(UVM_(?:ERROR|FATAL) .*?\[([^\]]+)\].*)$", log, re.M)
-    ids = sorted(set(re.findall(r"^UVM_(?:ERROR|FATAL) .*?\[([^\]]+)\]", log, re.M)))
+    # Questa prefixes transcript lines with "# "
+    first = re.search(r"^(?:# )?(UVM_(?:ERROR|FATAL) .*?\[([^\]]+)\].*)$", log, re.M)
+    ids = sorted(set(re.findall(r"^(?:# )?UVM_(?:ERROR|FATAL) .*?\[([^\]]+)\]", log, re.M)))
     return {
         "test": test, "seed": seed, "passed": passed, "rc": rc, "timed_out": timed_out,
         "errors": n_err, "fatals": n_fatal, "compared": int(m.group(1)) if m else None,
@@ -62,8 +64,9 @@ def run_one(binary, test, seed, outdir, verbosity, plusargs, timeout):
 
 
 def main():
-    ap = argparse.ArgumentParser(description='Run a regression list against one simulator binary.')
-    ap.add_argument("--bin", required=True)
+    ap = argparse.ArgumentParser(description='Run a regression list against one simulator build.')
+    ap.add_argument("--run", required=True,
+                    help="command for one run, with {test} {seed} {verb} {cov} placeholders (make print-run)")
     ap.add_argument("--list", required=True)
     ap.add_argument("--seeds", type=int, default=3)
     ap.add_argument("--seed-base", type=int, default=1)
@@ -75,8 +78,6 @@ def main():
     ap.add_argument("--quiet", action="store_true")
     args = ap.parse_args()
 
-    if not os.path.exists(args.bin):
-        sys.exit(f"no simulator binary at {args.bin} (run make build first)")
     if os.path.isdir(args.out):
         shutil.rmtree(args.out)
     os.makedirs(args.out)
@@ -85,7 +86,7 @@ def main():
     plusargs = args.plusargs.split()
     results = []
     with cf.ThreadPoolExecutor(max_workers=args.jobs) as ex:
-        futs = [ex.submit(run_one, args.bin, t, s, args.out, args.verbosity, plusargs, args.timeout)
+        futs = [ex.submit(run_one, args.run, t, s, args.out, args.verbosity, plusargs, args.timeout)
                 for t, s in jobs]
         for f in cf.as_completed(futs):
             r = f.result()
