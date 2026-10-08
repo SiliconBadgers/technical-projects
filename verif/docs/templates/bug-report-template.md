@@ -2,13 +2,15 @@
 
 | | |
 |---|---|
+| Project | `<systolic_array \| sync_fifo \| apb_regs>` |
 | Build | `<M07>` |
 | Reported by / date | `<name, date>` |
-| Requirement | `SA-R<nn>` |
+| Requirement | `R<nn>` in the project spec |
 
 ## Reproduce
 
 ```bash
+cd projects/<project>
 make run TEST=<test> SEED=<seed>
 ```
 
