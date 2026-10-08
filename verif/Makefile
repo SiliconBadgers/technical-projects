@@ -58,7 +58,7 @@ BIN      := $(BUILD)/obj/Vtb_top
 RUNDIR   := $(BUILD)/runs/$(TEST)_s$(SEED)
 
 VFLAGS := --binary --timing --assert -j $(JOBS) --timescale 1ns/1ps \
-          -Wno-fatal -Wno-lint -Wno-style -Wno-MULTIDRIVEN \
+          -Wno-fatal -Wno-lint -Wno-style -Wno-MULTIDRIVEN -Werror-USERERROR \
           +define+UVM_NO_DPI +define+SA_N=$(N) \
           +incdir+$(UVM_HOME) +incdir+$(abspath $(TB)) \
           --top-module tb_top --Mdir $(BUILD)/obj -o Vtb_top
