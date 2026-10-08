@@ -140,7 +140,8 @@ help:
 	@echo "e.g.   make run TEST=<test> SEED=3   make regress SEEDS=2   make run SIM=questa"
 
 lint:
-	$(VERILATOR) --lint-only -Wall $(LINT_ARGS) -F $(RTL_F) --top-module $(DUT_TOP)
+	$(VERILATOR) --lint-only -Wall $(if $(filter broken,$(DUT)),-Wno-UNUSED) $(LINT_ARGS) $(PROJECT_DEFS) \
+	  $(foreach b,$(BUG_LIST),+define+$(BUG_PREFIX)$(b)) -F $(RTL_F) --top-module $(DUT_TOP)
 
 $(STAMP): $(DEPS)
 	@# /usr/local/cae/bin holds warning stubs, not simulators
