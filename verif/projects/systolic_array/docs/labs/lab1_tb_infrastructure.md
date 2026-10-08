@@ -2,7 +2,7 @@
 
 **Goal:** a UVM environment that can drive and observe every channel, predict every result, and fail when the DUT is wrong.
 
-**Inputs:** `docs/spec/`, the skeleton in `tb/`, `docs/uvm_on_verilator.md`.
+**Inputs:** `docs/spec/`, the skeleton in `tb/`, `../../docs/simulators.md`.
 
 ## Deliverables
 

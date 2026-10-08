@@ -2,7 +2,7 @@
 
 **Goal:** a test plan, written from the spec, that shows how every requirement will be verified.
 
-**Inputs:** `docs/spec/`, `docs/templates/test-plan-template.md`.
+**Inputs:** `docs/spec/`, `../../docs/templates/test-plan-template.md`.
 
 ## Deliverable
 

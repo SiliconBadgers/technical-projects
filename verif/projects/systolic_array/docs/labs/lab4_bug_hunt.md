@@ -6,7 +6,7 @@
 
 1. Commit your testbench and tell your mentor the commit.
 2. The mentor runs your `tb/regress.list` against the golden design and each broken build, and sends you a scorecard.
-3. Write a bug report for each caught build, using `docs/templates/bug-report-template.md`.
+3. Write a bug report for each caught build, using `../../docs/templates/bug-report-template.md`.
 4. Improve your test plan and tests, then ask for another round.
 
 A bug counts as caught when your regression fails on that build and passes on the golden design. If your regression fails on the golden design, the round scores 0.

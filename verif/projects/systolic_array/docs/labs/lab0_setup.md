@@ -4,10 +4,10 @@
 
 ## Steps
 
-1. Install the tools: `micromamba create -f env/environment.yml && micromamba activate sb-uvm`.
+1. From the repository root, run `source env/setup.sh` (the first run builds the Verilator environment). Then `cd projects/systolic_array`.
 2. Run `make run TEST=sa_hello_test`. It must print `*** TEST PASSED ***`.
 3. Read `docs/spec/`: the block diagram, `interface.md`, the spec and `cycle_tables.md`.
-4. Read `docs/uvm_on_verilator.md`.
+4. Read `../../docs/simulators.md`.
 
 Do not read `rtl/`. Verify the design against the spec.
 
