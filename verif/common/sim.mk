@@ -114,7 +114,7 @@ else ifeq ($(SIM),xcelium)
   TOOL := xrun
   HINT := source env/setup.sh xcelium
   WRAP := $(call wrap,cadence-run)
-  BUILD_CMD = $(WRAP) xrun -64bit -elaborate -sv -timescale 1ns/1ps -uvmhome $(abspath $(UVM_HOME)/..) -uvmnocdnsextra \
+  BUILD_CMD = $(WRAP) xrun -64bit -elaborate -sv -timescale 1ns/1ps -vtimescale 1ns/1ps -uvmhome $(abspath $(UVM_HOME)/..) -uvmnocdnsextra \
               $(DEFS) $(INCS) $(FLIST) -top $(TOP) -xmlibdirname $(BUILD)/xcelium.d
   RUN_TMPL := $(WRAP) xrun -64bit -R -xmlibdirname $(BUILD)/xcelium.d +UVM_TESTNAME={test} -svseed {seed} \
               +UVM_VERBOSITY={verb} $(SIM_ARGS)
