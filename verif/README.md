@@ -23,7 +23,7 @@ git clone git@github.com:ihagedo/uvm-onboarding.git
 cd uvm-onboarding
 git switch -c <your-netid>
 source env/setup.sh                 # Verilator (default); add questa, xcelium or vcs
-cd projects/systolic_array && make run TEST=sa_hello_test
+cd projects/sync_fifo && make run TEST=fifo_hello_test
 ```
 
 | You edit | Course material (do not edit) |
