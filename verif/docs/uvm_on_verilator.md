@@ -20,6 +20,11 @@ The course uses Accellera UVM 1.2 (`third_party/uvm-1.2`) on Verilator 5.052 wit
 | Q4 | Negative bins on a `longint` coverpoint never hit. | Use an `int` coverpoint. |
 | Q5 | `binsof` in cross bins is not supported. | Shape the cross with coverpoint bins. |
 | Q6 | A comment that starts with the word "verilator" is read as a directive. | Start the comment with another word. |
-| Q7 | A clocking-block drive issued after `get_next_item`/`try_next_item` can take effect one edge late. | Drive signals at the falling edge; sample `ready` with a clocking block. |
+| Q7 | A clocking-block drive issued after a blocking call (`get_next_item`, `try_next_item`) can take effect one edge late. | Drive with non-blocking assignments right after the clock edge (or at the falling edge). |
+| Q8 | `dist` inside `randomize() with {}` is ignored. | Put `dist` in a class constraint. |
+| Q9 | `$error` in a generate block is only a warning. | Build with `-Werror-USERERROR` (the Makefile does). |
+| Q10 | A variable with an initializer inside an `always` block is static. | Declare it `automatic`. |
+| Q11 | `program`, `edge` and `until` are keywords. | Use other names. |
+| Q12 | Line coverage skips statements inside functions. | Check function logic with assertions or directed tests. |
 
 `scripts/verilator_quirks/run.sh` checks whether Q1–Q4 are still present.
