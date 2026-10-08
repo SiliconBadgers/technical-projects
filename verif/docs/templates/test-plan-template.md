@@ -26,7 +26,7 @@ Spec version: `<1.0>`. Owner: `<name>`.
 |---|---|---|---|---|---|
 | T01 | R01 | | | | Planned |
 
-Status: Planned, Implemented, Passing, Waived (reason).
+Status: Planned, Passing, Failing, Blocked (Qn), Waived (reason), Expected fail (Bn).
 
 ## 5. Coverage
 
