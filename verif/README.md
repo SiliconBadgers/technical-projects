@@ -34,6 +34,8 @@ make help
 | `model/` | Python reference model |
 | `scripts/` | Regression and coverage scripts |
 | `third_party/uvm-1.2/` | UVM library |
+| `examples/fifo/` | Worked example: FIFO spec, test plan, UVM bench |
+| `examples/dma/` | Worked example: AHB DMA spec, test plan, UVM bench |
 
 ## Rules
 
