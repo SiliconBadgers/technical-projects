@@ -73,7 +73,6 @@ CFG_TAG := $(DUT)$(if $(BUG),_$(subst $(space),-,$(strip $(BUG))))$(PROJECT_TAG)
 TB_TAG  := $(subst /,_,$(patsubst $(COURSE_ROOT)/%,%,$(patsubst $(PROJECT_ROOT)/%,%,$(TB_DIR))))
 BUILD   := $(COURSE_ROOT)/build/$(PROJECT)/$(SIM)/$(TB_TAG)/$(CFG_TAG)
 RUNDIR  := $(BUILD)/runs/$(TEST)_s$(SEED)
-STAMP   := $(BUILD)/.built
 
 BUG_LIST := $(if $(filter ALL,$(BUG)),$(ALL_BUGS),$(BUG))
 DEFS     := +define+UVM_NO_DPI $(PROJECT_DEFS) $(foreach b,$(BUG_LIST),+define+$(BUG_PREFIX)$(b))
@@ -129,6 +128,8 @@ else ifeq ($(SIM),vcs)
 else
   $(error SIM must be verilator, questa, xcelium or vcs)
 endif
+# Verilator's target is its binary, so a build whose obj/ was deleted (bughunt.py) is rebuilt
+STAMP   := $(if $(filter verilator,$(SIM)),$(BIN),$(BUILD)/.built)
 RUN_CMD := $(subst {test},$(TEST),$(subst {seed},$(SEED),$(subst {verb},$(VERB),$(subst {cov},$(RUNDIR)/coverage.dat,$(RUN_TMPL)))))
 
 .PHONY: help lint build run regress cov cov-code waves gui clean print-build print-run print-bugs
