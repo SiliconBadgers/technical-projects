@@ -3,4 +3,4 @@ build/
 *.vcd
 __pycache__/
 build_bughunt*.log
-mentor/
+mentor
