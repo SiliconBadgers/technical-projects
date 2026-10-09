@@ -8,22 +8,18 @@ module logic_basics (
     assign selected = select_b ? b : a;
     // Synchronous, active-high reset. q samples selected on a rising edge.
     always_ff @(posedge clk) begin
-        if (rst) q <= 1'b0;
-        else     q <= selected;
+        if (rst) // we can omit the begin/end block if it is just one line
+            q <= 1'b0;
+        else
+            q <= selected;
     end
-    typedef enum logic {IDLE, BUSY} state_t;
-    state_t state, next_state;
-    always_comb begin
-        next_state = state;
-        case (state)
-            IDLE: if (start) next_state = BUSY;
-            BUSY: next_state = IDLE;
-            default: next_state = IDLE;
-        endcase
-    end
+    // busy stores the state: 0 means idle, 1 means busy.
     always_ff @(posedge clk) begin
-        if (rst) state <= IDLE;
-        else     state <= next_state;
+        if (rst)
+            busy <= 1'b0;
+        else if (busy)
+            busy <= 1'b0;
+        else
+            busy <= start;
     end
-    assign busy = (state == BUSY);
 endmodule

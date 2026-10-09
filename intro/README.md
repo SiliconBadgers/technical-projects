@@ -13,6 +13,10 @@ Stages 1 and 2.
 - [Stage 1: digital logic](#stage-1-digital-logic)
 - [Day 1 exercises and waveforms](#day-1-exercises)
 - [Stage 2: SystemVerilog and systolic arrays](#stage-2-systemverilog-and-systolic-arrays)
+  - [Modules and ports](#modules-and-ports) · [Signal declarations](#signals-wire-reg-and-logic)
+  - [Concurrent hardware](#hdl-describes-concurrent-hardware) · [`if` and procedural blocks](#if-statements-and-procedural-blocks)
+  - [Slide companion](#read-the-code-alongside-the-slides-1) · [Sequential practice](#trace-and-draw-a-sequential-circuit-optional)
+  - [Run the example](#run-the-register-and-fsm-example-optional) · [Matrix and PE practice](#matrix-and-pe-practice-optional)
 - [Stage 3: implement a PE](#stage-3-implement-a-processing-element)
 - [PE checkpoint](#pe-checkpoint)
 - [Resources](#resources) and [code map](#code-map)
@@ -105,31 +109,191 @@ If an output differs, evaluate its expression using the inputs in that interval.
 ## Stage 2: SystemVerilog and systolic arrays
 
 Start this stage after you're comfortable with the [Stage 1 material](#stage-1-digital-logic).
-You'll move from `wire` and `assign` to SystemVerilog `logic` declarations and procedural blocks.
+Use the [Oct 7 meeting slides](https://docs.google.com/presentation/d/1Ix2XDtJfbOeGqoXGuWMjS9WQNwP62iEU4nWpcuQg98w/edit)
+alongside this section. You'll learn how modules, signals, and clocked blocks
+describe hardware, then connect those ideas to a processing element.
+The exercises and simulation below are optional practice for Stage 3.
 
-`logic` declares a signal. How you assign that signal determines whether it
-represents combinational logic or stored state. For example, `selected` is driven
-by a mux expression, while `q` stores a value on each rising clock edge.
+### Modules and ports
+
+A `module` describes a hardware block. Its ports are the signals that connect it
+to other blocks: an `input` comes into the block, and an `output` leaves it.
+Open the [`logic_basics` module declaration](projects/digital-logic/rtl/logic_basics.sv#L3-L6)<!-- region:interface -->:
+
+```systemverilog
+module logic_basics (
+    input  logic clk, rst, a, b, select_b, start,
+    output logic both_high, selected, q, busy
+);
+```
+
+The code between this declaration and `endmodule` describes the circuits inside
+`logic_basics`. Each port here is one bit. `clk` is the clock, `rst` resets stored
+state, and the other inputs supply data or control the block.
+
+To use a module, create an instance and connect its ports. The supplied testbench
+uses `logic_basics dut (.*);`: `dut` is the instance name, and `.*` connects ports
+to testbench signals with the same names. An explicit connection such as
+`.clk(test_clk)` connects the module's `clk` port to a signal named `test_clk`.
+An instance represents a separate copy of the hardware; it doesn't act like a
+software function call that runs and returns.
+
+### Signals: `wire`, `reg`, and `logic`
+
+The slides use Verilog's `wire` and `reg` declarations. The repository's `.sv`
+examples use SystemVerilog, which adds `logic`, `always_ff`, and `always_comb`.
+
+| Declaration | What it means | Typical use |
+| --- | --- | --- |
+| `wire` | A net: its value comes from its connected drivers. | Connect module ports or carry the result of an `assign` statement. |
+| `reg` | A Verilog variable that can be assigned inside a procedural block, such as `always`. | Describe a clocked register or a combinational result computed in a block. |
+| `logic` | A SystemVerilog four-state data type; a plain internal `logic` declaration creates a variable. | Declare signals assigned in `always_ff` or `always_comb`, or driven by a single continuous assignment. |
+
+Four-state signals can represent `0`, `1`, `x` (unknown), and `z` (high impedance,
+such as an undriven net). An uninitialized register can appear as `x` in simulation;
+reset gives the registers in our example a known starting value.
+
+The name `reg` doesn't create a physical register by itself, and `logic` doesn't
+mean the signal is combinational. A driver is the assignment or connected output that supplies a signal's value.
+The assignments describe the hardware:
+`selected` is driven by a mux expression, while `q` stores a value on a clock edge.
+Use `logic` for the single-driver signals in these exercises. Keep `wire` for net
+connections, especially when modeling a connection with multiple drivers.
+Give each signal one driver in the examples here; don't assign it from both an
+`assign` statement and an `always_ff` block.
+
+A range declares a group of bits, called a vector. `logic [7:0] count;` declares
+eight bits, numbered 7 through 0. Plain vectors are unsigned; adding `signed`,
+as in `logic signed [7:0] operand;`, makes arithmetic interpret the bits as a
+signed two's-complement number. Eight unsigned bits represent 0 through 255;
+eight signed bits represent −128 through 127. `1'b0` is a one-bit binary zero,
+and `8'd3` is an eight-bit decimal value of three.
 
 ### HDL describes concurrent hardware
 
+HDL means hardware description language. RTL (register-transfer level) describes
+registers and the logic that computes their next values. Simulation evaluates
+the behavior you describe; synthesis turns supported RTL into a circuit of gates
+and registers.
+Separate assignments, procedural blocks, and module instances operate concurrently.
+Writing one block below another doesn't make the hardware run them in that order.
+
 The [`assign` statements](projects/digital-logic/rtl/logic_basics.sv#L7-L8)<!-- region:combinational -->
-describe circuits that operate at the same time. When an input changes, the
-affected output is reevaluated.
+describe combinational circuits: the output depends on the current inputs.
+When an input changes, the affected output is reevaluated. For example,
+`assign selected = select_b ? b : a;` describes a mux that selects `b` when
+`select_b` is 1 and `a` when it is 0.
 
-The [`always_ff` block](projects/digital-logic/rtl/logic_basics.sv#L9-L13)<!-- region:register -->
-describes a register. At each rising clock edge, `q` captures `selected`, unless
-reset is asserted. Nonblocking assignments (`<=`) let registers capture their
-inputs before their new values take effect.
+The [`always_ff` block](projects/digital-logic/rtl/logic_basics.sv#L9-L15)<!-- region:register -->
+describes sequential logic: `q` remembers a value between clock edges.
+`@(posedge clk)` runs the block when `clk` changes from 0 to 1. At that edge,
+`q` captures `selected`, unless reset is asserted. This reset is synchronous:
+`rst = 1` clears `q` at the next rising edge.
 
-The finite-state machine (FSM) uses a register to remember its current state and
-an [`always_comb` block](projects/digital-logic/rtl/logic_basics.sv#L14-L28)<!-- region:fsm -->
-to choose its next state. The default `next_state = state` keeps the current state
-unless a branch selects another one.
+Use nonblocking assignments (`<=`) in clocked blocks. Their right-hand sides
+are evaluated using the values at the edge, and their updates take effect afterward.
+For example, if a block contains `b <= a + b;` and `a <= b;`, both expressions
+use the old `b`. Starting from `a = 0, b = 1`, the next values are `a = 1, b = 1`.
+On the following edge they become `a = 1, b = 2`.
+
+### `if` statements and procedural blocks
+
+A procedural block is a group of statements that runs when its triggering event
+occurs. Within a block, statements are evaluated in order. An `if` chooses an
+action based on a condition. `else` supplies the alternative,
+and `else if` tests another condition when the earlier one is false.
+In the `q` block, `if (rst)` selects zero when `rst` is 1; otherwise, `q` captures
+`selected`. Inside a clocked block, the condition is evaluated at the clock edge.
+Use `begin` and `end` to group several statements into a branch or block.
+They can be omitted for a single statement, as in this example.
+
+The [finite-state machine (FSM)](projects/digital-logic/rtl/logic_basics.sv#L16-L24)<!-- region:fsm -->
+uses `busy` to remember one of two states: `0` for idle and `1` for busy.
+The order of its branches gives reset priority over the other actions. With reset
+low, an idle block captures `start`; a busy block returns to idle on the next
+edge, even if `start` is still high.
+
+You can also use `if` to describe a combinational mux in an `always_comb` block.
+This is an alternative way to write the existing `selected` assignment:
+
+```systemverilog
+always_comb begin
+    if (select_b)
+        selected = b;
+    else
+        selected = a;
+end
+```
+
+`always_comb` reevaluates when signals it reads change. Use blocking assignments
+(`=`) here, so each statement updates its variable before the next statement runs.
+Assign the output on every path through a combinational block. Omitting the
+`else` here would require `selected` to retain its previous value when `select_b`
+is 0, creating unintended storage. If you try this version, replace the existing
+`assign selected` statement so the signal still has one driver.
+
+### Read the code alongside the slides
+
+| Slides | Repo companion | What to notice or try |
+| --- | --- | --- |
+| [21: Declare registers](https://docs.google.com/presentation/d/1Ix2XDtJfbOeGqoXGuWMjS9WQNwP62iEU4nWpcuQg98w/edit#slide=id.h4eca47d0806feab8_0_18) | [Signal declarations](#signals-wire-reg-and-logic) | Compare the slides' `reg` with the repo's `logic`; count the bits in `[7:0]`. |
+| [22: Update registers](https://docs.google.com/presentation/d/1Ix2XDtJfbOeGqoXGuWMjS9WQNwP62iEU4nWpcuQg98w/edit#slide=id.h4eca47d0806feab8_0_23) | [`q` register](projects/digital-logic/rtl/logic_basics.sv#L9-L15)<!-- region:register --> | Follow the rising edge, reset branch, and nonblocking assignment. |
+| [23: Sequential example](https://docs.google.com/presentation/d/1Ix2XDtJfbOeGqoXGuWMjS9WQNwP62iEU4nWpcuQg98w/edit#slide=id.h4eca47d0806feab8_0_28), [24: Draw the circuit](https://docs.google.com/presentation/d/1Ix2XDtJfbOeGqoXGuWMjS9WQNwP62iEU4nWpcuQg98w/edit#slide=id.h5b10e5ed2bbe2957_0_22) | [Sequential exercise](#trace-and-draw-a-sequential-circuit-optional) | Trace old and new values, then draw the registers and their input logic. |
+| [7: Dot products](https://docs.google.com/presentation/d/1Ix2XDtJfbOeGqoXGuWMjS9WQNwP62iEU4nWpcuQg98w/edit#slide=id.h4eca47d0806feab8_0_8), [9: Matrix multiplication](https://docs.google.com/presentation/d/1Ix2XDtJfbOeGqoXGuWMjS9WQNwP62iEU4nWpcuQg98w/edit#slide=id.h7fa110571f7de399_0_30) | [Matrix multiplication and PE](#from-matrix-multiplication-to-a-pe) | Match a row of `A` with a column of `B` for each result. |
+| [28: Draw a PE](https://docs.google.com/presentation/d/1Ix2XDtJfbOeGqoXGuWMjS9WQNwP62iEU4nWpcuQg98w/edit#slide=id.h5b10e5ed2bbe2957_0_11) | [PE practice](#matrix-and-pe-practice-optional) | Identify the stored values, arithmetic, and control signals. |
+
+### Trace and draw a sequential circuit (optional)
+
+Slides 23–24 use this clocked block, written here with `logic` declarations:
+
+```systemverilog
+logic [7:0] a, b, count;
+always_ff @(posedge clk) begin
+    if (count > 0) begin
+        count <= count - 1;
+        b <= a + b;
+        a <= b;
+    end
+end
+```
+
+1. For a paper trace, assume `a = 0`, `b = 1`, and `count = 3` before the first
+   rising edge. Predict all three registers after four edges. Use the old values
+   for every right-hand side and for the condition.
+2. Draw three eight-bit registers, an adder for `a + b`, a subtractor for
+   `count - 1`, and a comparator for `count > 0`. Show how each register either
+   loads its new value or holds its old value. You can draw that choice as a mux
+   feeding each register. All three registers share `clk`.
+3. Compare your diagram with [slide 25's solution](https://docs.google.com/presentation/d/1Ix2XDtJfbOeGqoXGuWMjS9WQNwP62iEU4nWpcuQg98w/edit#slide=id.codex_oct7_circuit_solution).
+
+The expected `(a, b, count)` values are `(1, 1, 2)`, `(1, 2, 1)`, `(2, 3, 0)`,
+and `(2, 3, 0)`. When `count` is zero, no assignment runs, so all three registers
+hold their values. The snippet has no reset or initialization hardware; the
+starting values are assumptions for this exercise. Results stored in these
+eight-bit registers wrap modulo 256 if they exceed the available width.
+
+### Run the register and FSM example (optional)
+
+From the repository root in the [configured simulation environment](SETUP.md#environment-setup), run:
+
+```sh
+make smoke
+```
+
+This runs the Day 1 examples, then `logic_basics_tb`. Expect the latter to print
+`PASS: digital logic smoke`. Its waveform file is `build/digital-logic/waves.vcd`.
+Use the [CAE waveform viewer instructions](SETUP.md#5-view-waveforms-on-the-cae-desktop)
+to open it and add `clk`, `rst`, `select_b`, `selected`, `q`, `start`, and `busy`.
+Follow `selected` as inputs change, then compare `q` just before and after rising
+edges. Trace the reset and idle/busy transitions against the two clocked blocks.
 
 ### From matrix multiplication to a PE
 
-For `C = A × B`, each result `C[i,j]` is a dot product: multiply matching entries
+For `C = A × B`, the number of columns in `A` must equal the number of rows in
+`B`. Multiplying an `M × K` matrix by a `K × N` matrix produces an `M × N`
+result. For example, `(2 × 3) × (3 × 4)` produces a `2 × 4` matrix.
+
+Each result `C[i,j]` is a dot product: multiply matching entries
 from row `i` of `A` and column `j` of `B`, then add the products. A PE can build
 that sum one product per valid clock cycle.
 
@@ -148,7 +312,7 @@ and read the [cycle rules](projects/processing-element/spec/pe.md#cycle-rules).
 `valid_out` marks valid forwarded operands. You'll work on array scheduling in
 the [RTL track](../rtl/README.md#rtl-track).
 
-### Do the exercise
+### Matrix and PE practice (optional)
 
 1. Compute `[[1,2],[3,4]] × [[5,6],[7,8]]` by hand. The expected result is
    `[[19,22],[43,50]]`; show the two products contributing to each entry.
@@ -282,8 +446,8 @@ relevant lines. In a local editor, search for the listed signal, task, or module
 | Slide 21 expressions | [`out1 and out2`](projects/digital-logic/rtl/day1_combinational.v#L20-L22)<!-- region:waveform_exercise --> | [Waveform exercise](#slide-21-waveform-exercise) |
 | Slide 21 inputs | [`interval calls`](projects/digital-logic/tb/day1_combinational_tb.sv#L13-L25)<!-- region:slide21_trace --> | [Day 1 companion](#stage-1-digital-logic) |
 | Gates and mux (follow-up) | [`both_high and selected`](projects/digital-logic/rtl/logic_basics.sv#L7-L8)<!-- region:combinational --> | [Stage 2](#stage-2-systemverilog-and-systolic-arrays) |
-| Clocked storage | [`q`](projects/digital-logic/rtl/logic_basics.sv#L9-L13)<!-- region:register --> | [Stage 2](#stage-2-systemverilog-and-systolic-arrays) |
-| State machine | [`state and next_state`](projects/digital-logic/rtl/logic_basics.sv#L14-L28)<!-- region:fsm --> | [Stage 2](#stage-2-systemverilog-and-systolic-arrays) |
+| Clocked storage | [`q`](projects/digital-logic/rtl/logic_basics.sv#L9-L15)<!-- region:register --> | [Stage 2](#stage-2-systemverilog-and-systolic-arrays) |
+| State machine | [`busy`](projects/digital-logic/rtl/logic_basics.sv#L16-L24)<!-- region:fsm --> | [Stage 2](#stage-2-systemverilog-and-systolic-arrays) |
 | Executable checks | [`logic_basics_tb`](projects/digital-logic/tb/logic_basics_tb.sv#L8-L32)<!-- region:checks --> | [Verification](../verif/README.md#getting-started-with-verification) |
 | PE signals | [`pe ports`](projects/processing-element/rtl/pe.sv#L7-L11)<!-- region:interface --> | [PE contract](projects/processing-element/spec/pe.md) |
 | Student implementation | [`pe body`](projects/processing-element/rtl/pe.sv#L13-L21)<!-- region:implementation --> | [PE guide](#stage-3-implement-a-processing-element) |

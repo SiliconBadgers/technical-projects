@@ -32,8 +32,12 @@
       "end": "^    end$"
     },
     "fsm": {
-      "start": "^    typedef enum logic",
-      "end": "^    assign busy\\b"
+      "start": "^    // busy stores the state:",
+      "end": "^    end$"
+    },
+    "interface": {
+      "start": "^module logic_basics \\(",
+      "end": "^\\);$"
     }
   },
   "intro/projects/digital-logic/tb/day1_combinational_tb.sv": {
