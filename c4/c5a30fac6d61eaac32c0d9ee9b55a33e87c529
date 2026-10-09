@@ -1,0 +1,40 @@
+intro/projects/digital-logic/rtl/logic_basics.sv
+  s_df70f8ba01e52f::t_c457a12d7cff6f 16,18,22-23
+  h_ef9e838b06a174 11-14,19-21
+intro/README.md
+  s_df70f8ba01e52f::t_c457a12d7cff6f 211
+  s_4c7127538bed8d::t_178b4bcc674667 16-19,112-139,141-156,159-170,178-180,182-200,204-210,212-226,228-233,235-288,292-296,315,449-450
+  s_4c7127538bed8d::t_ff1d8e1fcb9ac5 157-158,174-177,201-203
+scripts/code_links.json
+  s_df70f8ba01e52f::t_c457a12d7cff6f 35-36
+  s_4c7127538bed8d::t_178b4bcc674667 37-40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c4c5a30fac6d61eaac32c0d9ee9b55a33e87c529",
+  "prompts": {},
+  "humans": {
+    "h_ef9e838b06a174": {
+      "author": "Zeb Taylor <zceboys@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_4c7127538bed8d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a121d4-0bc0-7362-ab09-a81554f8a741",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Zeb Taylor <zceboys@gmail.com>"
+    },
+    "s_df70f8ba01e52f": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a112b5-e402-7872-9bc9-fa4a6a6e89fe",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Zeb Taylor <zceboys@gmail.com>"
+    }
+  }
+}
