@@ -1,0 +1,13 @@
+# Python packages the Track A flow and labs use, pinned (track/course_spec.md §9.7).
+# Outside the container: pip install -r requirements.txt (in a venv).
+# The team image (env/Dockerfile) adds only liberty-parser and lark; the rest
+# come with IIC-OSIC-TOOLS, and the Dockerfile checks cocotb's version.
+cocotb==2.1.0            # testbenches (sim, gls)
+ciel==2.6.1              # PDK manager; must match pdk.lock ciel_version
+PyYAML==6.0.3            # pdk.lock, targets.yaml, track/libraries.yaml
+liberty-parser==0.0.29   # Lab 0 parse_lib.py (GPL-3.0; used, not copied)
+lark==1.3.1              # liberty-parser's parser
+sympy==1.14.0            # liberty-parser dependency
+numpy==2.5.3
+matplotlib==3.11.2       # Lab 0 plots
+pytest==9.1.1            # Lab 0 self-checks; cocotb runner
