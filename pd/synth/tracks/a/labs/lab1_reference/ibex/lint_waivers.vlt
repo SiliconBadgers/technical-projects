@@ -1,0 +1,20 @@
+// File:        lint_waivers.vlt
+// Author:      Isaac Hagedorn
+// Date:        2026-10-08
+// Description: Verilator lint waivers for ibex (unmodified lowRISC code).
+`verilator_config
+
+// Unused error/ECC outputs left as `.port()`.
+lint_off -rule PINCONNECTEMPTY -file "*/ibex_cs_registers.sv"
+lint_off -rule PINCONNECTEMPTY -file "*/ibex_core.sv"
+
+// Ports and parameters unused in this configuration.
+lint_off -rule UNUSEDSIGNAL -file "*/ibex_compressed_decoder.sv" -match "*'clk_i'*"
+lint_off -rule UNUSEDSIGNAL -file "*/ibex_compressed_decoder.sv" -match "*'rst_ni'*"
+lint_off -rule UNUSEDSIGNAL -file "*/ibex_decoder.sv" -match "*'clk_i'*"
+lint_off -rule UNUSEDSIGNAL -file "*/ibex_decoder.sv" -match "*'rst_ni'*"
+lint_off -rule UNUSEDSIGNAL -file "*/ibex_core.sv" -match "*'instr_id_done'*"
+lint_off -rule UNUSEDPARAM  -file "*/ibex_if_stage.sv" -match "*'ICacheECC'*"
+
+// UNOPTFLAT is a Verilator performance warning, not a real loop.
+lint_off -rule UNOPTFLAT -file "*/ibex_*.sv"
