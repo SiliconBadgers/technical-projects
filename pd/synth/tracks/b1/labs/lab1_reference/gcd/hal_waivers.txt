@@ -1,0 +1,6 @@
+# File:        hal_waivers.txt
+# Author:      Isaac Hagedorn
+# Date:        2026-10-09
+# Description: Lint waivers for make lint (Track B1): HAL warnings that are checked and harmless. One per line, with the reason.
+# Format: <message code> [<file pattern>]   # why it is harmless
+# Example: UNUSED */ibex_decoder.sv   # clk_i and rst_ni are unused in this configuration

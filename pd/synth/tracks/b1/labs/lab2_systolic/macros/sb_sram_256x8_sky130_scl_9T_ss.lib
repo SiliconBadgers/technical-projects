@@ -1,0 +1,137 @@
+/* File:        sb_sram_256x8_sky130_scl_9T_ss.lib
+ * Author:      Isaac Hagedorn
+ * Date:        2026-10-09
+ * Description: Fake Liberty timing model of the 256x8 weight SRAM for sky130_scl_9T at the ss corner. Training only.
+ *
+ * FAKE TIMING MODEL FOR TRAINING ONLY.
+ * There is no real SRAM behind this file. The numbers are made up (scaled
+ * from rough sky130 estimates) so synthesis and STA can treat the macro like
+ * a real one. Copied from Track A's sb_sram_256x8_sky130scl_ss.lib (made by
+ * its gen_fake_sram_libs.py); only the file and library names changed.
+ */
+library (sb_sram_256x8_sky130_scl_9T_ss) {
+  technology (cmos);
+  delay_model : table_lookup;
+  time_unit : "1ns";
+  voltage_unit : "1V";
+  current_unit : "1mA";
+  leakage_power_unit : "1nW";
+  capacitive_load_unit (1, pf);
+  pulling_resistance_unit : "1kohm";
+  nom_process : 1;
+  nom_voltage : 1.60;
+  nom_temperature : 100;
+  default_max_transition : 1.900;
+  input_threshold_pct_rise : 50;
+  input_threshold_pct_fall : 50;
+  output_threshold_pct_rise : 50;
+  output_threshold_pct_fall : 50;
+  slew_lower_threshold_pct_rise : 20;
+  slew_lower_threshold_pct_fall : 20;
+  slew_upper_threshold_pct_rise : 80;
+  slew_upper_threshold_pct_fall : 80;
+
+  type (bus8) {
+    base_type : array;
+    data_type : bit;
+    bit_width : 8;
+    bit_from : 7;
+    bit_to : 0;
+    downto : true;
+  }
+
+  cell (sb_sram_256x8) {
+    area : 21000.0;
+    cell_leakage_power : 1500.0;
+    dont_touch : true;
+    dont_use : true;
+    interface_timing : true;
+
+    pin (clk) {
+      direction : input;
+      capacitance : 0.0100;
+      clock : true;
+      min_period : 3.040;
+    }
+    pin (ce_in) {
+      direction : input;
+      capacitance : 0.0050;
+      timing () {
+        related_pin : "clk";
+        timing_type : setup_rising;
+        rise_constraint (scalar) { values ("0.4750"); }
+        fall_constraint (scalar) { values ("0.4750"); }
+      }
+      timing () {
+        related_pin : "clk";
+        timing_type : hold_rising;
+        rise_constraint (scalar) { values ("0.0950"); }
+        fall_constraint (scalar) { values ("0.0950"); }
+      }
+    }
+    pin (we_in) {
+      direction : input;
+      capacitance : 0.0050;
+      timing () {
+        related_pin : "clk";
+        timing_type : setup_rising;
+        rise_constraint (scalar) { values ("0.4750"); }
+        fall_constraint (scalar) { values ("0.4750"); }
+      }
+      timing () {
+        related_pin : "clk";
+        timing_type : hold_rising;
+        rise_constraint (scalar) { values ("0.0950"); }
+        fall_constraint (scalar) { values ("0.0950"); }
+      }
+    }
+    bus (addr_in) {
+      bus_type : bus8;
+      direction : input;
+      capacitance : 0.0050;
+      timing () {
+        related_pin : "clk";
+        timing_type : setup_rising;
+        rise_constraint (scalar) { values ("0.4750"); }
+        fall_constraint (scalar) { values ("0.4750"); }
+      }
+      timing () {
+        related_pin : "clk";
+        timing_type : hold_rising;
+        rise_constraint (scalar) { values ("0.0950"); }
+        fall_constraint (scalar) { values ("0.0950"); }
+      }
+    }
+    bus (wd_in) {
+      bus_type : bus8;
+      direction : input;
+      capacitance : 0.0050;
+      timing () {
+        related_pin : "clk";
+        timing_type : setup_rising;
+        rise_constraint (scalar) { values ("0.4750"); }
+        fall_constraint (scalar) { values ("0.4750"); }
+      }
+      timing () {
+        related_pin : "clk";
+        timing_type : hold_rising;
+        rise_constraint (scalar) { values ("0.0950"); }
+        fall_constraint (scalar) { values ("0.0950"); }
+      }
+    }
+    bus (rd_out) {
+      bus_type : bus8;
+      direction : output;
+      max_capacitance : 0.200;
+      timing () {
+        related_pin : "clk";
+        timing_type : rising_edge;
+        timing_sense : non_unate;
+        cell_rise (scalar) { values ("1.5200"); }
+        cell_fall (scalar) { values ("1.5200"); }
+        rise_transition (scalar) { values ("0.1900"); }
+        fall_transition (scalar) { values ("0.1900"); }
+      }
+    }
+  }
+}
