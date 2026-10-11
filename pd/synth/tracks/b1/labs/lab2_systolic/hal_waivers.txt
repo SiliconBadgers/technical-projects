@@ -4,3 +4,8 @@
 # Description: Lint waivers for make lint (Track B1): HAL warnings that are checked and harmless. One per line, with the reason.
 # Format: <message code> [<file pattern>]   # why it is harmless
 # Example: UNUSED */ibex_decoder.sv   # clk_i and rst_ni are unused in this configuration
+# Shipped with the course (keep these; add your own below, each with a reason):
+USEPRT  */sb_sram_256x8.v   # the SRAM macro's black box has ports and no logic, by design
+UNDRIV  */sb_sram_256x8.v   # the black box drives nothing; synthesis and STA take the macro from its Liberty file
+EMPMOD  */sb_sram_256x8.v   # the black box module is empty on purpose
+URDREG  */tile_top.sv       # the last PE of each row and column drives a_h/v_h/w_v slices that leave the array unread

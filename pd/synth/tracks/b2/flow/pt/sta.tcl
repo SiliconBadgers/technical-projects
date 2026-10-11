@@ -34,9 +34,14 @@ close [open $rpt w]
 
 section $rpt "check_timing: unconstrained endpoints, missing input delays, loops"
 redirect -append $rpt { check_timing -verbose }
-section $rpt "Analysis coverage: timing checks met, violated, untested (untested = not timed)"
-redirect -append $rpt { report_analysis_coverage }
-redirect -append $rpt { report_analysis_coverage -status_details untested }
+# the checks your SDC decides: data (setup, hold), reset pins (recovery, removal), clock gating, outputs
+set sdc_checks {setup hold recovery removal clock_gating_setup clock_gating_hold out_setup out_hold}
+section $rpt "Analysis coverage of the SDC checks: met, violated, untested (untested = not timed)"
+redirect -append $rpt { report_analysis_coverage -check_type $sdc_checks }
+redirect -append $rpt { report_analysis_coverage -check_type $sdc_checks -status_details untested }
+# PrimeTime times a pulse width only where a clock arrives: flip-flop reset pins are untested (no_clock)
+section $rpt "Library pulse-width and period checks (reset pins are untested: no_clock, expected)"
+redirect -append $rpt { report_analysis_coverage -check_type {min_pulse_width min_period} }
 section $rpt "Setup (max delay): 10 worst paths"
 # with -max_paths, PrimeTime lists only violating paths unless -slack_lesser_than is given
 redirect -append $rpt { report_timing -delay_type max -max_paths 10 -slack_lesser_than infinity -input_pins -nets -transition_time -capacitance -significant_digits 3 }

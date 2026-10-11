@@ -21,6 +21,7 @@ Read the first **error** first: later messages are often caused by it. Then read
 ## Lint
 
 `lint.log` holds HAL's messages. Each names a rule (the code), the file and the line.
+`make lint` turns off the HAL rules listed in `flow/xcelium/hal_rules.f`: layout, naming and coding-style rules that fire on correct RTL. Every other message is a finding to fix or, if harmless, to waive. `HAL_ARGS=` (empty) runs every rule.
 
 - The topics are the ones in [04 — Lint](../docs/04_synthesis.md#lint): latches, multiple drivers, widths, loops, incomplete `case`, sensitivity lists. The text after the code says which.
 - The last lines come from `make`: `SB: xrun exit status`, then the check: errors, warnings, and how many were waived.
@@ -87,7 +88,8 @@ Genus usually prints times in **ps** and capacitance in **fF**. Tempus uses the 
 | `Inputs without external driver/transition`, `Outputs without external load` | missing drive or load |
 | `Timing exceptions with no effect`, `Suspicious multi_cycle exceptions` | an exception that matches nothing, or looks wrong |
 
-`sta_check_timing.rpt` (Tempus) is the same kind of check at sign-off. `make check` fails on unclocked flip-flops and on ports without delays; the asynchronous reset input may be the one exception, if your SDC handles it another way (with a comment).
+`sta_check_timing.rpt` (Tempus) is the same kind of check at sign-off, per view. `make check` fails on unclocked flip-flops and on ports without delays; the asynchronous reset input may be the one exception, if your SDC handles it another way (with a comment).
+With a correct Lab 2 SDC its summary lists only: `ideal_clock_waveform` (no clock tree before layout), `no_drive` on `clk` and `rst_n`, `no_input_delay` on `rst_n`, and `uncons_endpoint` on the reset synchronizer alone (its two flip-flops' `RN` behind your `rst_n` false path, and its first `D`, tied to 1). Any other unconstrained endpoint is a hole in your SDC. In ibex, the six outputs that are constant in its configuration (`alert_*`, address bits `[1:0]`) are also listed.
 
 ## Timing (Tempus)
 
@@ -108,7 +110,7 @@ Sign-off reads setup at `ss` ([06 — Setup](../docs/06_timing_reports.md#setup)
 ### Hold
 
 `sta_<corner>_hold.rpt`: the same layout, `Hold Check`, early (fastest) delays. Sign-off reads hold at `ff` ([06 — Hold](../docs/06_timing_reports.md#hold)).
-Paths that end on a reset pin of a flip-flop are called `Recovery Check` (like setup) and `Removal Check` (like hold).
+Paths that end on a reset pin of a flip-flop are called `Recovery Check` (like setup) and `Removal Check` (like hold). In Lab 2 the synchronized reset is launched by `clk`, so they are timed at every flip-flop except the synchronizer's own two.
 
 ### Summary and design rules
 

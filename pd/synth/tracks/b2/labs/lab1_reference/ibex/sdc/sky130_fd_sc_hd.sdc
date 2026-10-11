@@ -1,10 +1,10 @@
 # File:        sky130_fd_sc_hd.sdc
 # Author:      Isaac Hagedorn
 # Date:        2026-10-09
-# Description: ibex timing constraints for sky130_fd_sc_hd (Track B2), adapted from OpenROAD-flow-scripts (BSD-3). The period is a starting point; recalibrate it on the first run.
+# Description: ibex timing constraints for sky130_fd_sc_hd (Track B2), adapted from OpenROAD-flow-scripts (BSD-3). The period is calibrated: the shortest period that passes setup at ss with DC/PT Y-2026.03 (11.0 ns), plus 5 %.
 
 # clock period in ns (make CLOCK_PERIOD=<ns> replaces this line)
-set clk_period 24.0
+set clk_period 11.6
 # share of the period spent outside this block, for inputs and outputs
 set clk_io_pct 0.2
 

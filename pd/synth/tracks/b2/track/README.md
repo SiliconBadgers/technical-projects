@@ -146,16 +146,15 @@ Design Compiler picks adder and multiplier structures itself, from its **DesignW
 
 ## Clock targets
 
-These are **starting points**, taken from the open-source track, which uses the same library.
-Design Compiler and PrimeTime estimate wire delay before layout from the library's wire-load table, so your passing period may differ.
-The team recalibrates them on the first run (see the checklist below).
+These were calibrated on the first licensed run, with Design Compiler and PrimeTime Y-2026.03 (checklist item 15): Lab 1 = the shortest period that passes setup at `ss`, plus 5 %; Lab 2 (all `*_PIPE = 0`) Bronze = the shortest passing period (7.5 ns) rounded up to a whole MHz, Silver = 0.70 × that period.
+Design Compiler and PrimeTime estimate wire delay before layout from the library's wire-load table, so the numbers belong to these tools; after a tool upgrade the team recalibrates them.
 
 | Design | Clock target | Constraint file |
 |---|---|---|
-| gcd (Lab 1) | 9 ns | `labs/lab1_reference/gcd/sdc/sky130_fd_sc_hd.sdc` |
-| ibex (Lab 1) | 24 ns | `labs/lab1_reference/ibex/sdc/sky130_fd_sc_hd.sdc` |
-| sb_systolic_tile (Lab 2), **Bronze** | **57 MHz** (17.544 ns) | you write `labs/lab2_systolic/sdc/sky130_fd_sc_hd.sdc` |
-| sb_systolic_tile (Lab 2), Silver | 12.25 ns at `ss` | the same file |
+| gcd (Lab 1) | 3.8 ns | `labs/lab1_reference/gcd/sdc/sky130_fd_sc_hd.sdc` |
+| ibex (Lab 1) | 11.6 ns | `labs/lab1_reference/ibex/sdc/sky130_fd_sc_hd.sdc` |
+| sb_systolic_tile (Lab 2), **Bronze** | **133 MHz** (7.519 ns) | you write `labs/lab2_systolic/sdc/sky130_fd_sc_hd.sdc` |
+| sb_systolic_tile (Lab 2), Silver | 5.25 ns at `ss` | the same file |
 
 ## This track's checks
 
@@ -169,7 +168,7 @@ The labs ask that "your track's checks" pass. Here they are, with where to look 
 | Synthesis is clean | `make synth` passes: no `Error`, every instance linked (no `LINK-5` in `synth.log`) |
 | Setup | worst setup slack at `ss` is ≥ 0 (`sta_ss.txt`, `qor.csv`) |
 | Hold | worst hold slack at `ff` is ≥ 0 (`sta_ff.txt`, `qor.csv`) |
-| No unconstrained endpoints | in every `sta_<corner>.rpt`: `check_timing` lists no unconstrained endpoints and the coverage shows nothing untested |
+| No unconstrained endpoints | in every `sta_<corner>.rpt`: `check_timing` lists no unconstrained endpoints and no input without an input delay except `rst_n` (Lab 2: asynchronous, by the spec), and the coverage of the SDC checks shows nothing untested except (a) the reset synchronizer's two flip-flops behind your commented `rst_n` false path (`false_paths`) and (b) pins driven by a constant (`constant_disabled`, `no_paths`: the synchronizer's first `D` input, ibex's constant outputs) |
 | Reset synchronizer (Lab 2) | `reset_port_async_pins` in `sta_ss.txt` is at most 2 (the synchronizer's own flip-flops) |
 | Equivalence | `make lec`: `Verification SUCCEEDED` |
 | GLS | `make gls`: the same tests as `make sim`, all passing |

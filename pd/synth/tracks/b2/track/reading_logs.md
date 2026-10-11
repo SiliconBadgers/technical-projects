@@ -109,7 +109,7 @@ Many are harmless (an unused port of a reused module); each one deserves a look 
 `sta_<corner>.rpt` has these sections, in this order. Read the first two before any path ([05](../docs/05_sdc.md#checking-your-sdc)).
 
 1. `check_timing`: unconstrained endpoints, inputs without an input delay, loops, clocks.
-2. Analysis coverage: how many timing checks are met, violated or **untested** (untested = nothing checks them).
+2. Analysis coverage of the checks your SDC decides (setup, hold, recovery, removal, outputs): how many are met, violated or **untested** (untested = nothing checks them). A short section after it covers the library's pulse-width checks; reset pins are untested there (`no_clock`: a reset is not a clock), which is expected.
 3. Setup paths, then hold paths (10 each).
 4. Slack summary (`report_global_timing`): WNS, TNS and the number of violating paths, for setup and hold.
 5. All violators (`report_constraint -all_violators`): setup, hold, max transition, max capacitance, max fanout.
@@ -165,13 +165,14 @@ Many are harmless (an unused port of a reused module); each one deserves a look 
 ### Unconstrained endpoints
 
 - `check_timing` prints a warning such as `There are 5 endpoints which are not constrained for maximum delay`, then lists them.
-- The coverage section shows them as `untested`.
+- The coverage section shows them as `untested`, with a reason. Two reasons are fine: `false_paths` on the reset synchronizer's flip-flops (your `rst_n` false path) and `constant_disabled` or `no_paths` on pins driven by a constant. Any other untested check is a hole in your SDC.
 - Fix the SDC (a missing `set_input_delay` or `set_output_delay`), not the design ([05](../docs/05_sdc.md#unconstrained)).
 
 ### Recovery and removal
 
 Reset pins of flip-flops get their own checks: recovery (like setup) and removal (like hold) ([05](../docs/05_sdc.md#asynchronous-reset)).
 They appear as paths ending at a reset pin (`RESET_B`), with `library recovery time` or `library removal time` on the capture side.
+In Lab 2 the synchronized reset is launched by `clk`, so these checks are timed at every flip-flop except the synchronizer's own two, which `rst_n` drives directly.
 
 ### Violators and fanout
 
