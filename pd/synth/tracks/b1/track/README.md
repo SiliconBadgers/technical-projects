@@ -148,6 +148,7 @@ Add `KNOB=value` to any `make` line. The synthesis knobs match the rows of [09 â
 | `LEC_MODE` | `genus` (default: run the script Genus wrote) or `own` (only `flow/conformal/lec.do`) |
 | `BUILD=<dir>` | use another build folder, e.g. to keep two runs side by side |
 | `TOOL_WRAP`, `GENUS`, `TEMPUS`, `LEC`, `XRUN` | wrapper command, and each tool's command name |
+| `HAL_ARGS` | extra HAL options for `make lint` (default `-f flow/xcelium/hal_rules.f`: the style rules that are off) |
 
 Give `make check` and `make qor` the same `DESIGN_PARAMS`, `CLOCK_PERIOD` and `BUILD` as the run, so they read the same folder.
 

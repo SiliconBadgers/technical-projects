@@ -4,3 +4,27 @@
 # Description: Lint waivers for make lint (Track B1): HAL warnings that are checked and harmless. One per line, with the reason.
 # Format: <message code> [<file pattern>]   # why it is harmless
 # Example: UNUSED */ibex_decoder.sv   # clk_i and rst_ni are unused in this configuration
+# lowRISC ibex, used as shipped (see UPSTREAM.md). Its RTL is configurable: options are parameters, and the unused ones leave
+# constant conditions, unused signals and unconnected ports behind. None of these is a bug in this configuration.
+CONSTC  */ibex_*.sv          # if/?: on configuration parameters (RV32E, RV32M, BranchTargetALU, ...)
+CNSTCN  */ibex_*.sv          # the same parameter conditions, evaluated statically
+URDREG  */ibex_*.sv          # signals of features that this configuration leaves unused (PMP, RVFI, branch target ALU)
+UNCONO  */ibex_*.sv          # outputs of unused features that the parent leaves unconnected
+UNCONN  */ibex_*.sv          # ibex_csr rd_error_o: tied to 0 without shadow copies (ShadowCopy = 0), so the CSR instances leave it open
+USEPAR  */ibex_*.sv          # package and module parameters unused in this configuration
+USEPRT  */ibex_*.sv          # decoder ports (clk_i, rst_ni) unused in this configuration
+INTTOB  */ibex_*.sv          # integer 0/1 assigned to 1-bit signals
+ENUMAW  */ibex_cs_registers.sv  # packed CSR structs assigned from enum-typed fields, as upstream writes them
+CSTEXP  */ibex_*.sv          # case items that are parameters or package constants, not literals
+SHFTNC  */ibex_*.sv          # the ALU shifter and the divider shift by a variable amount on purpose
+POOBID  */ibex_multdiv_fast.sv  # op_numerator_q[div_counter_d]: a 5-bit index into a 32-bit vector, always in range
+MXUANS  */ibex_alu.sv        # signed shift built with $signed on purpose (arithmetic shift right)
+MEMSIZ  */ibex_core.sv       # pmp_req_err is an array of 1-bit flags, not a memory
+LOGORP  */ibex_*.sv          # bitwise | on 1-bit operands in conditions: same result as ||
+LOGNEG  */ibex_*.sv          # bitwise ~ on 1-bit operands in conditions: same result as !
+LOGAND  */ibex_*.sv          # bitwise & on 1-bit operands in conditions: same result as &&
+GTDCLK  */ibex_if_stage.sv   # flip-flops behind ibex's clock gate (core_clock_gate_i) on purpose
+CLKUCL  */ibex_core.sv       # clk_i drives the clock-gating cell prim_clock_gating on purpose
+CLKGNP  */prim_clock_gating.sv  # behavioral clock gate used in simulation; synthesis uses sb_icg (SYNTHESIS)
+LATBAS  */prim_clock_gating.sv  # the clock gate's enable latch, as intended
+BLKSQB  */prim_clock_gating.sv  # the clock gate's latch is written with a blocking assignment, as upstream writes it

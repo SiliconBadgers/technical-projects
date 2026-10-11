@@ -1,7 +1,7 @@
 # Lab 2 commands (Track B2)
 
 The tasks and questions are in [labs/lab2_systolic/README.md](../labs/lab2_systolic/README.md); the contract is [spec.md](../labs/lab2_systolic/spec.md).
-This page only shows how to run them here. Your clock target: [README.md](README.md#clock-targets) (Bronze: 57 MHz).
+This page only shows how to run them here. Your clock target: [README.md](README.md#clock-targets) (Bronze: 133 MHz).
 
 ## Your SDC
 
@@ -12,6 +12,7 @@ Your SDC goes in **`labs/lab2_systolic/sdc/sky130_fd_sc_hd.sdc`**. Until it exis
 - Input driver: `set_driving_cell -lib_cell sky130_fd_sc_hd__buf_2 -pin X <ports>`.
 - Output load: `set_load <pF> <ports>`. Look up the input capacitance of `sky130_fd_sc_hd__buf_4` pin `A` in the Liberty file (Lab 0 tools) and write it in a comment.
 - To leave some ports out of a list: `remove_from_collection [all_inputs] [get_ports {<ports>}]`.
+- `rst_n` is asynchronous and gets no input delay (spec). It reaches only the reset synchronizer: false-path it there, `set_false_path -from [get_ports rst_n]`, with a comment. Do not false-path the flip-flops' reset pins (`all_registers -async_pins`, which Design Compiler does not even know): the synchronized reset is launched by `clk`, and its recovery and removal checks must be timed ([reading_logs.md](reading_logs.md#recovery-and-removal)).
 - Example of the style: [the gcd SDC](../labs/lab1_reference/gcd/sdc/sky130_fd_sc_hd.sdc). Rules and conventions: [docs/05_sdc.md](../docs/05_sdc.md).
 
 Check it with `make sta DESIGN=sb_systolic_tile`, then read the first sections of `sta_ss.rpt` (`check_timing` and the coverage) before any path ([reading_logs.md](reading_logs.md#timing)).

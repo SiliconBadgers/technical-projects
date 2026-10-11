@@ -42,7 +42,8 @@ TEMPUS_FLAGS ?= -stylus -no_gui
 LEC          ?= lec
 LEC_FLAGS    ?= -xl -nogui
 XRUN         ?= xrun
-HAL_ARGS     ?=
+# HAL rules that are off by default (style rules that bury real findings): flow/xcelium/hal_rules.f
+HAL_ARGS     ?= -f $(FLOW)/xcelium/hal_rules.f
 
 # --- design ---
 DESIGN ?= gcd
@@ -178,7 +179,7 @@ $(BUILD)/flow.env: FORCE | $(BUILD)
 
 # --- lint: Xcelium HAL; warnings fail unless waived in hal_waivers.txt ---
 # HAL writes its messages only to the xrun log file (-logfile), not to stdout
-$(BUILD)/lint.done: $(RTL_FILES) $(MACRO_VERILOG) $(LINT_WAIVERS) $(FLOW_DEPS) | $(BUILD)
+$(BUILD)/lint.done: $(RTL_FILES) $(MACRO_VERILOG) $(LINT_WAIVERS) $(FLOW)/xcelium/hal_rules.f $(FLOW_DEPS) | $(BUILD)
 	@mkdir -p $(BUILD)/lint
 	cd $(BUILD)/lint && rc=0 && \
 	  { $(TOOL_WRAP) $(XRUN) -hal -sv -top $(TOP) $(addprefix -incdir ,$(RTL_INCDIRS)) \

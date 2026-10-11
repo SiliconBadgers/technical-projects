@@ -56,7 +56,7 @@ Each point is its own build, `build/ibex/sky130_fd_sc_hd_p<ns>/`:
 
 ```
 for f in 1.3 1.2 1.1 1.0 0.9 0.8 0.7; do
-  p=$(awk -v f=$f 'BEGIN { printf "%.2f", 24 * f }')      # 24 ns = the ibex SDC period
+  p=$(awk -v f=$f 'BEGIN { printf "%.2f", 11.6 * f }')    # 11.6 ns = the ibex SDC period
   make synth sta qor DESIGN=ibex CLOCK_PERIOD=$p CORNERS="ss ff"
 done
 grep -h ',ss,' build/ibex/sky130_fd_sc_hd_p*/qor.csv     # one line per period: WNS, TNS, area

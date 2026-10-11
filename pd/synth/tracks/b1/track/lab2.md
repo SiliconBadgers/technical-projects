@@ -11,6 +11,7 @@ Your SDC goes in **`labs/lab2_systolic/sdc/sky130_scl_9T.sdc`**. Until it exists
 - First clock line: `set clk_period <ns>`, then use `$clk_period`. `CLOCK_PERIOD=<ns>` replaces that line for one run.
 - Library cells for drive and load: `BUFX2` (pin `Y`) and `BUFX4` (pin `A`); the capacitance is in the Liberty file ([lab0.md](lab0.md#finding-the-library-files)).
 - The Lab 1 SDCs show the syntax: `labs/lab1_reference/*/sdc/sky130_scl_9T.sdc`.
+- `rst_n` is asynchronous and gets no input delay (spec). It reaches only the reset synchronizer: false-path it there, `set_false_path -from [get_ports rst_n]`, with a comment. Do not false-path the flip-flops' reset pins (`all_registers -async_pins`): the synchronized reset is launched by `clk`, and its recovery and removal checks must be timed ([reading_logs.md](reading_logs.md#hold)).
 - Check it: `make sta DESIGN=sb_systolic_tile`, then read `check_timing.rpt` and `sta_check_timing.rpt` before any path ([reading_logs.md](reading_logs.md#constraint-checks)).
 
 ## Run the steps one at a time
