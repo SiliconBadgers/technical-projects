@@ -217,6 +217,7 @@ RTL simulation and GLS print the same things (`sim.log`, `gls.log`):
 - cocotb, one line per test (`PASS` or `FAIL`), then a summary table, then the flow's line `SB: 3/3 cocotb tests passed`.
 - A failed test prints the Python assertion with the expected and actual values. An `x` or `z` in a value is unknown or undriven ([08](../docs/08_gate_level_sim.md#gls)).
 - Waveforms: add `WAVES=1`, then open `sim_rtl/waves.vcd` or `sim_gls/waves.vcd`.
+- A simulation that never ends is stopped after `SIM_TIMEOUT` seconds (`SB-ERROR: the simulation did not finish within SIM_TIMEOUT=...`). The usual cause is a combinational loop ([04](../docs/04_synthesis.md#combinational-loops)).
 
 ## QoR
 

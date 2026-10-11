@@ -91,6 +91,8 @@ DESIGN_PARAMS ?=
 CLOCK_PERIOD  ?=
 # 1 = save waveforms in sim and gls
 WAVES         ?= 0
+# wall-clock limit of one simulation run (sim, gls) in seconds; a normal run takes well under a minute
+SIM_TIMEOUT   ?= 900
 # Conformal: genus = run the dofile Genus wrote (default), own = flow/conformal/lec.do only
 LEC_MODE      ?= genus
 export SB_DESIGN_PARAMS := $(DESIGN_PARAMS)
@@ -98,7 +100,7 @@ export SB_DESIGN_PARAMS := $(DESIGN_PARAMS)
 PARAMS_TAG := $(if $(filter command line,$(origin DESIGN_PARAMS)),_$(subst =,,$(subst $(eval) ,_,$(strip $(DESIGN_PARAMS)))))
 BUILD      ?= $(SB_ROOT)/build/$(DESIGN)/$(LIB_NAME)$(PARAMS_TAG)$(if $(CLOCK_PERIOD),_p$(CLOCK_PERIOD))
 SYNTH_RTL  := $(SYNTH_EXTRA) $(RTL_FILES)
-COCOTB     := $(TOOL_WRAP) python3 $(FLOW)/xcelium/run_cocotb.py
+COCOTB     := $(TOOL_WRAP) python3 $(FLOW)/xcelium/run_cocotb.py --timeout $(SIM_TIMEOUT)
 FLOW_DEPS  := $(DESIGN_DIR)/design.mk
 
 # --- targets ---
@@ -110,7 +112,7 @@ help:
 	@echo "  steps:   lint sim synth sta lec gls qor | all | check | clean | info | env-check"
 	@echo "  DESIGN:  gcd ibex sb_systolic_tile"
 	@echo "  knobs:   SYNTH_EFFORT=low|medium|high  SYNTH_ADDER=auto|ripple  SYNTH_RETIME=0|1  SYNTH_CORNER=ss"
-	@echo "           WAVES=1  LEC_MODE=genus|own  TOOL_WRAP=<cmd>  BUILD=<dir>"
+	@echo "           WAVES=1  SIM_TIMEOUT=<s>  LEC_MODE=genus|own  TOOL_WRAP=<cmd>  BUILD=<dir>"
 	@echo "  library: $(LIB_NAME) from SB_PDK=$(SB_PDK)"
 	@echo "outputs: build/<DESIGN>/$(LIB_NAME)/ (see track/README.md)"
 

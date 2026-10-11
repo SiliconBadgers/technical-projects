@@ -138,6 +138,7 @@ To look at one in the GUI: copy `genus_lec.do`, delete its last `exit` line, and
 - `sim_rtl/xrun_test.log`: the simulation itself, with any `$display` output.
 - A failing test prints the cycle and the values it expected; see [08 — When GLS fails](../docs/08_gate_level_sim.md#when-gls-fails-but-rtl-simulation-passes).
 - `WAVES=1` writes `cocotb_waves.shm` in `sim_rtl/` or `sim_gls/`. Open it with `simvision <folder>/cocotb_waves.shm`.
+- A simulation that never ends is stopped after `SIM_TIMEOUT` seconds (`SB-ERROR: the simulation did not finish within SIM_TIMEOUT=...`). The usual cause is a combinational loop ([04](../docs/04_synthesis.md#combinational-loops)).
 
 ## QoR
 
