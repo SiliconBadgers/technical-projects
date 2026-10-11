@@ -53,11 +53,19 @@ If your machine runs Cadence tools inside a wrapper command (for example `cadenc
 
 ### 2. Python packages
 
-In a virtual environment (a private folder of Python packages):
+In a virtual environment (a private folder of Python packages; `liberty-parser` brings `lark`):
 
 ```
 python3 -m venv ~/sb-venv && source ~/sb-venv/bin/activate
-pip install cocotb==2.1.0 pyyaml numpy matplotlib liberty-parser==0.0.29 pytest
+pip install cocotb==2.1.0 pyyaml liberty-parser==0.0.29 numpy matplotlib pytest
+```
+
+**UW CAE machines**, or anywhere the tools run inside a container (`TOOL_WRAP=cadence-run`): `make sim` and `make gls` run `python3` inside the container. It has no Python of its own and cannot use a venv made from the host's Python, and your home folder is small. Build a conda-forge Python on a path the container mounts (local scratch) and put it first on `PATH`:
+
+```
+mamba create -y -p /var/tmp/$USER/sb-py -c conda-forge python=3.10 pip     # or micromamba; /var/tmp belongs to one machine
+/var/tmp/$USER/sb-py/bin/pip install cocotb==2.1.0 pyyaml liberty-parser==0.0.29 numpy matplotlib pytest
+export PATH=/var/tmp/$USER/sb-py/bin:$PATH
 ```
 
 ### 3. The PDK repo
@@ -136,6 +144,7 @@ Add `KNOB=value` to any `make` line. The synthesis knobs match the rows of [09 â
 | `SYNTH_CORNER` | Liberty corner Genus maps to (default `ss`) |
 | `DESIGN_PARAMS="A=1 B=2"` | top-level parameters for synthesis and simulation; output in a folder named after them |
 | `WAVES=1` | save waveforms in `sim_rtl/` or `sim_gls/` (`cocotb_waves.shm`; open it with `simvision`) |
+| `SIM_TIMEOUT=<s>` | wall-clock limit of one `sim` or `gls` run (default 900 s); a run that hits it is killed and fails |
 | `LEC_MODE` | `genus` (default: run the script Genus wrote) or `own` (only `flow/conformal/lec.do`) |
 | `BUILD=<dir>` | use another build folder, e.g. to keep two runs side by side |
 | `TOOL_WRAP`, `GENUS`, `TEMPUS`, `LEC`, `XRUN` | wrapper command, and each tool's command name |

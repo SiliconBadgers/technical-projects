@@ -56,10 +56,16 @@ The scripts use standard commands of recent releases. Assumed:
    ```
    The script also builds files for the physical design course (it needs `grdgenxo` and `icc2_lm_shell` for those).
    If it stops there, the three `.db` files are already written, and they are all this course needs.
-4. **Python packages**, in a virtual environment:
+4. **Python packages**, in a virtual environment (`liberty-parser` brings `lark`):
    ```
    python3 -m venv ~/venvs/sb && source ~/venvs/sb/bin/activate
-   pip install cocotb==2.1.0 PyYAML liberty-parser lark numpy matplotlib pytest
+   pip install cocotb==2.1.0 pyyaml liberty-parser==0.0.29 numpy matplotlib pytest
+   ```
+   **UW CAE machines**, or anywhere the tools run inside a container (`synopsys-run`): `make sim` and `make gls` run `python3` inside the container. It has no Python of its own and cannot use a venv made from the host's Python, and your home folder is small. Build a conda-forge Python on a path the container mounts (local scratch) and put it first on `PATH`:
+   ```
+   mamba create -y -p /var/tmp/$USER/sb-py -c conda-forge python=3.10 pip     # or micromamba; /var/tmp belongs to one machine
+   /var/tmp/$USER/sb-py/bin/pip install cocotb==2.1.0 pyyaml liberty-parser==0.0.29 numpy matplotlib pytest
+   export PATH=/var/tmp/$USER/sb-py/bin:$PATH
    ```
 5. **Smoke test** (from the repo root):
    ```
@@ -134,6 +140,7 @@ Add `KNOB=value` to any `make` line.
 | `DC_EXTRA=<file.tcl>` | your own `dc_shell` commands, run just before compile (Lab 1 uses it for the adder experiment) |
 | `LINT_TOOL` | `auto` (default: VC SpyGlass if installed), `vc` or `vcs` |
 | `WAVES=1` | VCS writes `waves.vcd` in `sim_rtl/` or `sim_gls/` (open it with Verdi or GTKWave) |
+| `SIM_TIMEOUT=<s>` | wall-clock limit of one `sim` or `gls` run (default 900 s); a run that hits it is killed and fails |
 
 Design Compiler picks adder and multiplier structures itself, from its **DesignWare** library of ready-made arithmetic blocks; `synth_resources.rpt` lists what it picked.
 

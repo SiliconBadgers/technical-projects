@@ -73,6 +73,8 @@ SYNTH_RETIME  ?= 0
 DC_EXTRA      ?=
 LINT_TOOL     ?= auto
 WAVES         ?= 0
+# wall-clock limit of one simulation run (sim, gls) in seconds; a normal run takes well under a minute
+SIM_TIMEOUT   ?= 900
 
 empty :=
 space := $(empty) $(empty)
@@ -98,7 +100,7 @@ help:
 	@echo "  targets: lint sim synth sta lec gls qor | all | macros | clean"
 	@echo "  DESIGN:  gcd ibex sb_systolic_tile"
 	@echo "  knobs:   CLOCK_PERIOD=<ns>  DESIGN_PARAMS=\"A=1 B=2\"  DC_COMPILE=compile_ultra|compile"
-	@echo "           SYNTH_RETIME=1  DC_EXTRA=<file.tcl>  LINT_TOOL=auto|vc|vcs  WAVES=1  SB_PDK=<dir>"
+	@echo "           SYNTH_RETIME=1  DC_EXTRA=<file.tcl>  LINT_TOOL=auto|vc|vcs  WAVES=1  SIM_TIMEOUT=<s>  SB_PDK=<dir>"
 	@echo "outputs: build/<design>/$(LIBRARY)/ (see track/README.md)"
 
 # print one variable, e.g. make -s print-CELL_VERILOG
@@ -161,7 +163,7 @@ $(BUILD)/lint.log: $(SIM_RTL) $(FLOW)/lint/run_lint.sh $(FLOW)/lint/vc_lint.tcl 
 	@grep '^SB:' $@ || true
 
 # --- sim / gls (the same cocotb testbench on the RTL and on the netlist, VCS) ---
-COCOTB := python3 $(FLOW)/sim/run_cocotb.py
+COCOTB := python3 $(FLOW)/sim/run_cocotb.py --timeout $(SIM_TIMEOUT)
 
 $(BUILD)/results.xml: $(SIM_RTL) $(wildcard $(TB_DIR)/*.py) $(DESIGN_DIR)/design.mk $(FLOW)/sim/run_cocotb.py | $(BUILD)
 	$(COCOTB) --toplevel $(TOP) --test-module $(TB_MODULE) --test-dir $(TB_DIR) \
@@ -170,17 +172,11 @@ $(BUILD)/results.xml: $(SIM_RTL) $(wildcard $(TB_DIR)/*.py) $(DESIGN_DIR)/design
 	  $(addprefix --param ,$(DESIGN_PARAMS)) \
 	  --sources $(SIM_RTL) 2>&1 | tee $(BUILD)/sim.log
 
-# VCS rejects the UDP port declarations of primitives.v under `default_nettype none`
-# (Error-[IND] Identifier not declared): GLS compiles a copy with `default_nettype wire`
-GLS_CELL_VERILOG := $(BUILD)/primitives_vcs.v $(filter-out %/primitives.v,$(CELL_VERILOG))
-$(BUILD)/primitives_vcs.v: $(CELLS)/verilog/primitives.v | $(BUILD)
-	sed 's/^`default_nettype none/`default_nettype wire/' $< > $@
-
-$(BUILD)/gls_results.xml: $(BUILD)/netlist.v $(GLS_CELL_VERILOG) $(MACRO_SIM_MODELS) $(wildcard $(TB_DIR)/*.py) $(FLOW)/sim/run_cocotb.py
+$(BUILD)/gls_results.xml: $(BUILD)/netlist.v $(MACRO_SIM_MODELS) $(wildcard $(TB_DIR)/*.py) $(FLOW)/sim/run_cocotb.py
 	$(COCOTB) --toplevel $(TOP) --test-module $(TB_MODULE) --test-dir $(TB_DIR) \
 	  --build-dir $(BUILD)/sim_gls --results $@ --waves $(WAVES) \
 	  --define FUNCTIONAL --define 'UNIT_DELAY=#1' \
-	  --sources $(BUILD)/netlist.v $(GLS_CELL_VERILOG) $(MACRO_SIM_MODELS) 2>&1 | tee $(BUILD)/gls.log
+	  --sources $(BUILD)/netlist.v $(CELL_VERILOG) $(MACRO_SIM_MODELS) 2>&1 | tee $(BUILD)/gls.log
 
 # --- synth (Design Compiler) ---
 # inputs for synth.tcl; the file is replaced only when its content changes
