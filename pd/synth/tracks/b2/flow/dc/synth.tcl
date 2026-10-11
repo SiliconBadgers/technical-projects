@@ -31,6 +31,8 @@ set_app_var link_library      [concat * $cell_db $macro_dbs dw_foundation.sldb]
 
 # Formality setup file: DC records here every change it makes
 set_svf synth.svf
+# time recovery/removal (reset pins) as PrimeTime does; DC skips them by default and leaves the reset tree slow
+set_app_var enable_recovery_removal_arcs true
 
 # --- 2. read the RTL ---
 define_design_lib WORK -path ./WORK
@@ -57,6 +59,8 @@ if {![link]} {
 source -echo $sdc
 redirect synth_check_design.rpt { check_design }
 redirect synth_check_timing.rpt { check_timing }
+# nets with more than 16 loads as the RTL wrote them (Lab 2 task 6); compile then buffers or duplicates them
+redirect synth_fanout.rpt { report_net_fanout -threshold 16 -nosplit [get_nets *] }   ;# top-level nets; loads counted through the hierarchy
 
 # --- 4. compile ---
 foreach pattern $dont_use {
@@ -77,6 +81,9 @@ redirect synth_cells.rpt      { report_reference -nosplit }
 redirect synth_qor.rpt        { report_qor }
 redirect synth_violators.rpt  { report_constraint -all_violators }
 redirect synth_resources.rpt  { report_resources }   ;# DesignWare parts (adders, multipliers) and their structure
+# the same nets after compile: -tree counts the loads behind the buffers compile added
+# (one tree in detail: report_buffer_tree -net <net> at the dc_shell prompt, SB_STAY=1)
+redirect -append synth_fanout.rpt { report_net_fanout -tree -threshold 16 -nosplit }
 # leakage and an activity-free power estimate (needs a Power Compiler license)
 if {[catch { redirect synth_power.rpt { report_power } }]} {
     puts "SB: report_power not available here (license?): no synth_power.rpt"

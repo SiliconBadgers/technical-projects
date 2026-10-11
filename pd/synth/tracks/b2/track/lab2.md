@@ -62,7 +62,7 @@ The testbench reads the same `DESIGN_PARAMS` (as `SB_DESIGN_PARAMS`), so it chec
 | 3. Bronze | [this track's checks](README.md#this-tracks-checks) |
 | 4. Silver | `sta_ss.rpt` setup paths, `qor.csv`, `synth_cells.rpt` |
 | 5. Gold | the same, for the 8 × 8 build |
-| 6. High fanout | `sta_ss.rpt`, section "All violators" (max fanout needs `set_max_fanout` in your SDC) |
+| 6. High fanout | `synth_fanout.rpt`: first the nets with more than 16 loads as your RTL wrote them (before compile: find the net with the most loads), then the same after compile, where `-tree` counts the loads behind the buffers Design Compiler added (fanout and buffer depth); it may also duplicate the driving logic instead. One tree in detail: `report_buffer_tree -net <net>` at the `dc_shell` prompt ([README.md](README.md#running-a-tool-by-hand)). With `set_max_fanout 16` in your SDC, Design Compiler fixes fanout during compile, so `sta_ss.rpt` "All violators" usually lists none |
 
 How to read each file: [reading_logs.md](reading_logs.md).
 

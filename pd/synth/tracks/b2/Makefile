@@ -86,9 +86,12 @@ macro_dbs     = $(foreach m,$(MACROS),$(MACRO_DB_DIR)/$(m)_$(LIBRARY)_$(1).db)
 # the SDC the tools read (a copy, with the CLOCK_PERIOD override if given)
 SDC := $(BUILD)/constraints.sdc
 
+# $(call tool_errors,<log>): fail when a dc_shell, pt_shell, fm_shell or lc_shell log has an "Error:" line that
+# flow/scripts/tool_error_waivers.txt does not waive; these tools can print an error and still exit 0
+tool_errors = python3 $(FLOW)/scripts/tool_errors.py $(1) --waivers $(FLOW)/scripts/tool_error_waivers.txt
 # $(call check_run,<log>,<output>,<step>): fail when <output> is missing or <log> has errors
-check_run = cd $(BUILD) && if [ ! -s $(2) ] || grep -qE '^(Error|SB-ERROR)' $(1); then \
-	grep -m5 -E '^(Error|SB-ERROR)' $(1) || true; \
+check_run = cd $(BUILD) && if [ ! -s $(2) ] || grep -q '^SB-ERROR' $(1) || ! $(call tool_errors,$(1)); then \
+	grep -m5 '^SB-ERROR' $(1) || true; \
 	echo "$(3) FAILED -- read $(BUILD)/$(1) (search for Error)"; rm -f $(2); exit 1; fi
 
 # --- targets ---
@@ -138,6 +141,7 @@ $(MACRO_DB_DIR)/%.db: $(DESIGN_DIR)/macros/%.lib $(FLOW)/lc/compile_lib.tcl
 	@mkdir -p $(@D)
 	cd $(@D) && LIB_FILE=$< DB_FILE=$@ lc_shell -no_init -f $(FLOW)/lc/compile_lib.tcl < /dev/null > $*.log 2>&1 || true
 	@test -s $@ || { echo "lc_shell could not compile $< -- read $(@D)/$*.log"; exit 1; }
+	@$(call tool_errors,$(@D)/$*.log) || { rm -f $@; echo "lc_shell FAILED -- read $(@D)/$*.log (search for Error)"; exit 1; }
 
 # --- constraints ---
 # the SDC is hand-written: report it if missing
@@ -243,6 +247,7 @@ $(BUILD)/lec.env: FORCE | $(BUILD)
 $(BUILD)/lec.log: $(BUILD)/lec.env $(BUILD)/netlist.v $(SYNTH_RTL) $(FLOW)/fm/lec.tcl
 	@echo "lec: fm_shell -> $(BUILD)/lec_run.log"
 	cd $(BUILD) && source lec.env && fm_shell -f $(FLOW)/fm/lec.tcl < /dev/null > lec_run.log 2>&1 || true
+	@$(call tool_errors,$(BUILD)/lec_run.log) || { echo "LEC FAILED -- read $(BUILD)/lec_run.log (search for Error)"; exit 1; }
 	@if grep -q 'Verification SUCCEEDED' $(BUILD)/lec_run.log; then \
 	  cp $(BUILD)/lec_run.log $@; echo "lec: Verification SUCCEEDED"; \
 	else \

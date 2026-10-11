@@ -30,7 +30,7 @@ for s in lint sim synth sta lec gls qor; do echo "== $s"; time make $s DESIGN=ib
 less build/ibex/sky130_fd_sc_hd/sta_ss.rpt        # section "Setup (max delay): 10 worst paths"
 ```
 
-- Design Compiler keeps the big ibex modules, so instance names start with the module instance (for example `id_stage_i/...`).
+- `compile_ultra` dissolves most ibex modules into the top (`Ungrouping hierarchy ... (OPT-776)` in `synth.log`); instance names still start with the module instance, joined with `_` (for example `if_stage_i_instr_rdata_id_o_reg_18_`). Only the register file and the multiplier/divider stay modules of their own (`gen_regfile_ff_register_file_i/...`).
 - `synth_timing.rpt` is the same path as Design Compiler saw it during synthesis.
 
 **Ripple-carry adders.** Design Compiler builds adders from DesignWare, its library of ready-made arithmetic blocks. Each block has several structures ("implementations"); `rpl` is the ripple-carry one.

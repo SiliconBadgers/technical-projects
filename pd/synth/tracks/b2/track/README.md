@@ -164,11 +164,11 @@ The labs ask that "your track's checks" pass. Here they are, with where to look 
 |---|---|
 | Lint | `make lint` finishes; every message in `lint.log` is fixed or explained to your mentor |
 | RTL simulation | `make sim`: every cocotb test passes (`sim.log`, `results.xml`) |
-| No latches | `synth_latches.rpt` says 0 (ibex: only its clock-gating cell, `sdlclkp`), and `synth.log` has no `Latch` in its inferred-memory tables |
+| No latches | `synth_latches.rpt` says 0 (ibex's clock-gating cell `sdlclkp` holds a latch on purpose and is not counted), and `synth.log` has no `Latch` in its inferred-memory tables |
 | Synthesis is clean | `make synth` passes: no `Error`, every instance linked (no `LINK-5` in `synth.log`) |
 | Setup | worst setup slack at `ss` is ≥ 0 (`sta_ss.txt`, `qor.csv`) |
 | Hold | worst hold slack at `ff` is ≥ 0 (`sta_ff.txt`, `qor.csv`) |
-| No unconstrained endpoints | in every `sta_<corner>.rpt`: `check_timing` lists no unconstrained endpoints and no input without an input delay except `rst_n` (Lab 2: asynchronous, by the spec), and the coverage of the SDC checks shows nothing untested except (a) the reset synchronizer's two flip-flops behind your commented `rst_n` false path (`false_paths`) and (b) pins driven by a constant (`constant_disabled`, `no_paths`: the synchronizer's first `D` input, ibex's constant outputs) |
+| No unconstrained endpoints | in every `sta_<corner>.rpt`: `check_timing` lists no unconstrained endpoints and no input without an input delay except `rst_n` (Lab 2: asynchronous, by the spec), and the coverage of the SDC checks shows nothing untested except (a) recovery/removal of the reset synchronizer's two flip-flops, which only `rst_n` reaches (`no_startpoint_clock`, or `false_paths` if you gave `rst_n` an input delay; comment your false path) and (b) pins driven by a constant (`constant_disabled`, `no_paths`: the synchronizer's first `D` input, ibex's constant outputs) |
 | Reset synchronizer (Lab 2) | `reset_port_async_pins` in `sta_ss.txt` is at most 2 (the synchronizer's own flip-flops) |
 | Equivalence | `make lec`: `Verification SUCCEEDED` |
 | GLS | `make gls`: the same tests as `make sim`, all passing |
