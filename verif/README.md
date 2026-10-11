@@ -10,9 +10,10 @@ and find the bugs in broken versions your instructors keep hidden.
 ## On this page
 
 - [Projects](#projects)
-- [Your branch](#your-branch)
+- [Getting started with verification](#getting-started-with-verification)
 - [Layout](#layout)
 - [Rules](#rules)
+- [Testbench completion](#testbench-completion)
 
 ## Projects
 
@@ -27,7 +28,7 @@ Do them in this order:
 Each project has its own labs under `projects/<project>/docs/labs/` and a hidden
 set of seeded bugs for the final bug hunt, which your instructors score against.
 
-## Your branch
+## Getting started with verification
 
 All your work lives on your own branch. `main` is the course.
 
@@ -72,3 +73,9 @@ All paths below are under `verif/`.
 1. Build your model from the spec, not the RTL.
 2. Never edit the RTL. Report disagreements as bugs or spec questions.
 3. Report every failed check with `uvm_error`.
+
+## Testbench completion
+
+Complete the project test plan and UVM testbench, then run the project regression.
+The checkpoint is complete when the testbench checks the specification and detects
+design errors.
