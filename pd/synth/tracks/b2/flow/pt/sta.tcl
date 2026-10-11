@@ -19,7 +19,8 @@ set_app_var link_path   [concat * $::env(CELL_DB) [env_or MACRO_DBS ""]]   ;# .d
 read_verilog $::env(NETLIST)
 current_design $top
 link_design $top                    ;# bind every instance to a library cell
-read_sdc $::env(SDC_FILE)
+# source, not read_sdc: read_sdc's SDC interpreter has no remove_from_collection (CMD-005)
+source -echo $::env(SDC_FILE)
 update_timing -full
 
 # --- 2. report ---
@@ -37,9 +38,10 @@ section $rpt "Analysis coverage: timing checks met, violated, untested (untested
 redirect -append $rpt { report_analysis_coverage }
 redirect -append $rpt { report_analysis_coverage -status_details untested }
 section $rpt "Setup (max delay): 10 worst paths"
-redirect -append $rpt { report_timing -delay_type max -max_paths 10 -input_pins -nets -transition_time -capacitance -significant_digits 3 }
+# with -max_paths, PrimeTime lists only violating paths unless -slack_lesser_than is given
+redirect -append $rpt { report_timing -delay_type max -max_paths 10 -slack_lesser_than infinity -input_pins -nets -transition_time -capacitance -significant_digits 3 }
 section $rpt "Hold (min delay): 10 worst paths"
-redirect -append $rpt { report_timing -delay_type min -max_paths 10 -input_pins -nets -transition_time -capacitance -significant_digits 3 }
+redirect -append $rpt { report_timing -delay_type min -max_paths 10 -slack_lesser_than infinity -input_pins -nets -transition_time -capacitance -significant_digits 3 }
 section $rpt "Slack summary (WNS, TNS, number of violating paths)"
 redirect -append $rpt { report_global_timing }
 section $rpt "All violators (setup, hold, max transition, max capacitance, max fanout)"

@@ -175,12 +175,13 @@ $(BUILD)/flow.env: FORCE | $(BUILD)
 	@cmp -s $@.tmp $@ && rm $@.tmp || mv $@.tmp $@
 
 # --- lint: Xcelium HAL; warnings fail unless waived in hal_waivers.txt ---
+# HAL writes its messages only to the xrun log file (-logfile), not to stdout
 $(BUILD)/lint.done: $(RTL_FILES) $(MACRO_VERILOG) $(LINT_WAIVERS) $(FLOW_DEPS) | $(BUILD)
 	@mkdir -p $(BUILD)/lint
 	cd $(BUILD)/lint && rc=0 && \
 	  { $(TOOL_WRAP) $(XRUN) -hal -sv -top $(TOP) $(addprefix -incdir ,$(RTL_INCDIRS)) \
 	    $(addprefix -define ,$(SIM_DEFINES)) $(foreach p,$(DESIGN_PARAMS),-defparam $(TOP).$(p)) $(HAL_ARGS) \
-	    $(RTL_FILES) $(MACRO_VERILOG) > $(BUILD)/lint.log 2>&1 || rc=$$?; } && \
+	    $(RTL_FILES) $(MACRO_VERILOG) -logfile $(BUILD)/lint.log > xrun_stdout.log 2>&1 || rc=$$?; } && \
 	  echo "SB: xrun exit status $$rc" >> $(BUILD)/lint.log
 	python3 $(FLOW)/scripts/check.py --build $(BUILD) --top $(TOP) --lint-waivers "$(LINT_WAIVERS)" --only lint_clean || \
 	  { echo "lint FAILED -- read $(BUILD)/lint.log"; exit 1; }

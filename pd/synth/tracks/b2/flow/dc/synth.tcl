@@ -53,7 +53,8 @@ if {![link]} {
 }
 
 # --- 3. constraints and checks before compile ---
-read_sdc $sdc
+# source, not read_sdc: read_sdc's SDC interpreter has no remove_from_collection (CMD-005)
+source -echo $sdc
 redirect synth_check_design.rpt { check_design }
 redirect synth_check_timing.rpt { check_timing }
 

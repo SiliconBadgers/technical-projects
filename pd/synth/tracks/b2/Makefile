@@ -170,11 +170,17 @@ $(BUILD)/results.xml: $(SIM_RTL) $(wildcard $(TB_DIR)/*.py) $(DESIGN_DIR)/design
 	  $(addprefix --param ,$(DESIGN_PARAMS)) \
 	  --sources $(SIM_RTL) 2>&1 | tee $(BUILD)/sim.log
 
-$(BUILD)/gls_results.xml: $(BUILD)/netlist.v $(MACRO_SIM_MODELS) $(wildcard $(TB_DIR)/*.py) $(FLOW)/sim/run_cocotb.py
+# VCS rejects the UDP port declarations of primitives.v under `default_nettype none`
+# (Error-[IND] Identifier not declared): GLS compiles a copy with `default_nettype wire`
+GLS_CELL_VERILOG := $(BUILD)/primitives_vcs.v $(filter-out %/primitives.v,$(CELL_VERILOG))
+$(BUILD)/primitives_vcs.v: $(CELLS)/verilog/primitives.v | $(BUILD)
+	sed 's/^`default_nettype none/`default_nettype wire/' $< > $@
+
+$(BUILD)/gls_results.xml: $(BUILD)/netlist.v $(GLS_CELL_VERILOG) $(MACRO_SIM_MODELS) $(wildcard $(TB_DIR)/*.py) $(FLOW)/sim/run_cocotb.py
 	$(COCOTB) --toplevel $(TOP) --test-module $(TB_MODULE) --test-dir $(TB_DIR) \
 	  --build-dir $(BUILD)/sim_gls --results $@ --waves $(WAVES) \
 	  --define FUNCTIONAL --define 'UNIT_DELAY=#1' \
-	  --sources $(BUILD)/netlist.v $(CELL_VERILOG) $(MACRO_SIM_MODELS) 2>&1 | tee $(BUILD)/gls.log
+	  --sources $(BUILD)/netlist.v $(GLS_CELL_VERILOG) $(MACRO_SIM_MODELS) 2>&1 | tee $(BUILD)/gls.log
 
 # --- synth (Design Compiler) ---
 # inputs for synth.tcl; the file is replaced only when its content changes

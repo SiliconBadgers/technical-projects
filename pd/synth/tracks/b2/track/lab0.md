@@ -50,7 +50,7 @@ Library Compiler can print what it read from the compiled library. Compare one c
 mkdir -p build/lab0
 lc_shell
 lc_shell> read_db $env(SB_PDK)/synopsys/views/sky130_fd_sc_hd__tt_025C_1v80.db
-lc_shell> report_lib sky130_fd_sc_hd__tt_025C_1v80 > build/lab0/tt_lib.rpt
+lc_shell> report_lib -timing_arcs -timing sky130_fd_sc_hd__tt_025C_1v80 sky130_fd_sc_hd__inv_1 > build/lab0/inv_1.rpt
 lc_shell> exit
 ```
 
