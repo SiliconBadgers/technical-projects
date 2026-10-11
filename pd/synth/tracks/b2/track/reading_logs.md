@@ -19,6 +19,7 @@ Everything is in `build/<design>/sky130_fd_sc_hd/`.
 | `synth_area.rpt`, `synth_cells.rpt` | `report_area`, `report_reference` | area; cells used and how many of each |
 | `synth_timing.rpt`, `synth_qor.rpt`, `synth_violators.rpt` | Design Compiler | timing as synthesis saw it |
 | `synth_resources.rpt`, `synth_power.rpt` | `report_resources`, `report_power` | DesignWare blocks picked; leakage |
+| `synth_fanout.rpt` | `report_net_fanout` | nets with more than 16 loads, before and after compile |
 | `netlist.v`, `synth.svf`, `synth.sdc` | Design Compiler | the netlist, the change log for Formality, the constraints as synthesis saw them |
 | `sta_<corner>.log`, `sta_<corner>.rpt`, `sta_<corner>.txt` | `pt_shell` | PrimeTime output, the timing report, a short summary |
 | `lec_run.log`, `lec_failing.rpt`, `lec_unmatched.rpt`, `lec_analyze.rpt` | `fm_shell` | Formality output and its reports |
@@ -30,13 +31,13 @@ Everything is in `build/<design>/sky130_fd_sc_hd/`.
 Design Compiler, PrimeTime, Formality and Library Compiler print messages in one format:
 
 ```
-Warning: /path/rtl/pe.sv:42: <what happened> (ELAB-292)
-Error: <what happened> (LINK-5)
-Information: <for your interest> (OPT-1)
+Warning:  /path/rtl/pe_ctrl.sv:69: signed to unsigned conversion occurs. (VER-318)
+Error: unknown option '-async_pins' (CMD-010)
+Information: Ungrouping hierarchy id_stage_i before Pass 1 (OPT-776)
 ```
 
-- The code in brackets (`ELAB-292`) names the message. At the tool's prompt, `man ELAB-292` explains it and says what to do.
-- `Error` lines matter first. The flow fails a step on any line that starts with `Error` or `SB-ERROR`.
+- The code in brackets (`VER-318`) names the message. At the tool's prompt, `man VER-318` explains it and says what to do.
+- `Error` lines matter first. `make synth`, `sta`, `lec` and `macros` fail on any log line that starts with `Error:` (or `SB-ERROR`), even when the tool went on and exited normally; the make output shows the first ones. The only exceptions are the message IDs in `flow/scripts/tool_error_waivers.txt`, each with its reason.
 - Lines that start with `SB:` are the flow's own summary.
 - Count each kind: `grep -o '([A-Z]*-[0-9]*)' synth.log | sort | uniq -c | sort -rn`.
 
@@ -44,7 +45,7 @@ Information: <for your interest> (OPT-1)
 
 - **VC SpyGlass** (`lint_vc.rpt`): one entry per violation, with a rule tag, a severity (error, warning, info), a file and line, and a message. Read errors first.
 - **VCS** (`lint/vcs.log`): each finding starts with `Lint-[<TAG>]`, then the file, the line and an explanation. Typical findings: width mismatches, unconnected ports, signals never read or never driven.
-- VCS stops on real errors, which then fail `make lint`. Example: a variable written from two `always` blocks gives `Error-[ICPD] Illegal combination of procedural drivers`.
+- VCS stops on real errors, which then fail `make lint`. Example: a variable driven by an `always` block and by a module output (or an `assign`) gives `Error-[ICPSD] Illegal combination of drivers`; two `always` blocks give `Error-[ICPD]`.
 
 ## Synthesis
 
@@ -61,22 +62,26 @@ Design Compiler works in this order. Each stage has its own kind of message in `
 For every `always` block that stores a value, `elaborate` prints a table:
 
 ```
-Inferred memory devices in process
-        in routine pe_ctrl line 57 in file '/path/rtl/pe_ctrl.sv'.
-===============================================================================
-|    Register Name    |   Type    | Width | Bus | MB | AR | AS | SR | SS | ST |
-===============================================================================
-|    state_reg        | Flip-flop |   2   |  Y  | N  | Y  | N  | N  | N  | N  |
-===============================================================================
+Inferred memory devices in process in routine 'arbiter' in file
+	 '/path/rtl/arbiter.sv'.
+==================================================================================
+|    Register Name    |   Type    | Width | Bus | MB |  Set  | Reset | ST | Line |
+==================================================================================
+|      grant_reg      |   Latch   |   1   |  N  | N  | None  | None  | -  |  27  |
+|     state_q_reg     | Flip-flop |   2   |  Y  | N  | None  | Async | N  |  52  |
+==================================================================================
+Warning:  Latch inferred in design arbiter read with 'hdlin_check_no_latch' (ELAB-395)
 ```
 
-- `Type` `Flip-flop` is a clocked register. `Latch` in a combinational block means a signal is not assigned on every path ([04](../docs/04_synthesis.md#latches)).
-- The flow also turns on a warning for every inferred latch (`hdlin_check_no_latch`).
-- After compile, `synth_latches.rpt` counts the latches left. In ibex the clock-gating cell (`sdlclkp`) holds a latch on purpose.
+- `Type` `Flip-flop` is a clocked register; `Line` is the line of its `always` block. `Latch` in a combinational block means a signal is not assigned on every path ([04](../docs/04_synthesis.md#latches)).
+- The flow turns on a warning for every inferred latch (`hdlin_check_no_latch`): `ELAB-395`, right after the table.
+- After compile, `synth_latches.rpt` counts the latches left. ibex's clock-gating cell (`sdlclkp`) holds a latch on purpose, but it is not counted there.
 
 ### Multiple drivers
 
-- Two drivers on one net stop `elaborate` with an error such as `Net '<name>' or a directly connected net is driven by more than one source ... (ELAB-366)`.
+- Two `always` blocks of one module that drive the same variable stop `elaborate`: `Net '<name>' or a directly connected net is driven by more than one source ... (ELAB-366)`.
+- A module output that the parent module also drives does not stop synthesis. `synth_check_design.rpt` counts it (`Net has multiple drivers (LINT-4)`), and `synth.log` says `Information: In design '<design>', net '<name>' has multiple drivers.  Wired AND assumed. (LINT-4)`: Design Compiler quietly ANDs the drivers.
+- VCS (`make lint`, `make sim`) stops on both: `Error-[ICPSD] Illegal combination of drivers`.
 - The message gives the net name; search the RTL for every place that assigns it ([04](../docs/04_synthesis.md#multiple-drivers)).
 
 ### Combinational loops
@@ -86,7 +91,7 @@ Inferred memory devices in process
 
 ### Black boxes
 
-- `Unable to resolve reference '<module>' in '<design>'. (LINK-5)`: a module or library cell was not found. The flow adds `SB-ERROR: link could not resolve every instance`.
+- `Warning: Unable to resolve reference '<module>' in '<design>'. (LINK-5)`: a module or library cell was not found. It is only a warning, so the flow adds `SB-ERROR: link could not resolve every instance` and fails the step.
 - Lab 2's SRAM is a library cell from its own `.db`, so it links. Its area is in the `Macro/Black Box area` line of `synth_area.rpt` ([04](../docs/04_synthesis.md#black-boxes)).
 
 ### Check
@@ -98,7 +103,6 @@ Many are harmless (an unused port of a reused module); each one deserves a look 
 
 | Search for | What |
 |---|---|
-| `ELAB-292` | a hand-written sensitivity list misses a signal the block reads: simulation and synthesis disagree |
 | `LINK-5` | an instance without a module or library cell |
 | `Inferred memory devices` | the register tables above |
 | `Optimization Complete` | the end of compile |
@@ -165,7 +169,7 @@ Many are harmless (an unused port of a reused module); each one deserves a look 
 ### Unconstrained endpoints
 
 - `check_timing` prints a warning such as `There are 5 endpoints which are not constrained for maximum delay`, then lists them.
-- The coverage section shows them as `untested`, with a reason. Two reasons are fine: `false_paths` on the reset synchronizer's flip-flops (your `rst_n` false path) and `constant_disabled` or `no_paths` on pins driven by a constant. Any other untested check is a hole in your SDC.
+- The coverage section shows them as `untested`, with a reason. Two kinds are fine: recovery/removal of the reset synchronizer's two flip-flops, which only `rst_n` reaches (`no_startpoint_clock`, or `false_paths`), and pins driven by a constant (`constant_disabled`, `no_paths`). Any other untested check is a hole in your SDC.
 - Fix the SDC (a missing `set_input_delay` or `set_output_delay`), not the design ([05](../docs/05_sdc.md#unconstrained)).
 
 ### Recovery and removal
@@ -177,7 +181,7 @@ In Lab 2 the synchronized reset is launched by `clk`, so these checks are timed 
 ### Violators and fanout
 
 - `report_constraint -all_violators` lists each violated limit with its required value, actual value and slack.
-- Max fanout is listed only when the SDC sets `set_max_fanout`.
+- Max fanout is listed only when the SDC sets `set_max_fanout`. Design Compiler fixes that limit during compile, so the high-fanout nets are in `synth_fanout.rpt` instead: their fanout before compile, then the buffer trees (fanout and depth) after it.
 
 ## LEC
 
@@ -207,7 +211,7 @@ Failing (not equivalent)       0       0       0       0       0       0       0
 - `lec_failing.rpt` lists failing points (`Ref` and `Impl` names of the same register or port).
 - `lec_analyze.rpt` (`analyze_points -failing`) suggests a cause for each one.
 - `lec_unmatched.rpt` lists points without a partner. Registers that synthesis removed (constants) show up here and are fine.
-- Formality also stops reading the RTL when the code means one thing in simulation and another in synthesis (for example an incomplete sensitivity list). The error gives the file and line: that is a finding, not a tool problem.
+- An incomplete sensitivity list (`always @(a)` in a block that also reads `b`) gets no message from Design Compiler or Formality (Y-2026.03): synthesis builds the logic as if the list were complete, Formality reads the RTL the same way, and LEC passes. Only RTL simulation, which honors the list, disagrees with GLS ([08](../docs/08_gate_level_sim.md#gls)).
 - To see a failing cone as a schematic: `source lec.env`, `SB_STAY=1 fm_shell -f ../../../flow/fm/lec.tcl`, then `start_gui`.
 
 ## Simulation

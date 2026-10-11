@@ -86,6 +86,7 @@ make env-check
 ```
 
 Every tool prints a path (not `MISSING`), every library file says `OK`, and cocotb prints its version.
+`make env-check` looks on your shell's `PATH`, not inside `TOOL_WRAP`'s container. With a wrapper, also check there: `cadence-run which genus tempus lec xrun python3`.
 
 ## Running a step
 

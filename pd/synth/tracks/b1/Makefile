@@ -221,6 +221,10 @@ else
 	  { rm -f $@; echo "CLOCK_PERIOD needs a line 'set clk_period <ns>' in $<"; exit 1; }
 endif
 
+# $(call tool_errors,<log>): fail when a Genus, Tempus or Conformal log has an error line (**ERROR:, Error :, // Error:)
+# that flow/scripts/tool_error_waivers.txt does not waive; these tools can print an error and still exit 0
+tool_errors = python3 $(FLOW)/scripts/tool_errors.py $(1) --waivers $(FLOW)/scripts/tool_error_waivers.txt
+
 # --- synth: Genus ---
 $(BUILD)/netlist.v: $(BUILD)/flow.env $(SYNTH_RTL) $(BUILD)/constraints.sdc $(FLOW)/genus/synth.tcl \
                     $(MACRO_LIBS_$(SYNTH_CORNER))
@@ -231,6 +235,7 @@ $(BUILD)/netlist.v: $(BUILD)/flow.env $(SYNTH_RTL) $(BUILD)/constraints.sdc $(FL
 	@grep -q '^SB: synthesis done' $(BUILD)/synth.log || { rm -f $@; grep -E '^(Error|SB-)' $(BUILD)/synth.log | head -5; \
 	  echo "synthesis FAILED -- read $(BUILD)/synth.log (search for Error)"; exit 1; }
 	@grep -E '^SB' $(BUILD)/synth.log || true
+	@$(call tool_errors,$(BUILD)/synth.log) || { rm -f $@; echo "synthesis FAILED -- read $(BUILD)/synth.log (search for Error)"; exit 1; }
 	@python3 $(FLOW)/scripts/check.py --build $(BUILD) --top $(TOP) --latch-cells "$(LATCH_CELLS)" \
 	  --only no_latches design_check --quiet --gate || \
 	  { rm -f $@; echo "synthesis check FAILED -- read $(BUILD)/check_design.rpt and synth.log"; exit 1; }
@@ -243,6 +248,7 @@ $(BUILD)/sta.done: $(BUILD)/netlist.v $(BUILD)/constraints.sdc $(FLOW)/tempus/st
 	  echo "sta $$((SECONDS - t0))" >> runtimes.txt
 	@test -s $(BUILD)/sta_summary.txt || { grep -E '^\*\*ERROR' $(BUILD)/sta.log | head -5; \
 	  echo "STA FAILED -- read $(BUILD)/sta.log (search for **ERROR)"; exit 1; }
+	@$(call tool_errors,$(BUILD)/sta.log) || { echo "STA FAILED -- read $(BUILD)/sta.log (search for **ERROR)"; exit 1; }
 	@cat $(BUILD)/sta_summary.txt
 	@touch $@
 
@@ -253,6 +259,7 @@ $(BUILD)/lec.done: $(BUILD)/netlist.v $(FLOW)/conformal/lec.do
 	  echo "lec $$((SECONDS - t0))" >> runtimes.txt
 	@grep -hE 'No of (compare|diff|abort|unknown) points' $(BUILD)/lec_run.log > $(BUILD)/lec_summary.txt || true
 	@cat $(BUILD)/lec_summary.txt
+	@$(call tool_errors,$(BUILD)/lec_run.log) || { echo "LEC FAILED -- read $(BUILD)/lec_run.log (search for // Error)"; exit 1; }
 	@python3 $(FLOW)/scripts/check.py --build $(BUILD) --top $(TOP) --only lec --quiet || \
 	  { echo "LEC FAILED -- read $(BUILD)/lec_run.log and $(BUILD)/lec.log"; exit 1; }
 	@touch $@

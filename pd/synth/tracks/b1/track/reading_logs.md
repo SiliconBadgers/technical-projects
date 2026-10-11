@@ -9,14 +9,15 @@ Read the first **error** first: later messages are often caused by it. Then read
 
 | Tool | Log | A warning looks like | An error looks like |
 |---|---|---|---|
-| HAL, Xcelium | `lint.log`, `sim_*/xrun_*.log` | `xmvlog: *W,<CODE> (<file>,<line>\|<col>): <text>` | `*E,<CODE>`, or `*F,<CODE>` (fatal: the tool stopped) |
+| HAL, Xcelium | `lint.log`, `sim_*/xrun_*.log` | `halcheck: *W,<CODE> (<file>,<line>\|<col>): <text>` (HAL), `xmvlog: *W,<CODE> (<file>,<line>\|<col>): <text>` (Xcelium) | `*E,<CODE>`, or `*F,<CODE>` (fatal: the tool stopped) |
 | Genus | `synth.log` | `Warning : <text> [<ID>]` | `Error   : <text> [<ID>]` |
 | Tempus | `sta.log` | `**WARN: (<ID>): <text>` | `**ERROR: (<ID>): <text>` |
 | Conformal | `lec_run.log`, `lec.log` | `// Warning: <text>` | `// Error: <text>` |
 
-- The word before the colon in an Xcelium message is the part of the tool that complained (`xmvlog` compiles, `xmelab` elaborates, `xmsim` simulates). `xmhelp <that part> <CODE>` explains the code.
+- The word before the colon is the part of the tool that complained: `halcheck`, `halsynth`, `halstruct` are HAL's lint, synthesizability and structure checks; `xmvlog` compiles, `xmelab` elaborates, `xmsim` simulates. `xmhelp <that part> <CODE>` explains an Xcelium code; HAL's rules are listed by `hal -rules_list` (run it through your `TOOL_WRAP`).
 - The `<ID>` of a Genus or Tempus message is the key to look it up in the Cadence documentation (`cdnshelp`).
 - Lines starting with `SB:` or `SB-WARNING:` come from this repo's scripts, not from the tool.
+- `make synth`, `make sta` and `make lec` fail when the tool's log has an error line (`Error   :` in Genus, `**ERROR:` in Tempus, `// Error:` in Conformal), even if the tool went on and exited normally: the make output shows the first ones (`SB-ERROR: ... error line(s)`). The only exceptions are the message IDs in `flow/scripts/tool_error_waivers.txt`, each with its reason.
 
 ## Lint
 
@@ -99,7 +100,7 @@ With a correct Lab 2 SDC its summary lists only: `ideal_clock_waveform` (no cloc
 
 `sta_<corner>_setup.rpt` holds the 10 worst setup paths at that corner, one per endpoint, worst first. Each path has:
 
-1. A header: `Path 1: MET` or `VIOLATED`, the slack, and the endpoint pin (`Setup Check with Pin <instance>/<pin>`).
+1. A header: `Path 1: MET` or `VIOLATED`, the slack, and the check: `Setup Check with Pin <instance>/<pin>` for a flip-flop, `Late Output Delay Assertion` for an output port.
 2. The start point, the endpoint, the clock edges and the view.
 3. The required time: the capture clock edge, minus setup, minus uncertainty.
 4. The arrival time, then **Slack** = required − arrival.
