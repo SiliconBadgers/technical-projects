@@ -50,7 +50,3 @@ Push your branch for review (`git push -u origin <your-netid>`). To pick up cour
 1. Build your model from the spec, not the RTL.
 2. Never edit the RTL. Report disagreements as bugs or spec questions.
 3. Report every failed check with `uvm_error`.
-
-## Mentors
-
-Answer keys, the broken designs and the scoring scripts are in the private `ihagedo/uvm-mentor` repository. Clone it as `mentor/` here (it is git-ignored); see its README.
