@@ -1,0 +1,9 @@
+# File:        libraries.yaml
+# Author:      Isaac Hagedorn
+# Date:        2026-10-09
+# Description: Track B2 Liberty files per library and corner, read by the Lab 0 scripts. The flow reads the .db built from these files (SB_PDK/synopsys/views).
+libraries:
+  sky130_fd_sc_hd:   # SkyWater 130 nm high-density cells
+    tt: ${SB_PDK}/synopsys/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+    ss: ${SB_PDK}/synopsys/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__ss_100C_1v60.lib
+    ff: ${SB_PDK}/synopsys/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__ff_n40C_1v95.lib
