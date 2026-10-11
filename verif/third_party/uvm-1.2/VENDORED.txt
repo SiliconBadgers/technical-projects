@@ -1,2 +1,0 @@
-Source: Accellera UVM 1.2 reference implementation (release-notes: UVM_1_2_RELEASE-1-gd6e87e2), copied from ihagedo/UVM_Library @ 33e85d8; only src/ + license files vendored. sha256 of src tree listing:
-42b4aa28bb19091fc47a04c949cb31b1e2b32e0db8e4a05455a3a72c3c12d233  -
