@@ -30,7 +30,7 @@ set read_args [list -r]
 if {[llength $vcs_opts]} { lappend read_args -vcs [join $vcs_opts " "] }
 read_sverilog {*}$read_args $rtl_files
 set top_args {}
-if {[llength $params]} { lappend top_args -parameters [join $params ,] }
+if {[llength $params]} { lappend top_args -parameter [join $params ,] }   ;# Formality: -parameter, not -parameters
 set_top {*}$top_args r:/WORK/$top
 
 # --- 2. implementation: the netlist ---

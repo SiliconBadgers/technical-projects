@@ -181,7 +181,7 @@ For the mentor who runs this track first on a new machine or after a tool upgrad
 7. `make lec DESIGN=gcd`, then `DESIGN=ibex`: `Verification SUCCEEDED`. Formality accepts `read_sverilog -vcs "+incdir+... +define+..."` (ibex uses both).
 8. `make sim gls DESIGN=gcd`, then `DESIGN=ibex`: cocotb finds VCS, the cell models compile, every test passes. `WAVES=1` writes `waves.vcd` (`+vcs+dumpvars`).
 9. `make lint DESIGN=gcd LINT_TOOL=vc` (if VC SpyGlass is installed: `configure_lint_setup -goal lint_rtl`, `report_lint -file`) and `LINT_TOOL=vcs`.
-10. Lab 2, with a mentor solution SDC: `make macros DESIGN=sb_systolic_tile` writes three `.db` files (read `build/sb_systolic_tile/macros/*.log`). `make all` passes, and with `DESIGN_PARAMS="N_ROWS=8 N_COLS=8"` the netlist's top module is still `sb_systolic_tile` and LEC passes (`set_top -parameters`).
+10. Lab 2, with a mentor solution SDC: `make macros DESIGN=sb_systolic_tile` writes three `.db` files (read `build/sb_systolic_tile/macros/*.log`). `make all` passes, and with `DESIGN_PARAMS="N_ROWS=8 N_COLS=8"` the netlist's top module is still `sb_systolic_tile` and LEC passes (`set_top -parameter`).
 11. Lab 2 reset check: on a correct tile, `reset_port_async_pins` in `sta_ss.txt` is 2, and the check fails on anything larger.
 12. The Lab 1 ripple-adder snippet in [lab1.md](lab1.md) works with your DesignWare version (`report_synlib dw_foundation.sldb` lists the implementation names).
 13. The message IDs in [reading_logs.md](reading_logs.md) match your version (`man LINK-5` at the `dc_shell` prompt).

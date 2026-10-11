@@ -7,7 +7,7 @@ This page only shows how to run them here. Your clock target: [README.md](README
 
 Your SDC goes in **`labs/lab2_systolic/sdc/sky130_fd_sc_hd.sdc`**. Until it exists, `make synth` stops and says so.
 
-- Write plain SDC: Design Compiler and PrimeTime both read it with `read_sdc`. There are no helper procedures in this track.
+- Write plain SDC: Design Compiler and PrimeTime both read it (with `source`: their `read_sdc` does not know `remove_from_collection`). There are no helper procedures in this track.
 - Put the period on its own line, `set clk_period <ns>`, and compute the rest from it. `make ... CLOCK_PERIOD=<ns>` replaces that line.
 - Input driver: `set_driving_cell -lib_cell sky130_fd_sc_hd__buf_2 -pin X <ports>`.
 - Output load: `set_load <pF> <ports>`. Look up the input capacitance of `sky130_fd_sc_hd__buf_4` pin `A` in the Liberty file (Lab 0 tools) and write it in a comment.
