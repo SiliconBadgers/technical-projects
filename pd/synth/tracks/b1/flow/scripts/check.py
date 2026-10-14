@@ -54,15 +54,22 @@ def as_float(x: str) -> float:
     return float("inf") if x.upper().startswith("INF") else float(x)
 
 
-def waivers(files: list[str]) -> list[tuple[str, str]]:
-    """(message code, file pattern) per line of the waiver files; '#' starts a comment."""
+def waivers(files: list[str]) -> list[tuple[str, str, str]]:
+    """(message code, file pattern, signal pattern) per line of the waiver files; '#' starts a comment."""
     out = []
     for f in files:
         for line in read(Path(f)).splitlines():
             fields = line.split("#", 1)[0].split()
             if fields:
-                out.append((fields[0], fields[1] if len(fields) > 1 else "*"))
+                fields += ["*"] * (3 - len(fields))   # no file or signal pattern: any
+                out.append((fields[0], fields[1], fields[2]))
     return out
+
+
+def signal(msg: str) -> str:
+    """The first quoted name in a HAL message's text, without its bit select ('a_h[39:32]' -> 'a_h')."""
+    m = re.search(r"'([^'\[]+)", msg.split("):", 1)[-1])
+    return m.group(1).strip() if m else ""
 
 
 @check("lint_clean", "docs/04_synthesis.md#lint")
@@ -82,7 +89,9 @@ def lint_clean(c):
         code = m.group(1) if m else ""
         m = re.search(r"\*W,\w+\s*\(([^,)]+)", ln)
         where = m.group(1) if m else ""
-        if any(code == wcode and fnmatch.fnmatch(where, pat) for wcode, pat in rules):
+        name = signal(ln)
+        if any(code == wcode and fnmatch.fnmatch(where, pat) and fnmatch.fnmatchcase(name, sig)
+               for wcode, pat, sig in rules):
             waived += 1
         else:
             unwaived.append(ln)
@@ -99,8 +108,13 @@ def rtl_sim(c):
 @check("no_latches", "docs/04_synthesis.md#latches")
 def no_latches(c):
     log = need(c, "synth.log")
+    # Genus 25.1 echoes the sourced Tcl (`@file(synth.tcl) N: ... hdl_error_on_latch ...`) and prints
+    # the CDFG-508 "Genus removes the flip-flop or latch inferred for an unused signal" help text when it
+    # drops an unused register. Both carry "latch"+"infer" but are not a real inferred latch (which, with
+    # hdl_error_on_latch true, hard-errors synthesis anyway). Skip those so they are not false positives.
+    benign = re.compile(r"@file\(|hdl_error_on_latch|Genus removes the flip-flop or latch", re.I)
     inferred = sorted({ln.strip() for ln in log.splitlines() if re.search(r"latch", ln, re.I)
-                       and re.search(r"infer", ln, re.I)})
+                       and re.search(r"infer", ln, re.I) and not benign.search(ln)})
     cells = re.findall(r"^\s*([A-Za-z_][\w$]*)\s+\S+\s*\(", read(c.build / "netlist.v"), re.M)
     latches = sorted({x for x in cells if any(fnmatch.fnmatch(x, p) for p in c.latch_cells)})
     ok = not inferred and not latches and (c.build / "netlist.v").exists()

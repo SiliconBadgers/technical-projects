@@ -73,7 +73,7 @@ ASYNC_RESET_PORT ?=
 RESET_SYNC_FLOPS ?= 2
 BRONZE_PERIOD_NS ?=
 SILVER_PERIOD_NS ?=
-# lint waivers: one line per waived HAL message, `<code> [<file pattern>]  # why`
+# lint waivers: one line per waived HAL message, `<code> [<file pattern> [<signal>]]  # why`
 LINT_WAIVERS     ?= $(wildcard $(DESIGN_DIR)/hal_waivers.txt)
 
 # --- run knobs ---

@@ -37,7 +37,7 @@ Outputs: `build/sb_systolic_tile/sky130_scl_9T/`.
 
 ## Lint waivers
 
-A lint warning fails `make lint`. If a warning is checked and harmless, waive it in `labs/lab2_systolic/hal_waivers.txt`: one line per message, `<code> [<file pattern>]  # why`.
+A lint warning fails `make lint`. If a warning is checked and harmless, waive it in `labs/lab2_systolic/hal_waivers.txt`: one line per message, `<code> [<file pattern> [<signal>]]  # why`. Name the signal when you can, so the waiver does not also hide a new message about another signal in that file.
 A mentor reviews every waiver.
 
 ## Trying changes
@@ -53,6 +53,7 @@ A mentor reviews every waiver.
 | 8 × 8 array | `DESIGN_PARAMS="N_ROWS=8 N_COLS=8"` |
 
 Give `make check` the same `DESIGN_PARAMS` and `CLOCK_PERIOD`, so it reads the same build folder.
+`SYNTH_RETIME` and `SYNTH_EFFORT` do not get their own build folder, so such a run replaces the one before it. To keep both, add `BUILD=$PWD/build/<name>` to every make line of the variant, `make check` included.
 
 ## Where to look
 

@@ -26,7 +26,7 @@ Read the first **error** first: later messages are often caused by it. Then read
 
 - The topics are the ones in [04 — Lint](../docs/04_synthesis.md#lint): latches, multiple drivers, widths, loops, incomplete `case`, sensitivity lists. The text after the code says which.
 - The last lines come from `make`: `SB: xrun exit status`, then the check: errors, warnings, and how many were waived.
-- A warning you checked and found harmless goes in the design's `hal_waivers.txt` with a reason (`<code> [<file pattern>]  # why`).
+- A warning you checked and found harmless goes in the design's `hal_waivers.txt` with a reason (`<code> [<file pattern> [<signal>]]  # why`; `<signal>` is the name in quotes in the message, without its bit select).
 
 ## Synthesis (Genus)
 
@@ -90,7 +90,8 @@ Genus usually prints times in **ps** and capacitance in **fF**. Tempus uses the 
 | `Timing exceptions with no effect`, `Suspicious multi_cycle exceptions` | an exception that matches nothing, or looks wrong |
 
 `sta_check_timing.rpt` (Tempus) is the same kind of check at sign-off, per view. `make check` fails on unclocked flip-flops and on ports without delays; the asynchronous reset input may be the one exception, if your SDC handles it another way (with a comment).
-With a correct Lab 2 SDC its summary lists only: `ideal_clock_waveform` (no clock tree before layout), `no_drive` on `clk` and `rst_n`, `no_input_delay` on `rst_n`, and `uncons_endpoint` on the reset synchronizer alone (its two flip-flops' `RN` behind your `rst_n` false path, and its first `D`, tied to 1). Any other unconstrained endpoint is a hole in your SDC. In ibex, the six outputs that are constant in its configuration (`alert_*`, address bits `[1:0]`) are also listed.
+With a correct Lab 2 SDC its summary lists only: `ideal_clock_waveform` (no clock tree before layout), `no_drive` on `clk` and `rst_n`, `no_input_delay` on `rst_n` (asynchronous, by the spec), and `uncons_endpoint` only on (a) the reset synchronizer's two flip-flops' `RN`, behind your `rst_n` false path, and (b) pins driven by a constant (the synchronizer's first `D`, tied to 1). Any other unconstrained endpoint is a hole in your SDC.
+ibex (Lab 1) has one more case of (b), expected: the six outputs its configuration ties to a constant, `instr_addr_o[1:0]`, `data_addr_o[1:0]`, `alert_minor_o` and `alert_major_o` (`uncons_endpoint` 18: one line per output and view).
 
 ## Timing (Tempus)
 

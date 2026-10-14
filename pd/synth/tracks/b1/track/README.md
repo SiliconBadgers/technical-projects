@@ -224,7 +224,8 @@ For the maintainer, on the first run on a licensed machine (and after a tool upg
 13. `make lec` for gcd and ibex: `lec_run.log` says it ran the Genus dofile and ends with `No of diff points = 0`. Also try `LEC_MODE=own` on gcd. Break the netlist on purpose (swap two cell types in a copy) and see LEC fail.
 14. `make lint`: HAL messages look like `*W,<CODE> (<file>,<line>|<col>): ...`. Add the harmless warnings in third-party code (gcd, ibex) to `labs/lab1_reference/<design>/hal_waivers.txt`, each with a reason, until `make lint` passes.
 15. `make sim gls` for all three designs pass. Lab 2 `DESIGN_PARAMS` reach the simulation (cocotb passes them as `-gpg`); GLS with the Liberate cell models gives no X on the outputs.
-16. Calibrate: find each design's shortest passing period at `ss`, then update the SDC periods, the tables above, and `BRONZE_PERIOD_NS`/`SILVER_PERIOD_NS`.
-17. Note the run times and disk use of an ibex build in [lab1.md](lab1.md).
+16. Recovery/removal in Genus, before calibrating. Tempus times them by default (`timing_analysis_async_checks`, `auto` in 23.14); Genus must too, or it builds the tile's reset tree (about 810 reset pins) without regard to them. (On Track B2, Design Compiler skips them by default: the tile failed at `ss` by 1.36 ns on recovery, its reset tree a chain of seven `buf_1`, until `enable_recovery_removal_arcs true`.) Check, with a mentor's Lab 2 SDC, after `make synth sta DESIGN=sb_systolic_tile`: in Genus, `report_timing -from u_reset_sync/rst_n_o_reg/CK` ends at a flip-flop's `RN` as a recovery check with a slack, not as an unconstrained path without a capture clock; `sta_ss_setup.rpt` has no failing `Recovery Check`. If Genus does not time them, find its attribute for asynchronous checks (`get_db -category timing`; try Tempus's name first), set it in `flow/genus/synth.tcl`, and rerun.
+17. Calibrate: find each design's shortest passing period at `ss`, then update the SDC periods, the tables above, and `BRONZE_PERIOD_NS`/`SILVER_PERIOD_NS`.
+18. Note the run times and disk use of an ibex build in [lab1.md](lab1.md).
 
 Next: [docs/03_liberty.md](../docs/03_liberty.md)
