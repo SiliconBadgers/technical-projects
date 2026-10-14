@@ -45,6 +45,8 @@ Or `make all DESIGN=sb_systolic_tile`. Outputs: `build/sb_systolic_tile/sky130_f
 | Waveforms | add `WAVES=1` to `make sim` or `make gls`; open `sim_rtl/waves.vcd` or `sim_gls/waves.vcd` |
 | 8 × 8 array | `DESIGN_PARAMS="N_ROWS=8 N_COLS=8"` |
 
+`SYNTH_RETIME=1` does not get its own build folder, so a retimed run replaces the plain one. To keep both, add `BUILD=$PWD/build/<name>` to every make line of the retimed run.
+
 The testbench reads the same `DESIGN_PARAMS` (as `SB_DESIGN_PARAMS`), so it checks the array you built.
 
 ## Bronze, Silver, Gold

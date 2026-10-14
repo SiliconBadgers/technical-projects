@@ -30,3 +30,4 @@ fv/
 *.cmd~
 # mentor material (separate repo)
 mentor/
+lc_output.txt

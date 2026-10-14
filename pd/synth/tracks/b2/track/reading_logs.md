@@ -169,7 +169,7 @@ Many are harmless (an unused port of a reused module); each one deserves a look 
 ### Unconstrained endpoints
 
 - `check_timing` prints a warning such as `There are 5 endpoints which are not constrained for maximum delay`, then lists them.
-- The coverage section shows them as `untested`, with a reason. Two kinds are fine: recovery/removal of the reset synchronizer's two flip-flops, which only `rst_n` reaches (`no_startpoint_clock`, or `false_paths`), and pins driven by a constant (`constant_disabled`, `no_paths`). Any other untested check is a hole in your SDC.
+- The coverage section shows them as `untested`, with a reason. Two kinds are fine: recovery/removal of the reset synchronizer's two flip-flops, which only `rst_n` reaches (`no_startpoint_clock`, or `false_paths`), and pins driven by a constant (`constant_disabled`, `no_paths`: the synchronizer's first `D` input; in ibex, the six outputs its configuration ties to a constant, `instr_addr_o[1:0]`, `data_addr_o[1:0]`, `alert_minor_o` and `alert_major_o`). Any other untested check is a hole in your SDC.
 - Fix the SDC (a missing `set_input_delay` or `set_output_delay`), not the design ([05](../docs/05_sdc.md#unconstrained)).
 
 ### Recovery and removal

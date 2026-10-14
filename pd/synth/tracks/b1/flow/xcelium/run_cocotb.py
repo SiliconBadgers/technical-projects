@@ -90,7 +90,9 @@ def main() -> int:
     params = dict(p.split("=", 1) for p in args.param)
 
     runner = get_runner("xcelium")
-    # Xcelium takes waves only in the test step, not in the build step
+    # Xcelium takes waves only in the test step, not in the build step. cocotb's build() also reads a WAVES
+    # environment variable and refuses it (make exports WAVES=1 from its command line), so --waves is the only switch
+    os.environ.pop("WAVES", None)
     runner.build(
         sources=[Path(s).resolve() for s in args.sources],
         hdl_toplevel=args.toplevel,
