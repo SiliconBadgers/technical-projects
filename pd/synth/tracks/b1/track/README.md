@@ -1,7 +1,8 @@
 # Track B1: Cadence tools
 
 Track B1 runs every step of the course with Cadence's commercial tools. They need a license, so you work on a licensed Linux machine (ask your mentor which one).
-You are on the `track-b1` branch. The course itself (concepts, labs, designs) is the same on every track; this folder only says how to do each step here.
+Track B1 lives in the folder `tracks/b1`. The course itself (concepts, labs, designs) is the same on every track and sits at the repo root; this folder holds Track B1's flow, and these pages say how to do each step here.
+Run every command on these pages from `tracks/b1`; paths are relative to it.
 
 ## The tools
 
@@ -15,7 +16,7 @@ You are on the `track-b1` branch. The course itself (concepts, labs, designs) is
 | Gate-level simulation | Xcelium + cocotb | The same testbench on the netlist, with the cell models. |
 
 Think of Genus as the translator (RTL into gates) that also shops for real parts in the library catalog, Tempus as the person checking the train timetable, and Conformal as the proofreader who compares the translation with the original.
-New words: [glossary](../docs/02_glossary.md).
+New words: [glossary](../../../docs/02_glossary.md).
 
 ### Library
 
@@ -106,7 +107,7 @@ make <step> DESIGN=<design>
 | `all` | all of the above, in order | |
 | `check` | the course's checks (`flow/scripts/check.py`) | PASS/FAIL per check |
 
-- `DESIGN=`: `gcd`, `ibex`, `sb_systolic_tile`. Each has a `design.mk` in its lab folder (RTL files, top module, SDC, testbench).
+- `DESIGN=`: `gcd`, `ibex`, `sb_systolic_tile`. Each has a `design.mk` in its lab folder here (top module, SDC, and the RTL files and testbench from the lab folder at the repo root).
 - Outputs go to `build/<design>/sky130_scl_9T/`, e.g. `build/gcd/sky130_scl_9T/`.
 - `flow.env` there holds every input of the Tcl scripts. To rerun a tool by hand: `cd build/gcd/sky130_scl_9T && source flow.env && genus -files $FLOW_DIR/genus/synth.tcl`.
 - A failing step prints the file to read. A failing check prints the page to read.
@@ -134,14 +135,14 @@ make <step> DESIGN=<design>
 
 ## Knobs
 
-Add `KNOB=value` to any `make` line. The synthesis knobs match the rows of [09 — What synthesis can fix](../docs/09_synthesis_vs_pd.md#synthesis-can-fix).
+Add `KNOB=value` to any `make` line. The synthesis knobs match the rows of [09 — What synthesis can fix](../../../docs/09_synthesis_vs_pd.md#synthesis-can-fix).
 
 | Knob | Meaning |
 |---|---|
 | `CLOCK_PERIOD=<ns>` | replace the `set clk_period` line of the SDC; output in `build/<design>/sky130_scl_9T_p<ns>/`. A tighter period makes Genus restructure and size harder |
 | `SYNTH_EFFORT` | Genus effort for all three synthesis steps: `low`, `medium` (default) or `high` |
 | `SYNTH_ADDER` | `auto` (default: Genus picks an adder structure per path) or `ripple` (ripple-carry adders everywhere) |
-| `SYNTH_RETIME` | `1` = let Genus move registers across logic ([retiming](../docs/02_glossary.md#retiming)); LEC gets harder |
+| `SYNTH_RETIME` | `1` = let Genus move registers across logic ([retiming](../../../docs/02_glossary.md#retiming)); LEC gets harder |
 | `SYNTH_CORNER` | Liberty corner Genus maps to (default `ss`) |
 | `DESIGN_PARAMS="A=1 B=2"` | top-level parameters for synthesis and simulation; output in a folder named after them |
 | `WAVES=1` | save waveforms in `sim_rtl/` or `sim_gls/` (`cocotb_waves.shm`; open it with `simvision`) |
@@ -157,13 +158,13 @@ Stronger cells and buffers: Genus adds them by itself while mapping; there is no
 
 ## Gate-level simulation
 
-[GLS](../docs/08_gate_level_sim.md#gls) runs the RTL testbench on `netlist.v`:
+[GLS](../../../docs/08_gate_level_sim.md#gls) runs the RTL testbench on `netlist.v`:
 
 ```
 make gls DESIGN=gcd            # runs synth first if the netlist is missing
 ```
 
-- Xcelium reads the netlist, the cell models `$SB_PDK/cadence/sky130_scl_9T/verilog/sky130_scl_9T.v`, the tie-cell models `flow/cells/sky130_scl_9T_tiecells.v` (the library ships none), and for Lab 2 the SRAM model `labs/lab2_systolic/macros/sb_sram_256x8_model.v`.
+- Xcelium reads the netlist, the cell models `$SB_PDK/cadence/sky130_scl_9T/verilog/sky130_scl_9T.v`, the tie-cell models `flow/cells/sky130_scl_9T_tiecells.v` (the library ships none), and for Lab 2 the SRAM model `../../labs/lab2_systolic/macros/sb_sram_256x8_model.v`.
 - The cell models have zero delay: GLS checks behaviour, not timing.
 - ibex's clock gate: under `SYNTHESIS`, the RTL uses the wrapper `flow/cells/sky130_scl_9T_sb_icg.v`, which instantiates the library's clock-gating cell `ICGPRECX1`. Genus keeps it in `netlist.v`; GLS uses its model from the cell file.
 - Results: `gls_results.xml`; logs in `sim_gls/`. With `WAVES=1`: `sim_gls/cocotb_waves.shm`.
@@ -228,4 +229,4 @@ For the maintainer, on the first run on a licensed machine (and after a tool upg
 17. Calibrate: find each design's shortest passing period at `ss`, then update the SDC periods, the tables above, and `BRONZE_PERIOD_NS`/`SILVER_PERIOD_NS`.
 18. Note the run times and disk use of an ibex build in [lab1.md](lab1.md).
 
-Next: [docs/03_liberty.md](../docs/03_liberty.md)
+Next: [docs/03_liberty.md](../../../docs/03_liberty.md)

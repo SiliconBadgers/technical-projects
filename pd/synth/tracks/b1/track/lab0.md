@@ -1,7 +1,7 @@
 # Lab 0 commands (Track B1)
 
-The tasks and questions are in [labs/lab0_libraries/README.md](../labs/lab0_libraries/README.md). This page only shows how to run them here.
-Run everything from the repo root, with the tools and the Python environment from [README.md](README.md#setup) loaded.
+The tasks and questions are in [labs/lab0_libraries/README.md](../../../labs/lab0_libraries/README.md). This page only shows how to run them here.
+Run everything from this track's folder, `tracks/b1`, with the tools and the Python environment from [README.md](README.md#setup) loaded.
 
 ## 0. Environment
 
@@ -18,13 +18,13 @@ make check DESIGN=gcd
 ## Finding the library files
 
 The Lab 0 scripts read [libraries.yaml](libraries.yaml): `sky130_scl_9T` (this track's library) and `sky130_fd_sc_hd` (for comparison only).
-`$SB_PDK` is the PDK repo; if you did not set it, it is `../silicon-badgers-sky130-pdk`.
+`$SB_PDK` is the PDK repo; if you did not set it, it is `silicon-badgers-sky130-pdk` next to this repo (`../../../silicon-badgers-sky130-pdk` from here).
 
 ```
-python3 libs/lab0/platforms.py                      # every library and corner, with its file
-python3 libs/lab0/platforms.py sky130_scl_9T tt     # one file
+python3 ../../libs/lab0/platforms.py                      # every library and corner, with its file
+python3 ../../libs/lab0/platforms.py sky130_scl_9T tt     # one file
 make -s print-LIB_tt                                # the same file, as the flow uses it
-zless $(python3 libs/lab0/platforms.py sky130_scl_9T tt)    # the sky130_scl_9T files are gzipped
+zless $(python3 ../../libs/lab0/platforms.py sky130_scl_9T tt)    # the sky130_scl_9T files are gzipped
 ```
 
 | What | sky130_scl_9T | sky130_fd_sc_hd |
@@ -38,18 +38,18 @@ Cell names differ: `sky130_scl_9T` writes function and drive strength as `INVX1`
 ## 1. Parse a Liberty file
 
 ```
-pytest libs/lab0
-python3 libs/lab0/parse_lib.py summary $(python3 libs/lab0/platforms.py sky130_scl_9T tt)
-python3 libs/lab0/parse_lib.py table   $(python3 libs/lab0/platforms.py sky130_scl_9T tt) INVX1 Y A cell_rise
-python3 libs/lab0/parse_lib.py lookup  $(python3 libs/lab0/platforms.py sky130_scl_9T tt) INVX1 Y A cell_rise --slew 0.04 --load 0.01
+pytest ../../libs/lab0
+python3 ../../libs/lab0/parse_lib.py summary $(python3 ../../libs/lab0/platforms.py sky130_scl_9T tt)
+python3 ../../libs/lab0/parse_lib.py table   $(python3 ../../libs/lab0/platforms.py sky130_scl_9T tt) INVX1 Y A cell_rise
+python3 ../../libs/lab0/parse_lib.py lookup  $(python3 ../../libs/lab0/platforms.py sky130_scl_9T tt) INVX1 Y A cell_rise --slew 0.04 --load 0.01
 ```
 
-`python3 libs/lab0/parse_lib.py -h` lists every command. The same commands work for `sky130_fd_sc_hd` with `sky130_fd_sc_hd__inv_1`.
+`python3 ../../libs/lab0/parse_lib.py -h` lists every command. The same commands work for `sky130_fd_sc_hd` with `sky130_fd_sc_hd__inv_1`.
 
 ## 2. Plots
 
 ```
-python3 libs/lab0/plot_delays.py        # PNGs in build/lab0/
+python3 ../../libs/lab0/plot_delays.py        # PNGs in build/lab0/
 ```
 
 The corner plot uses the first library in [libraries.yaml](libraries.yaml), `sky130_scl_9T` (`INVX1`).
@@ -57,7 +57,7 @@ The corner plot uses the first library in [libraries.yaml](libraries.yaml), `sky
 ## 3. Table
 
 ```
-python3 libs/lab0/make_table.py > labs/lab0_libraries/lab0_table.md
+python3 ../../libs/lab0/make_table.py > ../../labs/lab0_libraries/lab0_table.md
 ```
 
 ## 4. Physical views
@@ -76,7 +76,7 @@ Search for `SITE`, `SIZE` and `PITCH`. Do the same in the `sky130_fd_sc_hd` file
 | Units and corner of a library | `parse_lib.py summary`, or the top of the Liberty file |
 | A delay table, a lookup by hand | `parse_lib.py table` and `lookup` |
 | Delay vs. load, slew and corner | `build/lab0/*.png` |
-| Area, pin capacitance, drive strengths | `labs/lab0_libraries/lab0_table.md` |
+| Area, pin capacitance, drive strengths | `../../labs/lab0_libraries/lab0_table.md` |
 | Row height, track pitch | technology LEF (site, layer pitches) and cell LEF (cell sizes) |
 
-Next: answer the questions in [labs/lab0_libraries/README.md](../labs/lab0_libraries/README.md), then follow its Next link.
+Next: answer the questions in [labs/lab0_libraries/README.md](../../../labs/lab0_libraries/README.md), then follow its Next link.

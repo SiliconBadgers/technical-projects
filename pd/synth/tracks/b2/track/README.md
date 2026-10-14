@@ -1,7 +1,8 @@
 # Track B2: Synopsys tools
 
 Track B2 runs every step of the course with Synopsys tools on the open SkyWater 130 nm library `sky130_fd_sc_hd`.
-You are on the `track-b2` branch. The course itself (concepts, labs, designs) is the same on every track; this folder only says how to do each step here.
+Track B2 lives in the folder `tracks/b2`. The course itself (concepts, labs, designs) is the same on every track and sits at the repo root; this folder holds Track B2's flow, and these pages say how to do each step here.
+Run every command on these pages from `tracks/b2`; paths are relative to it.
 
 These are commercial tools: they need a **license** (a permission file served by a license server on your network).
 Work on a machine where your group has the tools installed. Ask your mentor which one.
@@ -51,7 +52,7 @@ The scripts use standard commands of recent releases. Assumed:
    ```
 3. **Build the library views** (the `.db` files):
    ```
-   $SB_PDK/synopsys/make_views.sh            # or ../silicon-badgers-sky130-pdk/synopsys/make_views.sh
+   $SB_PDK/synopsys/make_views.sh            # or ../../../silicon-badgers-sky130-pdk/synopsys/make_views.sh
    ls $SB_PDK/synopsys/views/*.db            # three files: tt, ss, ff
    ```
    The script also builds files for the physical design course (it needs `grdgenxo` and `icc2_lm_shell` for those).
@@ -67,7 +68,7 @@ The scripts use standard commands of recent releases. Assumed:
    /var/tmp/$USER/sb-py/bin/pip install cocotb==2.1.0 pyyaml liberty-parser==0.0.29 numpy matplotlib pytest
    export PATH=/var/tmp/$USER/sb-py/bin:$PATH
    ```
-5. **Smoke test** (from the repo root):
+5. **Smoke test** (in `tracks/b2`):
    ```
    make all DESIGN=gcd
    ```
@@ -75,12 +76,12 @@ The scripts use standard commands of recent releases. Assumed:
 
 | Variable | Meaning | Default |
 |---|---|---|
-| `SB_PDK` | the SiliconBadgers sky130 PDK repo | `../silicon-badgers-sky130-pdk` (next to this repo) |
+| `SB_PDK` | the SiliconBadgers sky130 PDK repo | `silicon-badgers-sky130-pdk` next to this repo (`../../../silicon-badgers-sky130-pdk` from `tracks/b2`) |
 
 ## Running a step
 
 ```
-make <step> DESIGN=<design>          # from the repo root; make help lists everything
+make <step> DESIGN=<design>          # in tracks/b2; make help lists everything
 ```
 
 | Target | Tool | Main output |
@@ -153,7 +154,7 @@ Design Compiler and PrimeTime estimate wire delay before layout from the library
 |---|---|---|
 | gcd (Lab 1) | 3.8 ns | `labs/lab1_reference/gcd/sdc/sky130_fd_sc_hd.sdc` |
 | ibex (Lab 1) | 11.6 ns | `labs/lab1_reference/ibex/sdc/sky130_fd_sc_hd.sdc` |
-| sb_systolic_tile (Lab 2), **Bronze** | **133 MHz** (7.519 ns) | you write `labs/lab2_systolic/sdc/sky130_fd_sc_hd.sdc` |
+| sb_systolic_tile (Lab 2), **Bronze** | **133 MHz** (7.519 ns) | you write `tracks/b2/labs/lab2_systolic/sdc/sky130_fd_sc_hd.sdc` |
 | sb_systolic_tile (Lab 2), Silver | 5.25 ns at `ss` | the same file |
 
 ## This track's checks
@@ -203,4 +204,4 @@ For the mentor who runs this track first on a new machine or after a tool upgrad
 | [reading_logs.md](reading_logs.md) | reading this track's logs and reports |
 | [libraries.yaml](libraries.yaml) | the Liberty files the Lab 0 scripts read |
 
-Next: [docs/03_liberty.md](../docs/03_liberty.md)
+Next: [docs/03_liberty.md](../../../docs/03_liberty.md)

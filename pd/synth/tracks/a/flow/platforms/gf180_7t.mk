@@ -2,7 +2,7 @@
 # Author:      Isaac Hagedorn
 # Date:        2026-10-09
 # Description: Platform settings for GF180MCU 7-track 5 V cells (gf180mcu_fd_sc_mcu7t5v0). Cell choices follow OpenROAD-flow-scripts.
-# NOTE(spec-mismatch): corner voltages differ (5.00 / 4.50 / 5.50 V); see track/spec_deviations.md.
+# NOTE(spec-mismatch): corner voltages differ (5.00 / 4.50 / 5.50 V).
 
 PLATFORM_PDK  := gf180mcuD
 STD_CELL_LIB  := gf180mcu_fd_sc_mcu7t5v0

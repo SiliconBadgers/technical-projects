@@ -1,7 +1,7 @@
 # File:        test_parse_lib.py
 # Author:      Isaac Hagedorn
 # Date:        2026-10-09
-# Description: Tests for libs/lab0/parse_lib.py on every library in track/libraries.yaml. Exact values come from the sky130_fd_sc_hd and gf180mcu 7-track tt files, when the track has them.
+# Description: Tests for libs/lab0/parse_lib.py on every library in your track's track/libraries.yaml. Exact values come from the sky130_fd_sc_hd and gf180mcu 7-track tt files, when the track has them.
 import sys
 from pathlib import Path
 

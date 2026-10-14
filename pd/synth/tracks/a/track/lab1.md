@@ -1,6 +1,6 @@
 # Lab 1 commands (Track A)
 
-The tasks and questions are in [labs/lab1_reference/README.md](../labs/lab1_reference/README.md). This page only shows how to run them here.
+The tasks and questions are in [labs/lab1_reference/README.md](../../../labs/lab1_reference/README.md). This page only shows how to run them here.
 Clock periods: [README.md](README.md#clock-targets). Reading the outputs: [reading_logs.md](reading_logs.md).
 
 - `gcd` runs in under a minute per library.
@@ -70,4 +70,4 @@ make lec gls PDK=sky130hd DESIGN=ibex LEC_JOBS=<cores>
 | What LEC proved | `lec.log` (see [reading_logs.md](reading_logs.md#lec)) |
 | GLS result | `gls_results.xml` |
 
-Next: answer the questions in [labs/lab1_reference/README.md](../labs/lab1_reference/README.md), then follow its Next link.
+Next: answer the questions in [labs/lab1_reference/README.md](../../../labs/lab1_reference/README.md), then follow its Next link.

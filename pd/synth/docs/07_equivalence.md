@@ -38,6 +38,6 @@ A failing point is named after a key point (a register or an output) in the desi
   Apply those values in simulation to both and compare.
 - **Inconclusive**: no difference was found, but the proof did not close. Check whether a stronger method ran, and whether the piece is just too big.
 
-Where your track's tool writes these details: [track/reading_logs.md](../track/reading_logs.md).
+Where your track's tool writes these details: its `track/reading_logs.md`.
 
 Next: [08 — Gate-level simulation](08_gate_level_sim.md)

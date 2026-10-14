@@ -72,7 +72,7 @@ def signal(msg: str) -> str:
     return m.group(1).strip() if m else ""
 
 
-@check("lint_clean", "docs/04_synthesis.md#lint")
+@check("lint_clean", "../../docs/04_synthesis.md#lint")
 def lint_clean(c):
     log = need(c, "lint.log")
     rc = re.search(r"SB: xrun exit status (\d+)", log)
@@ -105,7 +105,7 @@ def rtl_sim(c):
     return bool(names) and not failed, f"{len(names) - len(failed)}/{len(names)} cocotb tests pass on the RTL", failed
 
 
-@check("no_latches", "docs/04_synthesis.md#latches")
+@check("no_latches", "../../docs/04_synthesis.md#latches")
 def no_latches(c):
     log = need(c, "synth.log")
     # Genus 25.1 echoes the sourced Tcl (`@file(synth.tcl) N: ... hdl_error_on_latch ...`) and prints
@@ -122,7 +122,7 @@ def no_latches(c):
         "a latch was inferred (or synthesis did not finish): see synth.log", inferred[:5] + latches
 
 
-@check("design_check", "docs/04_synthesis.md#check")
+@check("design_check", "../../docs/04_synthesis.md#check")
 def design_check(c):
     rpt, lint = need(c, "check_design.rpt"), need(c, "check_timing.rpt")
     rows = ["Unresolved References", r"Multidriven Port\(s\)", r"Multidriven Leaf Pin\(s\)",
@@ -137,7 +137,7 @@ def design_check(c):
         "structural problems: " + "; ".join(bad), bad
 
 
-@check("no_unconstrained", "docs/05_sdc.md#unconstrained")
+@check("no_unconstrained", "../../docs/05_sdc.md#unconstrained")
 def no_unconstrained(c):
     lint = need(c, "check_timing.rpt")
     rows = {"unclocked flip-flops": "Sequential clock pins without clock waveform",
@@ -154,7 +154,7 @@ def no_unconstrained(c):
         f"unconstrained: {bad} (see check_timing.rpt)", []
 
 
-@check("reset_sync", "docs/05_sdc.md#asynchronous-reset")
+@check("reset_sync", "../../docs/05_sdc.md#asynchronous-reset")
 def reset_sync(c):
     if not c.reset_port:
         return True, "no asynchronous reset port declared (ASYNC_RESET_PORT): nothing to check", []
@@ -166,7 +166,7 @@ def reset_sync(c):
         ("" if ok else ": the reset release is not synchronized to the clock"), []
 
 
-@check("setup_ss", "docs/06_timing_reports.md#setup")
+@check("setup_ss", "../../docs/06_timing_reports.md#setup")
 def setup_ss(c):
     need(c, "sta_ss_setup.rpt")
     wns, _ = slack(c.build, "ss", "setup")
@@ -175,7 +175,7 @@ def setup_ss(c):
     return as_float(wns) >= 0, f"worst setup slack at ss = {wns} ns (period {period_ns(c.build)} ns)", []
 
 
-@check("hold_ff", "docs/06_timing_reports.md#hold")
+@check("hold_ff", "../../docs/06_timing_reports.md#hold")
 def hold_ff(c):
     need(c, "sta_ff_hold.rpt")
     wns, _ = slack(c.build, "ff", "hold")
@@ -184,7 +184,7 @@ def hold_ff(c):
     return as_float(wns) >= 0, f"worst hold slack at ff = {wns} ns", []
 
 
-@check("lec", "docs/07_equivalence.md")
+@check("lec", "../../docs/07_equivalence.md")
 def lec(c):
     log = need(c, "lec_run.log") + read(c.build / "lec.log")
     n = {k: [int(x) for x in re.findall(rf"No of {k} points\s*=\s*(\d+)", log)]
@@ -196,7 +196,7 @@ def lec(c):
     return ok, f"Conformal: {total} compare points, {diff} non-equivalent, {abort} aborted, {unknown} unknown", []
 
 
-@check("gls", "docs/08_gate_level_sim.md#gls")
+@check("gls", "../../docs/08_gate_level_sim.md#gls")
 def gls(c):
     names, failed = junit(need(c, "gls_results.xml"))
     rtl_names, _ = junit(need(c, "results.xml"))
@@ -205,7 +205,7 @@ def gls(c):
     return bool(names) and not failed and same, msg + ("" if same else "; not the same tests as the RTL run"), failed
 
 
-@check("qor_columns", "docs/06_timing_reports.md#qor")
+@check("qor_columns", "../../docs/06_timing_reports.md#qor")
 def qor_columns(c):
     need(c, "qor.csv")
     with (c.build / "qor.csv").open() as f:

@@ -1,11 +1,11 @@
 # Lab 2 commands (Track B1)
 
-The tasks and questions are in [labs/lab2_systolic/README.md](../labs/lab2_systolic/README.md); the contract is [spec.md](../labs/lab2_systolic/spec.md).
+The tasks and questions are in [labs/lab2_systolic/README.md](../../../labs/lab2_systolic/README.md); the contract is [spec.md](../../../labs/lab2_systolic/spec.md).
 This page only shows how to run them here. Your clock target: [README.md](README.md#lab-2).
 
 ## Your SDC
 
-Your SDC goes in **`labs/lab2_systolic/sdc/sky130_scl_9T.sdc`**. Until it exists, `make synth` stops and says so.
+Your SDC goes in **`tracks/b1/labs/lab2_systolic/sdc/sky130_scl_9T.sdc`** (this track's lab folder, not the one at the repo root). Until it exists, `make synth` stops and says so.
 
 - Plain SDC: Genus (synthesis) and Tempus (timing) both read it.
 - First clock line: `set clk_period <ns>`, then use `$clk_period`. `CLOCK_PERIOD=<ns>` replaces that line for one run.
@@ -68,4 +68,4 @@ Give `make check` the same `DESIGN_PARAMS` and `CLOCK_PERIOD`, so it reads the s
 
 How to read each file: [reading_logs.md](reading_logs.md). `make check` also prints your tier and leaderboard score.
 
-Next: answer the questions in [labs/lab2_systolic/README.md](../labs/lab2_systolic/README.md), then follow its Next link.
+Next: answer the questions in [labs/lab2_systolic/README.md](../../../labs/lab2_systolic/README.md), then follow its Next link.

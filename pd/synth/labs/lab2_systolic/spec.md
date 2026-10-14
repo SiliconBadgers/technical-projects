@@ -1,7 +1,7 @@
 # sb_systolic_tile — interface and timing specification
 
 Your RTL implements the interface. Your SDC implements the timing section; every number in it must trace to a line here.
-Where the SDC goes: [track/lab2.md](../../track/lab2.md).
+Where the SDC goes: your track's `track/lab2.md`.
 
 ## Function
 
@@ -51,7 +51,7 @@ The `*_PIPE` parameters change latency, never results. The testbench needs no ch
 
 | Item | Value |
 |---|---|
-| Clock frequency | the clock target for your library is in [track/README.md](../../track/README.md) |
+| Clock frequency | the clock target for your library is in your track's `track/README.md` |
 | Clock transition at the clock pin | sky130 libraries: 0.10 ns; gf180 libraries: 0.20 ns |
 | Clock uncertainty | setup: 10 % of the period; hold: 0.05 ns ([05](../../docs/05_sdc.md#clocks)) |
 | Input delay | 30 % of the period after the clock edge, **every** input except `clk` and `rst_n` |
@@ -67,7 +67,7 @@ Sign-off rule (your track's checks): setup at `ss`, hold at `ff`, no unconstrain
 
 ## Targets
 
-The Bronze clock target for your library is in [track/README.md](../../track/README.md).
+The Bronze clock target for your library is in your track's `track/README.md`.
 
 - **Bronze**: everything passes at the clock target.
 - **Silver**: 0.70 × that period at `ss`, hold clean at `ff`, area ≤ 1.25 × Bronze.

@@ -26,6 +26,6 @@ GLS can catch what the other checks miss:
 
 If the testbench seems to need a change to pass GLS, talk to a mentor first. The testbench is the reference.
 
-How to run GLS on your track: [track/README.md](../track/README.md).
+How to run GLS on your track: its `track/README.md` ([tracks/README.md](../tracks/README.md)).
 
 Next: [Lab 1 — Reference designs](../labs/lab1_reference/README.md)

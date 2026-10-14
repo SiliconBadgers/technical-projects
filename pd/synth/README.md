@@ -11,7 +11,7 @@ Every page ends with a **Next:** link, so you can also just follow those.
 
 1. [ ] Read [01 — The big picture](docs/01_big_picture.md).
 2. [ ] Skim [02 — Glossary](docs/02_glossary.md). Come back to it whenever a word is new.
-3. [ ] Pick a track and set it up: [track/README.md](track/README.md).
+3. [ ] Pick a track and set it up: [tracks/README.md](tracks/README.md).
 4. [ ] Read [03 — Reading a Liberty file](docs/03_liberty.md).
 5. [ ] Do [Lab 0 — Library literacy](labs/lab0_libraries/README.md) (week 1).
 6. [ ] Read [04 — Synthesis and its common problems](docs/04_synthesis.md).
@@ -25,25 +25,24 @@ Every page ends with a **Next:** link, so you can also just follow those.
 
 ## Tracks
 
-The `main` branch holds the course: concepts, tasks and designs, with no tool commands.
-Each track branch adds the commands and flow scripts for one set of tools, mostly in `track/`.
+The course (`docs/`, `labs/`, `libs/`) is the same for every track. Each track has a folder under `tracks/` with the commands and flow scripts for one set of tools; its pages are in that folder's `track/`.
 
-| Track | Tools | Branch |
+| Track | Tools | Folder |
 |---|---|---|
-| A | Open-source: Yosys, OpenSTA, eqy, Verilator, Icarus Verilog, cocotb | `track-a` |
-| B1 | Cadence: Genus, Tempus, Conformal, Xcelium | `track-b1` |
-| B2 | Synopsys: Design Compiler, PrimeTime, Formality, VCS | `track-b2` |
+| A | Open-source: Yosys, OpenSTA, eqy, Verilator, Icarus Verilog, cocotb | [`tracks/a`](tracks/a/track/README.md) |
+| B1 | Cadence: Genus, Tempus, Conformal, Xcelium | [`tracks/b1`](tracks/b1/track/README.md) |
+| B2 | Synopsys: Design Compiler, PrimeTime, Formality, VCS | [`tracks/b2`](tracks/b2/track/README.md) |
 
 Track A runs on your own computer. Track B needs a machine with the vendor's licenses. Ask your mentor which one to use.
 
-## Switching tracks
+## Working in a track
+
+Run every command from your track's folder; build output goes to its `build/` folder.
 
 ```
-git checkout track-a       # or track-b1, track-b2
-git checkout main          # back to the course without tool commands
+cd tracks/b2               # or tracks/a, tracks/b1
+make all DESIGN=gcd
 ```
-
-Commit your own work before you switch.
 
 ## Layout
 
@@ -52,4 +51,4 @@ Commit your own work before you switch.
 | `docs/` | the concepts, numbered in reading order |
 | `labs/` | the three labs: tasks, RTL, testbenches |
 | `libs/lab0/` | Lab 0 Python scripts |
-| `track/` | the commands for your track (on `main`: how to pick one) |
+| `tracks/` | one folder per track: its flow, constraints and commands (`track/`); [tracks/README.md](tracks/README.md) helps you pick one |

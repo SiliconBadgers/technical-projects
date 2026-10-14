@@ -8,7 +8,7 @@ RTL_INCDIRS :=
 RTL_DEFINES :=
 
 # constraints for this library
-SDC_FILE    := $(DESIGN_DIR)/sdc/sky130_fd_sc_hd.sdc
+SDC_FILE    := $(TRACK_DESIGN_DIR)/sdc/sky130_fd_sc_hd.sdc
 
 # cocotb testbench: tb/test_gcd.py
 TB_DIR      := $(DESIGN_DIR)/tb

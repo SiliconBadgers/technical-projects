@@ -2,7 +2,7 @@
 # File:        checks.py
 # Author:      Isaac Hagedorn
 # Date:        2026-10-09
-# Description: Track A acceptance checks (track/course_spec.md §7), one function per check. Reads the flow's outputs; reruns no tool.
+# Description: Track A acceptance checks, one function per check. Reads the flow's outputs; reruns no tool.
 from __future__ import annotations
 
 import argparse
@@ -216,7 +216,7 @@ def tracked(p: Path) -> bool:
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description="Track A acceptance checks (track/course_spec.md §7). Run after `make all`.")
+    ap = argparse.ArgumentParser(description="Track A acceptance checks. Run after `make all`.")
     ap.add_argument("--build", required=True, type=Path)
     ap.add_argument("--design-dir", required=True, type=Path)
     ap.add_argument("--latch-cells", default="", help="space-separated glob patterns (platform LATCH_CELLS)")

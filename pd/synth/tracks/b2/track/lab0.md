@@ -1,7 +1,7 @@
 # Lab 0 commands (Track B2)
 
-The tasks and questions are in [labs/lab0_libraries/README.md](../labs/lab0_libraries/README.md). This page only shows how to run them here.
-Run everything from the repo root.
+The tasks and questions are in [labs/lab0_libraries/README.md](../../../labs/lab0_libraries/README.md). This page only shows how to run them here.
+Run everything from this track's folder, `tracks/b2`.
 
 ## 0. Environment
 
@@ -17,7 +17,7 @@ make all DESIGN=gcd
 ## Finding the library files
 
 This track has one library, `sky130_fd_sc_hd`, at three corners (tt, ss, ff).
-`python3 libs/lab0/platforms.py` lists the Liberty files named in [libraries.yaml](libraries.yaml).
+`python3 ../../libs/lab0/platforms.py` lists the Liberty files named in [libraries.yaml](libraries.yaml).
 
 | File | Where (`$SB_PDK` = the PDK repo) |
 |---|---|
@@ -28,19 +28,19 @@ This track has one library, `sky130_fd_sc_hd`, at three corners (tt, ss, ff).
 | Cell simulation models (GLS) | `$SB_PDK/synopsys/sky130_fd_sc_hd/verilog/` |
 
 `<corner>` is `tt_025C_1v80`, `ss_100C_1v60` or `ff_n40C_1v95`: process, temperature, voltage.
-`SB_PDK` not set in your shell? The PDK repo sits next to this one: `export SB_PDK=$PWD/../silicon-badgers-sky130-pdk`.
+`SB_PDK` not set in your shell? The PDK repo sits next to this one: `export SB_PDK=$PWD/../../../silicon-badgers-sky130-pdk`.
 
 ## 1. Parse a Liberty file
 
 ```
-pytest libs/lab0
-LIB=$(python3 libs/lab0/platforms.py sky130_fd_sc_hd tt)
-python3 libs/lab0/parse_lib.py summary $LIB
-python3 libs/lab0/parse_lib.py table   $LIB sky130_fd_sc_hd__inv_1 Y A cell_rise
-python3 libs/lab0/parse_lib.py lookup  $LIB sky130_fd_sc_hd__inv_1 Y A cell_rise --slew 0.04 --load 0.01
+pytest ../../libs/lab0
+LIB=$(python3 ../../libs/lab0/platforms.py sky130_fd_sc_hd tt)
+python3 ../../libs/lab0/parse_lib.py summary $LIB
+python3 ../../libs/lab0/parse_lib.py table   $LIB sky130_fd_sc_hd__inv_1 Y A cell_rise
+python3 ../../libs/lab0/parse_lib.py lookup  $LIB sky130_fd_sc_hd__inv_1 Y A cell_rise --slew 0.04 --load 0.01
 ```
 
-`python3 libs/lab0/parse_lib.py -h` lists every command.
+`python3 ../../libs/lab0/parse_lib.py -h` lists every command.
 
 ### The same library, seen by a Synopsys tool (optional)
 
@@ -57,7 +57,7 @@ lc_shell> exit
 ## 2. Plots
 
 ```
-python3 libs/lab0/plot_delays.py        # PNGs in build/lab0/
+python3 ../../libs/lab0/plot_delays.py        # PNGs in build/lab0/
 ```
 
 With one library, the plots show `sky130_fd_sc_hd` only, plus its three corners.
@@ -65,7 +65,7 @@ With one library, the plots show `sky130_fd_sc_hd` only, plus its three corners.
 ## 3. Table
 
 ```
-python3 libs/lab0/make_table.py > labs/lab0_libraries/lab0_table.md
+python3 ../../libs/lab0/make_table.py > ../../labs/lab0_libraries/lab0_table.md
 ```
 
 ## 4. Physical views
@@ -84,7 +84,7 @@ Search for `SITE`, `SIZE` and `PITCH` (type `/` and the word in `less`).
 | Units and corner of a library | `parse_lib.py summary`, or the top of the Liberty file |
 | A delay table, a lookup by hand | `parse_lib.py table` and `lookup` |
 | Delay vs. load, slew and corner | `build/lab0/*.png` |
-| Area, pin capacitance, drive strengths | `labs/lab0_libraries/lab0_table.md` |
+| Area, pin capacitance, drive strengths | `../../labs/lab0_libraries/lab0_table.md` |
 | Row height, track pitch | technology LEF (site, layer pitches) and cell LEF (cell sizes) |
 
-Next: answer the questions in [labs/lab0_libraries/README.md](../labs/lab0_libraries/README.md), then follow its Next link.
+Next: answer the questions in [labs/lab0_libraries/README.md](../../../labs/lab0_libraries/README.md), then follow its Next link.

@@ -10,8 +10,10 @@ SHELL       := /bin/bash
 # keep generated files such as *.env
 .SECONDARY:
 
-SB_ROOT  := $(abspath $(dir $(lastword $(MAKEFILE_LIST)))/..)
-FLOW     := $(SB_ROOT)/flow
+# TRACK_DIR: this track's folder (tracks/a: flow, design.mk, SDCs, build/); SB_ROOT: the repo root (shared RTL, testbenches)
+TRACK_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST)))/..)
+SB_ROOT  := $(abspath $(TRACK_DIR)/../..)
+FLOW     := $(TRACK_DIR)/flow
 SCRIPTS  := $(FLOW)/scripts
 
 PDK      ?= sky130hd
@@ -51,12 +53,15 @@ ifeq ($(wildcard $(PLATFORM_MK)),)
 endif
 include $(PLATFORM_MK)
 
-include $(SB_ROOT)/labs/designs.mk
+include $(TRACK_DIR)/labs/designs.mk
+# DESIGN_DIR: the lab folder at the repo root (RTL, testbench, macro models);
+# TRACK_DESIGN_DIR: the same folder in this track (design.mk, SDCs, lint waivers, macro Liberty)
 DESIGN_DIR := $(SB_ROOT)/$(DESIGN_DIR_$(DESIGN))
+TRACK_DESIGN_DIR := $(TRACK_DIR)/$(DESIGN_DIR_$(DESIGN))
 ifeq ($(DESIGN_DIR_$(DESIGN)),)
   $(error DESIGN=$(DESIGN) is not registered in labs/designs.mk)
 endif
-include $(DESIGN_DIR)/design.mk
+include $(TRACK_DESIGN_DIR)/design.mk
 
 # --- optional design.mk settings (MACRO_LIBS_<corner>: macro Liberty per corner) ---
 # macros for synthesis and LEC only
@@ -83,7 +88,7 @@ SYNTH_RTL      := $(foreach c,$(PLATFORM_CELLS),$(FLOW)/platforms/cells/$(PDK)_$
 # clock period override in ns (needs [sb_clock_period <ns>] in the SDC)
 CLOCK_PERIOD ?=
 PARAMS_TAG := $(if $(filter command line,$(origin DESIGN_PARAMS)),_$(subst =,,$(subst $(eval) ,_,$(strip $(DESIGN_PARAMS)))))
-BUILD    ?= $(SB_ROOT)/build/$(DESIGN)/$(PDK)$(PARAMS_TAG)$(if $(CLOCK_PERIOD),_p$(CLOCK_PERIOD))
+BUILD    ?= $(TRACK_DIR)/build/$(DESIGN)/$(PDK)$(PARAMS_TAG)$(if $(CLOCK_PERIOD),_p$(CLOCK_PERIOD))
 TIMES    := $(BUILD)/runtimes.txt
 TIMED    := $(SCRIPTS)/util/timed.sh $(TIMES)
 
@@ -96,7 +101,7 @@ CLOCK_PERIOD_NS := $(if $(wildcard $(SDC_FILE)),$(shell tclsh $(SCRIPTS)/util/cl
 CLOCK_PERIOD_PS := $(if $(CLOCK_PERIOD_NS),$(shell awk 'BEGIN{printf "%d", $(CLOCK_PERIOD_NS)*1000 + 0.5}'))
 ABC_DELAY_PS    := $(if $(CLOCK_PERIOD_NS),$(shell awk 'BEGIN{printf "%d", $(CLOCK_PERIOD_NS)*1000*$(ABC_DELAY_FRAC) + 0.5}'))
 
-FLOW_DEPS := $(PLATFORM_MK) $(DESIGN_DIR)/design.mk
+FLOW_DEPS := $(PLATFORM_MK) $(TRACK_DESIGN_DIR)/design.mk
 
 # --- targets ---
 .PHONY: help info env-check all lint sim synth sta lec gls qor check lec-mutation clean FORCE
@@ -137,13 +142,13 @@ gls:   $(BUILD)/gls_results.xml
 qor:   $(BUILD)/qor.csv
 
 check:
-	python3 $(SB_ROOT)/ci/checks.py --build $(BUILD) --design-dir $(DESIGN_DIR) --latch-cells "$(LATCH_CELLS)" \
+	python3 $(TRACK_DIR)/ci/checks.py --build $(BUILD) --design-dir $(TRACK_DESIGN_DIR) --latch-cells "$(LATCH_CELLS)" \
 	  --reset-sync-flops $(RESET_SYNC_FLOPS)
 
 # break the netlist on purpose; LEC must FAIL. LEC_MUTATIONS: number of mutants
 LEC_MUTATIONS ?= 2
 lec-mutation: $(BUILD)/lec.log
-	python3 $(SB_ROOT)/ci/lec_mutation_test.py --build $(BUILD) --count $(LEC_MUTATIONS) --jobs $(LEC_JOBS)
+	python3 $(TRACK_DIR)/ci/lec_mutation_test.py --build $(BUILD) --count $(LEC_MUTATIONS) --jobs $(LEC_JOBS)
 
 clean:
 	rm -rf $(BUILD)
@@ -152,7 +157,7 @@ $(BUILD):
 	mkdir -p $@
 
 # --- lint (Verilator and sb_lint gate, Verible is advisory) ---
-LINT_WAIVERS ?= $(wildcard $(DESIGN_DIR)/lint_waivers.vlt)
+LINT_WAIVERS ?= $(wildcard $(TRACK_DESIGN_DIR)/lint_waivers.vlt)
 $(BUILD)/lint.log: $(RTL_FILES) $(MACRO_VERILOG) $(LINT_WAIVERS) $(FLOW_DEPS) $(SCRIPTS)/lint/sb_lint.py | $(BUILD)
 	@echo "== lint: verilator --lint-only -Wall" | tee $@
 	verilator --lint-only -Wall --top-module $(TOP) $(addprefix -I,$(RTL_INCDIRS)) \
@@ -209,7 +214,7 @@ $(BUILD)/synth.env: FORCE | $(BUILD)
 
 # the SDC is hand-written: report it if missing
 $(SDC_FILE):
-	@echo "no SDC: write $@ (see docs/05_sdc.md and track/README.md#sdc-helpers; for Lab 2, from spec.md)"; exit 1
+	@echo "no SDC: write $@ (see ../../docs/05_sdc.md and track/README.md#sdc-helpers; for Lab 2, from spec.md)"; exit 1
 
 # ABC constraints: input driving cell and output load (4 x LOAD_CELL pin, fF)
 $(BUILD)/abc.constr: $(LIB_SYNTH) $(FLOW_DEPS) $(SCRIPTS)/util/liberty_pin_cap.py | $(BUILD)
@@ -220,7 +225,7 @@ $(BUILD)/abc.constr: $(LIB_SYNTH) $(FLOW_DEPS) $(SCRIPTS)/util/liberty_pin_cap.p
 
 $(BUILD)/netlist.v: $(BUILD)/synth.env $(SYNTH_RTL) $(SDC_FILE) $(FLOW_DEPS) $(SCRIPTS)/yosys/synth.tcl \
                     $(if $(filter 1,$(ABC_CONSTR)),$(BUILD)/abc.constr)
-	@test -f "$(SDC_FILE)" || { echo "no SDC: write $(SDC_FILE) (see docs/05_sdc.md and track/README.md#sdc-helpers)"; exit 1; }
+	@test -f "$(SDC_FILE)" || { echo "no SDC: write $(SDC_FILE) (see ../../docs/05_sdc.md and track/README.md#sdc-helpers)"; exit 1; }
 	@test -n "$(CLOCK_PERIOD_PS)" || { echo "could not read the clock period from $(SDC_FILE)"; exit 1; }
 	@echo "synth: $(TOP) on $(PDK), period $(CLOCK_PERIOD_NS) ns -> ABC -D $(ABC_DELAY_PS) ps ($(ABC_DELAY_FRAC) x period)"
 	cd $(BUILD) && source synth.env && \

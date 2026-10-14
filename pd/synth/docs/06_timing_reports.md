@@ -16,7 +16,7 @@ Analogy: checking a train timetable. You do not ride every train; you add up the
 | `tt` | comparison only |
 
 The layout of the report differs between timing tools. The parts below are in every one.
-Your track shows a real report: [track/reading_logs.md](../track/reading_logs.md).
+Your track shows a real report in its `track/reading_logs.md`.
 
 ## Setup
 

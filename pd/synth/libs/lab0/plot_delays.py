@@ -2,7 +2,7 @@
 # File:        plot_delays.py
 # Author:      Isaac Hagedorn
 # Date:        2026-10-09
-# Description: Lab 0 plots of cell delay (mean of cell_rise/cell_fall) vs. output load and input slew. Writes PNGs to build/lab0/.
+# Description: Lab 0 plots of cell delay (mean of cell_rise/cell_fall) vs. output load and input slew. Writes PNGs to your track's build/lab0/.
 from __future__ import annotations
 
 import argparse
@@ -13,7 +13,7 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from parse_lib import Library  # noqa: E402
-from platforms import ROOT, SPEC_PLATFORMS, cell_name, lib_path  # noqa: E402
+from platforms import ROOT, SPEC_PLATFORMS, TRACK, cell_name, lib_path  # noqa: E402
 
 import matplotlib  # noqa: E402
 matplotlib.use("Agg")
@@ -31,7 +31,7 @@ def delay(lib: Library, cell: str, slew: float, load: float) -> float:
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description="Lab 0 plots: cell delay vs. output load and input slew, written to build/lab0/.")
+    ap = argparse.ArgumentParser(description="Lab 0 plots: cell delay vs. output load and input slew, written to your track's build/lab0/.")
     ap.add_argument("--platforms", nargs="+", default=SPEC_PLATFORMS)
     ap.add_argument("--cells", nargs="+", default=["inv_1", "inv_4", "nand2_1"],
                     help="<role>_<drive>, role one of inv, nand2, buf")
@@ -39,7 +39,7 @@ def main() -> int:
     ap.add_argument("--load", type=float, default=0.01, help="fixed output load (pF) for the slew sweep")
     ap.add_argument("--corner-platform", default=None, help="library for the corner plot (default: the first one)")
     ap.add_argument("--corner-cell", default="inv_1")
-    ap.add_argument("--out", type=Path, default=ROOT / "build" / "lab0")
+    ap.add_argument("--out", type=Path, default=TRACK / "build" / "lab0")
     a = ap.parse_args()
     a.out.mkdir(parents=True, exist_ok=True)
 

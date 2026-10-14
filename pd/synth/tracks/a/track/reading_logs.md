@@ -1,6 +1,6 @@
 # Reading Track A logs and reports
 
-What the tools print, and where. The concepts behind them are in the main docs: [04_synthesis.md](../docs/04_synthesis.md), [06_timing_reports.md](../docs/06_timing_reports.md), [07_equivalence.md](../docs/07_equivalence.md), [08_gate_level_sim.md](../docs/08_gate_level_sim.md).
+What the tools print, and where. The concepts behind them are in the main docs: [04_synthesis.md](../../../docs/04_synthesis.md), [06_timing_reports.md](../../../docs/06_timing_reports.md), [07_equivalence.md](../../../docs/07_equivalence.md), [08_gate_level_sim.md](../../../docs/08_gate_level_sim.md).
 Every file below is in `build/<design>/<library>/`.
 
 ## Lint

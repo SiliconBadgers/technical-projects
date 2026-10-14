@@ -1,6 +1,6 @@
 # Lab 2 commands (Track A)
 
-The tasks and questions are in [labs/lab2_systolic/README.md](../labs/lab2_systolic/README.md); the contract is [spec.md](../labs/lab2_systolic/spec.md).
+The tasks and questions are in [labs/lab2_systolic/README.md](../../../labs/lab2_systolic/README.md); the contract is [spec.md](../../../labs/lab2_systolic/spec.md).
 This page only shows how to run them here. Your clock target: [README.md](README.md#clock-targets).
 
 ## Run the steps one at a time
@@ -26,7 +26,7 @@ Outputs: `build/sb_systolic_tile/sky130hd/`.
 
 ## Your SDC
 
-- Write `labs/lab2_systolic/sdc/<library>.sdc` (e.g. `sky130hd.sdc`). The flow reads `sdc/$(PDK).sdc`.
+- Write `tracks/a/labs/lab2_systolic/sdc/<library>.sdc` (e.g. `sky130hd.sdc`; this track's lab folder, not the one at the repo root). The flow reads `sdc/$(PDK).sdc`.
 - Use the [SDC helpers](README.md#sdc-helpers): `set clk_period [sb_clock_period <ns>]`, `$sb_driving_cell`, `[sb_pin_cap ...]`.
 - Check it: `make sta ...`, then read the first sections of `sta_ss.rpt` ([reading_logs.md](reading_logs.md#timing)).
 
@@ -57,4 +57,4 @@ Give `make check` the same `DESIGN_PARAMS` and `CLOCK_PERIOD`, so it reads the s
 
 How to read each file: [reading_logs.md](reading_logs.md). `make check` also prints your tier and leaderboard score.
 
-Next: answer the questions in [labs/lab2_systolic/README.md](../labs/lab2_systolic/README.md), then follow its Next link.
+Next: answer the questions in [labs/lab2_systolic/README.md](../../../labs/lab2_systolic/README.md), then follow its Next link.

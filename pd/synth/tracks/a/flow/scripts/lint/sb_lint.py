@@ -27,7 +27,7 @@ def check(path: Path) -> list[str]:
         if re.search(r"sb_lint:\s*allow\s+SB-SENS\s+\S", line):
             continue                       # opt-out: // sb_lint: allow SB-SENS <reason>
         out.append(f"%Error-SB-SENS: {path}:{n}: combinational `{m.group(0)}` -- use always_comb or always @* "
-                   "(see docs/04_synthesis.md#lint)")
+                   "(see ../../docs/04_synthesis.md#lint)")
     return out
 
 

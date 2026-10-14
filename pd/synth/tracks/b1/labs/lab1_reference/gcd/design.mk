@@ -7,7 +7,7 @@ RTL_FILES   := $(DESIGN_DIR)/rtl/gcd.v
 RTL_INCDIRS :=
 
 # constraints for sky130_scl_9T
-SDC_FILE    := $(DESIGN_DIR)/sdc/sky130_scl_9T.sdc
+SDC_FILE    := $(TRACK_DESIGN_DIR)/sdc/sky130_scl_9T.sdc
 
 # cocotb testbench
 TB_DIR      := $(DESIGN_DIR)/tb

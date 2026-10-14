@@ -15,7 +15,7 @@ Traffic jams caused by long roads only show up once the roads exist.
 | A weak gate driving a moderate load | use a stronger cell or add a buffer while mapping |
 | Registers in the wrong place in a pipeline | [retiming](02_glossary.md#retiming): move them (equivalence checking gets harder) |
 
-Your track's knobs for these: [track/README.md](../track/README.md).
+Your track's knobs for these: its `track/README.md` ([tracks/README.md](../tracks/README.md)).
 
 ## Only the RTL can fix
 

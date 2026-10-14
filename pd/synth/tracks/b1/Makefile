@@ -2,15 +2,17 @@
 # Author:      Isaac Hagedorn
 # Date:        2026-10-09
 # Description: Track B1 (Cadence) flow: lint, sim, synth, sta, lec, gls and qor for one DESIGN on sky130_scl_9T.
-#              Run `make help` for usage.
+#              Run `make help` in this folder (tracks/b1) for usage.
 
 SHELL         := /bin/bash
 .SHELLFLAGS   := -eu -o pipefail -c
 .DEFAULT_GOAL := help
 .DELETE_ON_ERROR:
 
-SB_ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
-FLOW    := $(SB_ROOT)/flow
+# TRACK_DIR: this track's folder (tracks/b1: flow, design.mk, SDCs, build/); SB_ROOT: the repo root (shared RTL, testbenches)
+TRACK_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
+SB_ROOT   := $(abspath $(TRACK_DIR)/../..)
+FLOW      := $(TRACK_DIR)/flow
 
 # --- library: sky130_scl_9T from the SiliconBadgers PDK repo (cloned next to this repo) ---
 SB_PDK   ?= $(abspath $(SB_ROOT)/../silicon-badgers-sky130-pdk)
@@ -53,8 +55,11 @@ DESIGN_DIR_sb_systolic_tile := labs/lab2_systolic
 ifeq ($(DESIGN_DIR_$(DESIGN)),)
   $(error DESIGN=$(DESIGN) is unknown. Use gcd, ibex or sb_systolic_tile)
 endif
-DESIGN_DIR := $(SB_ROOT)/$(DESIGN_DIR_$(DESIGN))
-include $(DESIGN_DIR)/design.mk
+# DESIGN_DIR: the lab folder at the repo root (RTL, testbench, macro models);
+# TRACK_DESIGN_DIR: the same folder in this track (design.mk, SDCs, HAL waivers, macro Liberty)
+DESIGN_DIR       := $(SB_ROOT)/$(DESIGN_DIR_$(DESIGN))
+TRACK_DESIGN_DIR := $(TRACK_DIR)/$(DESIGN_DIR_$(DESIGN))
+include $(TRACK_DESIGN_DIR)/design.mk
 
 # optional design.mk settings
 RTL_INCDIRS      ?=
@@ -74,7 +79,7 @@ RESET_SYNC_FLOPS ?= 2
 BRONZE_PERIOD_NS ?=
 SILVER_PERIOD_NS ?=
 # lint waivers: one line per waived HAL message, `<code> [<file pattern> [<signal>]]  # why`
-LINT_WAIVERS     ?= $(wildcard $(DESIGN_DIR)/hal_waivers.txt)
+LINT_WAIVERS     ?= $(wildcard $(TRACK_DESIGN_DIR)/hal_waivers.txt)
 
 # --- run knobs ---
 CORNERS      := tt ss ff
@@ -99,10 +104,10 @@ LEC_MODE      ?= genus
 export SB_DESIGN_PARAMS := $(DESIGN_PARAMS)
 
 PARAMS_TAG := $(if $(filter command line,$(origin DESIGN_PARAMS)),_$(subst =,,$(subst $(eval) ,_,$(strip $(DESIGN_PARAMS)))))
-BUILD      ?= $(SB_ROOT)/build/$(DESIGN)/$(LIB_NAME)$(PARAMS_TAG)$(if $(CLOCK_PERIOD),_p$(CLOCK_PERIOD))
+BUILD      ?= $(TRACK_DIR)/build/$(DESIGN)/$(LIB_NAME)$(PARAMS_TAG)$(if $(CLOCK_PERIOD),_p$(CLOCK_PERIOD))
 SYNTH_RTL  := $(SYNTH_EXTRA) $(RTL_FILES)
 COCOTB     := $(TOOL_WRAP) python3 $(FLOW)/xcelium/run_cocotb.py --timeout $(SIM_TIMEOUT)
-FLOW_DEPS  := $(DESIGN_DIR)/design.mk
+FLOW_DEPS  := $(TRACK_DESIGN_DIR)/design.mk
 
 # --- targets ---
 .PHONY: help info env-check all lint sim synth sta lec gls qor check clean FORCE
@@ -210,7 +215,7 @@ $(BUILD)/gls.done: $(BUILD)/netlist.v $(MACRO_SIM_MODELS) $(wildcard $(TB_DIR)/*
 
 # --- constraints: your SDC, with the period replaced when CLOCK_PERIOD is set ---
 $(SDC_FILE):
-	@echo "no SDC: write $@ (see docs/05_sdc.md; for Lab 2, from spec.md)"; exit 1
+	@echo "no SDC: write $@ (see ../../docs/05_sdc.md; for Lab 2, from spec.md)"; exit 1
 
 $(BUILD)/constraints.sdc: $(SDC_FILE) | $(BUILD)
 ifeq ($(CLOCK_PERIOD),)

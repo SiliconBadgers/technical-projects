@@ -5,7 +5,7 @@ Nothing here is broken on purpose.
 
 Read docs [04](../../docs/04_synthesis.md) to [08](../../docs/08_gate_level_sim.md) before or while you do the tasks.
 
-Commands for your track: [track/lab1.md](../../track/lab1.md)
+Commands for your track: its `track/lab1.md` ([tracks/README.md](../../tracks/README.md))
 
 | Part | Design |
 |---|---|

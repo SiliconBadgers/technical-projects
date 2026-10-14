@@ -13,7 +13,7 @@ It works like a compiler: it reads your code, builds generic logic, simplifies i
 
 Synthesis can only build what the RTL describes. If the RTL describes a [latch](02_glossary.md#latch) or a short circuit, synthesis builds it faithfully.
 The sections below are the problems to look for in the logs, roughly in the order you meet them.
-Your track explains the exact log messages: [track/reading_logs.md](../track/reading_logs.md).
+Your track explains the exact log messages in its `track/reading_logs.md` ([tracks/README.md](../tracks/README.md)).
 
 ## Lint
 

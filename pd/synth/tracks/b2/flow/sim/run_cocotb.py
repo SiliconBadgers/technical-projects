@@ -102,7 +102,7 @@ def main() -> int:
     except SimTimeout:
         print(f"SB-ERROR: the simulation did not finish within SIM_TIMEOUT={args.timeout} s and was killed. "
               "A simulation that never advances is often a combinational loop: read the loop reports "
-              "(synth_check_timing.rpt, check_timing in sta_<corner>.rpt) and docs/04_synthesis.md#combinational-loops")
+              "(synth_check_timing.rpt, check_timing in sta_<corner>.rpt) and ../../docs/04_synthesis.md#combinational-loops")
         return 1
     signal.alarm(0)
     num_tests, num_failed = get_results(Path(results))
