@@ -7,6 +7,7 @@
 | Common stages 1–3, setup, introductory examples, baseline PE | `intro/` |
 | Array design, interfaces, buffering, control, and design smoke tests | `rtl/` |
 | Verification methodology, test plans, extended testbenches, coverage, and regressions | `verif/` |
+| Synthesis, timing constraints, and physical design flows | `pd/` |
 
 Keep teaching explanations in `intro/README.md`, `rtl/README.md`, or
 `verif/README.md`. Add a section and a contents link instead of another guide file.
