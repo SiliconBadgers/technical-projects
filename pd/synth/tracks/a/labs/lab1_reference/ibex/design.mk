@@ -17,12 +17,12 @@ SLANG_HIERARCHY := 1
 ABC_SUBMODULE_DELAY_FRAC := 0.15
 
 # One SDC per platform.
-SDC_FILE     := $(DESIGN_DIR)/sdc/$(PDK).sdc
+SDC_FILE     := $(TRACK_DESIGN_DIR)/sdc/$(PDK).sdc
 
 # Icarus cannot elaborate ibex, so RTL sim and GLS use Verilator.
 SIM_RTL      := verilator
 GLS_SIM      := verilator
-SIM_ARGS     := $(DESIGN_DIR)/lint_waivers.vlt
+SIM_ARGS     := $(TRACK_DESIGN_DIR)/lint_waivers.vlt
 TB_DIR       := $(DESIGN_DIR)/tb
 TB_MODULE    := test_ibex
 TB_SOURCES   :=

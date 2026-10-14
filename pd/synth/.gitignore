@@ -28,6 +28,6 @@ fv/
 *.log
 *.cmd
 *.cmd~
+lc_output.txt
 # mentor material (separate repo)
 mentor/
-lc_output.txt

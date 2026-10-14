@@ -49,4 +49,4 @@ Not installed by ciel: `sky130_scl_9T` 0.1.2 (`extra_libraries` in `pdk.lock`, w
 | kepler-formal | `f025fa2f254efd6c702cef004e55995c1f13a11a` |
 | ORFS reference | `3a964e13f11a4e435aac01ffa14db0a7d2853720` |
 
-Next: [spec_deviations.md](spec_deviations.md)
+Next: [README.md](README.md)

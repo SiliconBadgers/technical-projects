@@ -5,11 +5,11 @@ Your synthesis tool reads it to choose cells. Your timing tool reads it to compu
 
 Analogy: a parts catalog. For every part it lists the size, the price in power, what it does, and how fast it is for a given job.
 
-Find your track's files and open one:
+Find your track's files and open one, from your track's folder (`tracks/<track>`):
 
 ```
-python3 libs/lab0/platforms.py                 # every library and corner of your track
-less $(python3 libs/lab0/platforms.py <library> tt)
+python3 ../../libs/lab0/platforms.py                 # every library and corner of your track
+less $(python3 ../../libs/lab0/platforms.py <library> tt)
 ```
 
 For a `.lib.gz` file use `zless` instead of `less`.

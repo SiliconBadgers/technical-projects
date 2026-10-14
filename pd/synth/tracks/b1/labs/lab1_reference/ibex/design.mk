@@ -16,7 +16,7 @@ SYNTH_EXTRA   := $(FLOW)/cells/sky130_scl_9T_sb_icg.v
 SIM_DEFINES   := VERILATOR
 
 # constraints for sky130_scl_9T
-SDC_FILE    := $(DESIGN_DIR)/sdc/sky130_scl_9T.sdc
+SDC_FILE    := $(TRACK_DESIGN_DIR)/sdc/sky130_scl_9T.sdc
 
 # cocotb testbench
 TB_DIR      := $(DESIGN_DIR)/tb

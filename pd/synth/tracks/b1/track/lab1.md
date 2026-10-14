@@ -1,6 +1,6 @@
 # Lab 1 commands (Track B1)
 
-The tasks and questions are in [labs/lab1_reference/README.md](../labs/lab1_reference/README.md). This page only shows how to run them here.
+The tasks and questions are in [labs/lab1_reference/README.md](../../../labs/lab1_reference/README.md). This page only shows how to run them here.
 Clock periods: [README.md](README.md#clock-targets). Reading the outputs: [reading_logs.md](reading_logs.md).
 
 - This track has one library, `sky130_scl_9T`, so "every library of your track" means this one.
@@ -78,4 +78,4 @@ make lec gls DESIGN=ibex
 | What LEC proved | `lec_run.log` (see [reading_logs.md](reading_logs.md#equivalence-conformal)) |
 | GLS result | `gls_results.xml` |
 
-Next: answer the questions in [labs/lab1_reference/README.md](../labs/lab1_reference/README.md), then follow its Next link.
+Next: answer the questions in [labs/lab1_reference/README.md](../../../labs/lab1_reference/README.md), then follow its Next link.

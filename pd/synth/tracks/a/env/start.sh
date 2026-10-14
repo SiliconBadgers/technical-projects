@@ -2,12 +2,13 @@
 # File:        start.sh
 # Author:      Isaac Hagedorn
 # Date:        2026-10-08
-# Description: Builds and starts the Track A team container. Usage: env/start.sh [build|shell|print].
+# Description: Builds and starts the Track A team container. Usage, in tracks/a: env/start.sh [build|shell|print].
 set -euo pipefail
 
 HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-REPO=$(cd "$HERE/.." && pwd)
-LOCK="$REPO/pdk.lock"
+TRACK=$(cd "$HERE/.." && pwd)                    # tracks/a: pdk.lock, requirements.txt, the image build context
+REPO=$(cd "$TRACK/../.." && pwd)                 # the course repo
+LOCK="$TRACK/pdk.lock"
 
 # lock_top KEY: value of a top-level "KEY: value" line
 lock_top() { sed -n "s/^$1:[[:space:]]*\([^[:space:]#]*\).*/\1/p" "$LOCK"; }
@@ -46,7 +47,7 @@ build)
         --build-arg "OPEN_PDKS_SKY130=$OPDK_SKY130" \
         --build-arg "OPEN_PDKS_GF180=$OPDK_GF180" \
         --build-arg "CIEL_VERSION=$CIEL_VERSION" \
-        -f "$HERE/Dockerfile" -t "localhost/$TEAM_IMAGE:$TEAM_TAG" "$REPO"
+        -f "$HERE/Dockerfile" -t "localhost/$TEAM_IMAGE:$TEAM_TAG" "$TRACK"
     ;;
 shell|print)
     export DESIGNS=${DESIGNS:-$(dirname "$REPO")}            # host dir mounted at /foss/designs
@@ -68,7 +69,7 @@ shell|print)
         echo "[sb] image localhost/$TEAM_IMAGE:$TEAM_TAG not found: run 'env/start.sh build' first" >&2
         exit 1
     fi
-    echo "[sb] in the container:  cd /foss/designs/$(basename "$REPO") && make PDK=sky130hd DESIGN=gcd all"
+    echo "[sb] in the container:  cd /foss/designs/$(basename "$REPO")/tracks/a && make PDK=sky130hd DESIGN=gcd all"
     exec "$HERE/iic/start_shell.sh"    # IIC-OSIC-TOOLS' launcher (vendored)
     ;;
 *)

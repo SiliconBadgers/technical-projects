@@ -33,7 +33,7 @@ RUN set -eux; \
          "$(sed -n 's/^cocotb==\([^ ]*\).*/\1/p' /tmp/sb-requirements.txt)"
 
 # smoke check: flow tools on PATH, read_slang built in
-# NOTE(spec-mismatch): spec §2(b) yosys-slang is already in Yosys, see track/spec_deviations.md.
+# NOTE(spec-mismatch): spec §2(b) yosys-slang is already in Yosys.
 RUN set -eux; \
     for t in yosys eqy sta verilator verible-verilog-lint iverilog vvp; do command -v "$t"; done; \
     yosys -q -p 'help read_slang' > /dev/null; \

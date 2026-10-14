@@ -92,7 +92,7 @@ if {[sb_count t:\$_DLATCH* t:\$_SR_* t:\$_DLATCHSR*] > 0} {
     select -list t:\$_DLATCH* t:\$_SR_* t:\$_DLATCHSR*
     log -stderr "SB-ERROR: synthesis inferred a latch (listed just above in synth.log):"
     log -stderr "          a combinational block does not assign a signal on every path."
-    log -stderr "          Add a default assignment or a full case. See docs/04_synthesis.md#latches"
+    log -stderr "          Add a default assignment or a full case. See ../../docs/04_synthesis.md#latches"
     error "latch inferred"
 }
 

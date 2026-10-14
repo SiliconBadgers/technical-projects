@@ -17,7 +17,7 @@ PLATFORM_CELLS := sb_icg
 SIM_DEFINES    := VERILATOR
 
 # constraints for this library
-SDC_FILE    := $(DESIGN_DIR)/sdc/sky130_fd_sc_hd.sdc
+SDC_FILE    := $(TRACK_DESIGN_DIR)/sdc/sky130_fd_sc_hd.sdc
 
 # cocotb testbench: tb/test_ibex.py
 TB_DIR      := $(DESIGN_DIR)/tb

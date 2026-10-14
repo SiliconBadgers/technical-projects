@@ -16,7 +16,7 @@ MACRO_SIM_MODELS := $(DESIGN_DIR)/macros/sb_sram_256x8_model.v
 ASYNC_RESET_PORT := rst_n
 
 # you write this SDC from spec.md (see sdc/README.md)
-SDC_FILE    := $(DESIGN_DIR)/sdc/sky130_fd_sc_hd.sdc
+SDC_FILE    := $(TRACK_DESIGN_DIR)/sdc/sky130_fd_sc_hd.sdc
 
 # cocotb testbench: tb/test_tile.py
 TB_DIR      := $(DESIGN_DIR)/tb

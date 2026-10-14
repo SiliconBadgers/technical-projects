@@ -65,7 +65,7 @@ Example: an output port without `set_output_delay`, or an input that feeds logic
 
 - The timing tool never reports a violation on an unconstrained path. It looks clean, but nothing was checked.
 - The team's checks fail on any unconstrained endpoint.
-- Your timing tool can list them ([track/reading_logs.md](../track/reading_logs.md)). Fix the SDC, not the design.
+- Your timing tool can list them (your track's `track/reading_logs.md`). Fix the SDC, not the design.
 
 ## Asynchronous reset
 
@@ -94,6 +94,6 @@ Every exception needs a comment saying why it is safe. A wrong exception hides a
 2. Read the timing tool's constraint check first: missing clocks, unconstrained endpoints, loops.
 3. Fix the SDC until that list is empty, then read the timing paths ([06](06_timing_reports.md)).
 
-Commands for your track: [track/reading_logs.md](../track/reading_logs.md).
+Commands for your track: its `track/reading_logs.md` ([tracks/README.md](../tracks/README.md)).
 
 Next: [06 — Reading timing reports](06_timing_reports.md)

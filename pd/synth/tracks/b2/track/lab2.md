@@ -1,11 +1,11 @@
 # Lab 2 commands (Track B2)
 
-The tasks and questions are in [labs/lab2_systolic/README.md](../labs/lab2_systolic/README.md); the contract is [spec.md](../labs/lab2_systolic/spec.md).
+The tasks and questions are in [labs/lab2_systolic/README.md](../../../labs/lab2_systolic/README.md); the contract is [spec.md](../../../labs/lab2_systolic/spec.md).
 This page only shows how to run them here. Your clock target: [README.md](README.md#clock-targets) (Bronze: 133 MHz).
 
 ## Your SDC
 
-Your SDC goes in **`labs/lab2_systolic/sdc/sky130_fd_sc_hd.sdc`**. Until it exists, `make synth` stops and says so.
+Your SDC goes in **`tracks/b2/labs/lab2_systolic/sdc/sky130_fd_sc_hd.sdc`** (this track's lab folder, not the one at the repo root). Until it exists, `make synth` stops and says so.
 
 - Write plain SDC: Design Compiler and PrimeTime both read it (with `source`: their `read_sdc` does not know `remove_from_collection`). There are no helper procedures in this track.
 - Put the period on its own line, `set clk_period <ns>`, and compute the rest from it. `make ... CLOCK_PERIOD=<ns>` replaces that line.
@@ -13,7 +13,7 @@ Your SDC goes in **`labs/lab2_systolic/sdc/sky130_fd_sc_hd.sdc`**. Until it exis
 - Output load: `set_load <pF> <ports>`. Look up the input capacitance of `sky130_fd_sc_hd__buf_4` pin `A` in the Liberty file (Lab 0 tools) and write it in a comment.
 - To leave some ports out of a list: `remove_from_collection [all_inputs] [get_ports {<ports>}]`.
 - `rst_n` is asynchronous and gets no input delay (spec). It reaches only the reset synchronizer: false-path it there, `set_false_path -from [get_ports rst_n]`, with a comment. Do not false-path the flip-flops' reset pins (`all_registers -async_pins`, which Design Compiler does not even know): the synchronized reset is launched by `clk`, and its recovery and removal checks must be timed ([reading_logs.md](reading_logs.md#recovery-and-removal)).
-- Example of the style: [the gcd SDC](../labs/lab1_reference/gcd/sdc/sky130_fd_sc_hd.sdc). Rules and conventions: [docs/05_sdc.md](../docs/05_sdc.md).
+- Example of the style: [the gcd SDC](../labs/lab1_reference/gcd/sdc/sky130_fd_sc_hd.sdc). Rules and conventions: [docs/05_sdc.md](../../../docs/05_sdc.md).
 
 Check it with `make sta DESIGN=sb_systolic_tile`, then read the first sections of `sta_ss.rpt` (`check_timing` and the coverage) before any path ([reading_logs.md](reading_logs.md#timing)).
 
@@ -68,4 +68,4 @@ The testbench reads the same `DESIGN_PARAMS` (as `SB_DESIGN_PARAMS`), so it chec
 
 How to read each file: [reading_logs.md](reading_logs.md).
 
-Next: answer the questions in [labs/lab2_systolic/README.md](../labs/lab2_systolic/README.md), then follow its Next link.
+Next: answer the questions in [labs/lab2_systolic/README.md](../../../labs/lab2_systolic/README.md), then follow its Next link.

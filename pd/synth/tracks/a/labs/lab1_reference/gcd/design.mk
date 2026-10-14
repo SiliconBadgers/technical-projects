@@ -8,7 +8,7 @@ RTL_INCDIRS  :=
 RTL_DEFINES  :=
 
 # One SDC per platform.
-SDC_FILE     := $(DESIGN_DIR)/sdc/$(PDK).sdc
+SDC_FILE     := $(TRACK_DESIGN_DIR)/sdc/$(PDK).sdc
 
 TB_DIR       := $(DESIGN_DIR)/tb
 TB_MODULE    := test_gcd

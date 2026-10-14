@@ -1,7 +1,7 @@
 # File:        Makefile
 # Author:      Isaac Hagedorn
 # Date:        2026-10-09
-# Description: Track B2 (Synopsys) flow: lint, sim, synth, sta, lec, gls and qor for one DESIGN on sky130_fd_sc_hd. Run `make help` for usage.
+# Description: Track B2 (Synopsys) flow: lint, sim, synth, sta, lec, gls and qor for one DESIGN on sky130_fd_sc_hd. Run `make help` in this folder (tracks/b2) for usage.
 
 SHELL         := /bin/bash
 .SHELLFLAGS   := -eu -o pipefail -c
@@ -10,8 +10,10 @@ SHELL         := /bin/bash
 # keep generated files such as *.env
 .SECONDARY:
 
-ROOT    := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
-FLOW    := $(ROOT)/flow
+# TRACK_DIR: this track's folder (tracks/b2: flow, design.mk, SDCs, build/); ROOT: the repo root (shared RTL, testbenches)
+TRACK_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
+ROOT    := $(abspath $(TRACK_DIR)/../..)
+FLOW    := $(TRACK_DIR)/flow
 DESIGN  ?= gcd
 LIBRARY := sky130_fd_sc_hd
 
@@ -40,7 +42,10 @@ DESIGN_DIR_sb_systolic_tile := labs/lab2_systolic
 ifeq ($(DESIGN_DIR_$(DESIGN)),)
   $(error DESIGN=$(DESIGN) is unknown: use gcd, ibex or sb_systolic_tile)
 endif
-DESIGN_DIR := $(ROOT)/$(DESIGN_DIR_$(DESIGN))
+# DESIGN_DIR: the lab folder at the repo root (RTL, testbench, macro models);
+# TRACK_DESIGN_DIR: the same folder in this track (design.mk, SDCs, macro Liberty)
+DESIGN_DIR       := $(ROOT)/$(DESIGN_DIR_$(DESIGN))
+TRACK_DESIGN_DIR := $(TRACK_DIR)/$(DESIGN_DIR_$(DESIGN))
 
 # defaults for the optional design.mk settings
 RTL_INCDIRS      :=
@@ -56,7 +61,7 @@ MACROS           :=
 MACRO_SIM_MODELS :=
 # asynchronous reset input: STA counts the flip-flops hanging straight on it
 ASYNC_RESET_PORT :=
-include $(DESIGN_DIR)/design.mk
+include $(TRACK_DESIGN_DIR)/design.mk
 
 SYNTH_RTL := $(foreach c,$(PLATFORM_CELLS),$(FLOW)/cells/$(LIBRARY)_$(c).v) $(RTL_FILES)
 SIM_RTL   := $(RTL_FILES) $(MACRO_SIM_MODELS)
@@ -79,9 +84,9 @@ SIM_TIMEOUT   ?= 900
 empty :=
 space := $(empty) $(empty)
 PARAMS_TAG := $(if $(strip $(DESIGN_PARAMS)),_$(subst =,,$(subst $(space),_,$(strip $(DESIGN_PARAMS)))))
-BUILD      ?= $(ROOT)/build/$(DESIGN)/$(LIBRARY)$(PARAMS_TAG)$(if $(CLOCK_PERIOD),_p$(CLOCK_PERIOD))
+BUILD      ?= $(TRACK_DIR)/build/$(DESIGN)/$(LIBRARY)$(PARAMS_TAG)$(if $(CLOCK_PERIOD),_p$(CLOCK_PERIOD))
 # compiled macro libraries, shared by all builds of the design
-MACRO_DB_DIR := $(ROOT)/build/$(DESIGN)/macros
+MACRO_DB_DIR := $(TRACK_DIR)/build/$(DESIGN)/macros
 macro_dbs     = $(foreach m,$(MACROS),$(MACRO_DB_DIR)/$(m)_$(LIBRARY)_$(1).db)
 # the SDC the tools read (a copy, with the CLOCK_PERIOD override if given)
 SDC := $(BUILD)/constraints.sdc
@@ -137,7 +142,7 @@ $(VIEWS)/%.db:
 	@exit 1
 
 # macro Liberty (.lib) -> .db with lc_shell
-$(MACRO_DB_DIR)/%.db: $(DESIGN_DIR)/macros/%.lib $(FLOW)/lc/compile_lib.tcl
+$(MACRO_DB_DIR)/%.db: $(TRACK_DESIGN_DIR)/macros/%.lib $(FLOW)/lc/compile_lib.tcl
 	@mkdir -p $(@D)
 	cd $(@D) && LIB_FILE=$< DB_FILE=$@ lc_shell -no_init -f $(FLOW)/lc/compile_lib.tcl < /dev/null > $*.log 2>&1 || true
 	@test -s $@ || { echo "lc_shell could not compile $< -- read $(@D)/$*.log"; exit 1; }
@@ -145,7 +150,7 @@ $(MACRO_DB_DIR)/%.db: $(DESIGN_DIR)/macros/%.lib $(FLOW)/lc/compile_lib.tcl
 
 # --- constraints ---
 # the SDC is hand-written: report it if missing
-$(DESIGN_DIR)/sdc/%.sdc:
+$(TRACK_DESIGN_DIR)/sdc/%.sdc:
 	@echo "no SDC: write $@ (Lab 2: see track/lab2.md)"; exit 1
 
 $(SDC): $(SDC_FILE) | $(BUILD)
@@ -169,7 +174,7 @@ $(BUILD)/lint.log: $(SIM_RTL) $(FLOW)/lint/run_lint.sh $(FLOW)/lint/vc_lint.tcl 
 # --- sim / gls (the same cocotb testbench on the RTL and on the netlist, VCS) ---
 COCOTB := python3 $(FLOW)/sim/run_cocotb.py --timeout $(SIM_TIMEOUT)
 
-$(BUILD)/results.xml: $(SIM_RTL) $(wildcard $(TB_DIR)/*.py) $(DESIGN_DIR)/design.mk $(FLOW)/sim/run_cocotb.py | $(BUILD)
+$(BUILD)/results.xml: $(SIM_RTL) $(wildcard $(TB_DIR)/*.py) $(TRACK_DESIGN_DIR)/design.mk $(FLOW)/sim/run_cocotb.py | $(BUILD)
 	$(COCOTB) --toplevel $(TOP) --test-module $(TB_MODULE) --test-dir $(TB_DIR) \
 	  --build-dir $(BUILD)/sim_rtl --results $@ --waves $(WAVES) \
 	  $(addprefix --incdir ,$(RTL_INCDIRS)) $(addprefix --define ,$(RTL_DEFINES) $(SIM_DEFINES)) \
@@ -202,7 +207,7 @@ $(BUILD)/synth.env: FORCE | $(BUILD)
 	@cmp -s $@.tmp $@ && rm $@.tmp || mv $@.tmp $@
 
 $(BUILD)/netlist.v: $(BUILD)/synth.env $(SYNTH_RTL) $(SDC) $(call cell_db,$(SYNTH_CORNER)) \
-                    $(call macro_dbs,$(SYNTH_CORNER)) $(FLOW)/dc/synth.tcl $(DESIGN_DIR)/design.mk
+                    $(call macro_dbs,$(SYNTH_CORNER)) $(FLOW)/dc/synth.tcl $(TRACK_DESIGN_DIR)/design.mk
 	@echo "synth: dc_shell, $(TOP) at $(SYNTH_CORNER) -> $(BUILD)/synth.log"
 	cd $(BUILD) && rm -f netlist.v && source synth.env && \
 	  dc_shell -f $(FLOW)/dc/synth.tcl < /dev/null > synth.log 2>&1 || true

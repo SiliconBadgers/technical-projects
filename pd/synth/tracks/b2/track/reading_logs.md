@@ -1,6 +1,6 @@
 # Reading logs and reports (Track B2)
 
-The ideas are in the main docs ([04](../docs/04_synthesis.md), [05](../docs/05_sdc.md), [06](../docs/06_timing_reports.md), [07](../docs/07_equivalence.md), [08](../docs/08_gate_level_sim.md)).
+The ideas are in the main docs ([04](../../../docs/04_synthesis.md), [05](../../../docs/05_sdc.md), [06](../../../docs/06_timing_reports.md), [07](../../../docs/07_equivalence.md), [08](../../../docs/08_gate_level_sim.md)).
 This page shows where the Synopsys tools write them and what the lines look like.
 The examples below are shortened, and their numbers are made up.
 
@@ -73,7 +73,7 @@ Inferred memory devices in process in routine 'arbiter' in file
 Warning:  Latch inferred in design arbiter read with 'hdlin_check_no_latch' (ELAB-395)
 ```
 
-- `Type` `Flip-flop` is a clocked register; `Line` is the line of its `always` block. `Latch` in a combinational block means a signal is not assigned on every path ([04](../docs/04_synthesis.md#latches)).
+- `Type` `Flip-flop` is a clocked register; `Line` is the line of its `always` block. `Latch` in a combinational block means a signal is not assigned on every path ([04](../../../docs/04_synthesis.md#latches)).
 - The flow turns on a warning for every inferred latch (`hdlin_check_no_latch`): `ELAB-395`, right after the table.
 - After compile, `synth_latches.rpt` counts the latches left. ibex's clock-gating cell (`sdlclkp`) holds a latch on purpose, but it is not counted there.
 
@@ -82,22 +82,22 @@ Warning:  Latch inferred in design arbiter read with 'hdlin_check_no_latch' (ELA
 - Two `always` blocks of one module that drive the same variable stop `elaborate`: `Net '<name>' or a directly connected net is driven by more than one source ... (ELAB-366)`.
 - A module output that the parent module also drives does not stop synthesis. `synth_check_design.rpt` counts it (`Net has multiple drivers (LINT-4)`), and `synth.log` says `Information: In design '<design>', net '<name>' has multiple drivers.  Wired AND assumed. (LINT-4)`: Design Compiler quietly ANDs the drivers.
 - VCS (`make lint`, `make sim`) stops on both: `Error-[ICPSD] Illegal combination of drivers`.
-- The message gives the net name; search the RTL for every place that assigns it ([04](../docs/04_synthesis.md#multiple-drivers)).
+- The message gives the net name; search the RTL for every place that assigns it ([04](../../../docs/04_synthesis.md#multiple-drivers)).
 
 ### Combinational loops
 
 - Timing tools cannot time a loop, so they cut one arc in it: `Disabling timing arc between pins ... to break a timing loop`.
-- `synth_check_timing.rpt` and the `check_timing` section of `sta_<corner>.rpt` list loops ([04](../docs/04_synthesis.md#combinational-loops)).
+- `synth_check_timing.rpt` and the `check_timing` section of `sta_<corner>.rpt` list loops ([04](../../../docs/04_synthesis.md#combinational-loops)).
 
 ### Black boxes
 
 - `Warning: Unable to resolve reference '<module>' in '<design>'. (LINK-5)`: a module or library cell was not found. It is only a warning, so the flow adds `SB-ERROR: link could not resolve every instance` and fails the step.
-- Lab 2's SRAM is a library cell from its own `.db`, so it links. Its area is in the `Macro/Black Box area` line of `synth_area.rpt` ([04](../docs/04_synthesis.md#black-boxes)).
+- Lab 2's SRAM is a library cell from its own `.db`, so it links. Its area is in the `Macro/Black Box area` line of `synth_area.rpt` ([04](../../../docs/04_synthesis.md#black-boxes)).
 
 ### Check
 
 `synth_check_design.rpt` lists structural problems before compile: undriven inputs, unconnected outputs, constant ports, multiple drivers.
-Many are harmless (an unused port of a reused module); each one deserves a look ([04](../docs/04_synthesis.md#check)).
+Many are harmless (an unused port of a reused module); each one deserves a look ([04](../../../docs/04_synthesis.md#check)).
 
 ### Other things in `synth.log`
 
@@ -110,7 +110,7 @@ Many are harmless (an unused port of a reused module); each one deserves a look 
 
 ## Timing
 
-`sta_<corner>.rpt` has these sections, in this order. Read the first two before any path ([05](../docs/05_sdc.md#checking-your-sdc)).
+`sta_<corner>.rpt` has these sections, in this order. Read the first two before any path ([05](../../../docs/05_sdc.md#checking-your-sdc)).
 
 1. `check_timing`: unconstrained endpoints, inputs without an input delay, loops, clocks.
 2. Analysis coverage of the checks your SDC decides (setup, hold, recovery, removal, outputs): how many are met, violated or **untested** (untested = nothing checks them). A short section after it covers the library's pulse-width checks; reset pins are untested there (`no_clock`: a reset is not a clock), which is expected.
@@ -164,17 +164,17 @@ Many are harmless (an unused port of a reused module); each one deserves a look 
 
 - `Path Type: min`, at `ff`. The capture side shows `library hold time` instead of setup time.
 - Slack = arrival − required: data must not arrive too early. The clock period does not appear.
-- Before layout, hold is often clean or tight; real fixes come in physical design ([09](../docs/09_synthesis_vs_pd.md)).
+- Before layout, hold is often clean or tight; real fixes come in physical design ([09](../../../docs/09_synthesis_vs_pd.md)).
 
 ### Unconstrained endpoints
 
 - `check_timing` prints a warning such as `There are 5 endpoints which are not constrained for maximum delay`, then lists them.
 - The coverage section shows them as `untested`, with a reason. Two kinds are fine: recovery/removal of the reset synchronizer's two flip-flops, which only `rst_n` reaches (`no_startpoint_clock`, or `false_paths`), and pins driven by a constant (`constant_disabled`, `no_paths`: the synchronizer's first `D` input; in ibex, the six outputs its configuration ties to a constant, `instr_addr_o[1:0]`, `data_addr_o[1:0]`, `alert_minor_o` and `alert_major_o`). Any other untested check is a hole in your SDC.
-- Fix the SDC (a missing `set_input_delay` or `set_output_delay`), not the design ([05](../docs/05_sdc.md#unconstrained)).
+- Fix the SDC (a missing `set_input_delay` or `set_output_delay`), not the design ([05](../../../docs/05_sdc.md#unconstrained)).
 
 ### Recovery and removal
 
-Reset pins of flip-flops get their own checks: recovery (like setup) and removal (like hold) ([05](../docs/05_sdc.md#asynchronous-reset)).
+Reset pins of flip-flops get their own checks: recovery (like setup) and removal (like hold) ([05](../../../docs/05_sdc.md#asynchronous-reset)).
 They appear as paths ending at a reset pin (`RESET_B`), with `library recovery time` or `library removal time` on the capture side.
 In Lab 2 the synchronized reset is launched by `clk`, so these checks are timed at every flip-flop except the synchronizer's own two, which `rst_n` drives directly.
 
@@ -211,7 +211,7 @@ Failing (not equivalent)       0       0       0       0       0       0       0
 - `lec_failing.rpt` lists failing points (`Ref` and `Impl` names of the same register or port).
 - `lec_analyze.rpt` (`analyze_points -failing`) suggests a cause for each one.
 - `lec_unmatched.rpt` lists points without a partner. Registers that synthesis removed (constants) show up here and are fine.
-- An incomplete sensitivity list (`always @(a)` in a block that also reads `b`) gets no message from Design Compiler or Formality (Y-2026.03): synthesis builds the logic as if the list were complete, Formality reads the RTL the same way, and LEC passes. Only RTL simulation, which honors the list, disagrees with GLS ([08](../docs/08_gate_level_sim.md#gls)).
+- An incomplete sensitivity list (`always @(a)` in a block that also reads `b`) gets no message from Design Compiler or Formality (Y-2026.03): synthesis builds the logic as if the list were complete, Formality reads the RTL the same way, and LEC passes. Only RTL simulation, which honors the list, disagrees with GLS ([08](../../../docs/08_gate_level_sim.md#gls)).
 - To see a failing cone as a schematic: `source lec.env`, `SB_STAY=1 fm_shell -f ../../../flow/fm/lec.tcl`, then `start_gui`.
 
 ## Simulation
@@ -220,9 +220,9 @@ RTL simulation and GLS print the same things (`sim.log`, `gls.log`):
 
 - VCS compile messages: `Error-[<CODE>]` or `Warning-[<CODE>]`, then the file and line.
 - cocotb, one line per test (`PASS` or `FAIL`), then a summary table, then the flow's line `SB: 3/3 cocotb tests passed`.
-- A failed test prints the Python assertion with the expected and actual values. An `x` or `z` in a value is unknown or undriven ([08](../docs/08_gate_level_sim.md#gls)).
+- A failed test prints the Python assertion with the expected and actual values. An `x` or `z` in a value is unknown or undriven ([08](../../../docs/08_gate_level_sim.md#gls)).
 - Waveforms: add `WAVES=1`, then open `sim_rtl/waves.vcd` or `sim_gls/waves.vcd`.
-- A simulation that never ends is stopped after `SIM_TIMEOUT` seconds (`SB-ERROR: the simulation did not finish within SIM_TIMEOUT=...`). The usual cause is a combinational loop ([04](../docs/04_synthesis.md#combinational-loops)).
+- A simulation that never ends is stopped after `SIM_TIMEOUT` seconds (`SB-ERROR: the simulation did not finish within SIM_TIMEOUT=...`). The usual cause is a combinational loop ([04](../../../docs/04_synthesis.md#combinational-loops)).
 
 ## QoR
 

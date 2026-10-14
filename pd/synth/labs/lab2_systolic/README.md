@@ -8,7 +8,7 @@
 
 Find each problem from tool output, not by reading the RTL line by line. For every fix, point at the log line that told you.
 
-Commands for your track: [track/lab2.md](../../track/lab2.md)
+Commands for your track: its `track/lab2.md` ([tracks/README.md](../../tracks/README.md))
 
 ## What you have
 
@@ -18,7 +18,7 @@ Commands for your track: [track/lab2.md](../../track/lab2.md)
 | `rtl/` | `tile_top.sv` (top: `sb_systolic_tile`), `pe.sv`, `pe_ctrl.sv`, `readout.sv`, `reset_sync.sv`, `params.svh` |
 | `macros/` | weight-buffer SRAM: black box for synthesis (`sb_sram_256x8.v`) and simulation model (`sb_sram_256x8_model.v`); your track adds its fake timing models |
 | `tb/test_tile.py` | the testbench. Do not change it to make something pass |
-| your SDC | you write it; [track/lab2.md](../../track/lab2.md) says where it goes |
+| your SDC | you write it; your track's `track/lab2.md` says where it goes |
 
 ## Tasks
 
@@ -26,7 +26,7 @@ Commands for your track: [track/lab2.md](../../track/lab2.md)
    See [04](../../docs/04_synthesis.md), [07](../../docs/07_equivalence.md), [08](../../docs/08_gate_level_sim.md).
 2. **Write the SDC** from [spec.md](spec.md): every port constrained, right units, drive and load, uncertainty, and a decision (with a comment) for `cfg_k_len` and `rst_n`.
    See [05](../../docs/05_sdc.md). Check hold at `ff` after every change to timing exceptions.
-3. **Bronze:** every check of your track passes at the clock target for your library ([track/README.md](../../track/README.md)).
+3. **Bronze:** every check of your track passes at the clock target for your library (your track's `track/README.md`).
 4. **Silver:** 0.70 × the Bronze period at `ss`, hold clean at `ff`, area ≤ 1.25 × your Bronze area.
    Read the critical path first ([06](../../docs/06_timing_reports.md)). Options: `MUL_PIPE`, `ACC_PIPE`, `OUT_PIPE`, retiming, RTL changes.
    Your track shows how to set parameters and sweep clock periods.

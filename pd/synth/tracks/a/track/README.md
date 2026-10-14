@@ -1,7 +1,8 @@
 # Track A: open-source tools
 
 Track A runs every step of the course with free, open-source tools. No license and no special machine are needed: a laptop is enough.
-You are on the `track-a` branch. The course itself (concepts, labs, designs) is the same on every track; this folder only says how to do each step here.
+Track A lives in the folder `tracks/a`. The course itself (concepts, labs, designs) is the same on every track and sits at the repo root; this folder holds Track A's flow, and these pages say how to do each step here.
+Run every command on these pages from `tracks/a`; paths are relative to it.
 
 ## The tools
 
@@ -22,7 +23,7 @@ You are on the `track-a` branch. The course itself (concepts, labs, designs) is 
 | Everything | IIC-OSIC-TOOLS | A container image that holds all of the above. |
 
 Think of Yosys as the translator (RTL into gates) and ABC as the shopper who picks real parts from the library catalog.
-Exact versions: [pins.md](pins.md). New words: [glossary](../docs/02_glossary.md).
+Exact versions: [pins.md](pins.md). New words: [glossary](../../../docs/02_glossary.md).
 
 ## Setup
 
@@ -33,7 +34,7 @@ A container is a ready-made Linux box with every tool at the right version, so e
 ```
 env/start.sh build      # once, and again whenever pdk.lock changes
 env/start.sh shell      # opens a shell inside the container
-cd /foss/designs/silicon-badgers-synth-onboarding
+cd /foss/designs/silicon-badgers-synth-onboarding/tracks/a
 make env-check          # PDKs and tools match pdk.lock
 ```
 
@@ -149,8 +150,5 @@ Write the period as `set clk_period [sb_clock_period <ns>]`; otherwise `CLOCK_PE
 | [lab0.md](lab0.md), [lab1.md](lab1.md), [lab2.md](lab2.md) | commands for each lab |
 | [reading_logs.md](reading_logs.md) | reading this track's logs and reports |
 | [pins.md](pins.md) | pinned tool and PDK versions |
-| [spec_deviations.md](spec_deviations.md) | where Track A differs from its build spec |
-| [course_spec.md](course_spec.md) | the build spec |
-| [maintainers.md](maintainers.md) | rules for people who change this branch |
 
-Next: [docs/03_liberty.md](../docs/03_liberty.md), then Lab 0 with [track/lab0.md](lab0.md).
+Next: [docs/03_liberty.md](../../../docs/03_liberty.md), then Lab 0 with [track/lab0.md](lab0.md).

@@ -2,7 +2,7 @@
 # File:        platforms.py
 # Author:      Isaac Hagedorn
 # Date:        2026-10-09
-# Description: Liberty file paths and cell names per library, read from track/libraries.yaml. Run it to list your track's libraries.
+# Description: Liberty file paths and cell names per library, read from your track's track/libraries.yaml. Run it from your track's folder (tracks/<track>) to list its libraries.
 from __future__ import annotations
 
 import gzip
@@ -15,7 +15,11 @@ from pathlib import Path
 import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
-LIBRARIES_YAML = ROOT / "track" / "libraries.yaml"
+# the track: tracks/$SB_TRACK if set, else the tracks/<track> folder you run from
+_CWD = Path.cwd().resolve()
+TRACK = (ROOT / "tracks" / os.environ["SB_TRACK"] if os.environ.get("SB_TRACK") else
+         next((d for d in (_CWD, *_CWD.parents) if d.parent == ROOT / "tracks"), None))
+LIBRARIES_YAML = TRACK / "track" / "libraries.yaml" if TRACK else None
 CORNERS = ("tt", "ss", "ff")
 
 # SB_PDK: the SiliconBadgers PDK repo, cloned next to this repo unless set
@@ -46,9 +50,9 @@ sys.excepthook = _hook
 
 def _load() -> dict[str, dict[str, str]]:
     """{library: {corner: path as written}} from track/libraries.yaml."""
-    if not LIBRARIES_YAML.is_file():
-        raise TrackError(f"{LIBRARIES_YAML.relative_to(ROOT)} not found: "
-                         "pick a track (see track/README.md)")
+    if LIBRARIES_YAML is None or not LIBRARIES_YAML.is_file():
+        raise TrackError("no track/libraries.yaml here: run this from your track's folder, "
+                         "tracks/<track> (see tracks/README.md)")
     data = yaml.safe_load(LIBRARIES_YAML.read_text()) or {}
     libs = data.get("libraries") or {}
     for name, corners in libs.items():

@@ -53,6 +53,6 @@ That is a separate course. [09](09_synthesis_vs_pd.md) explains which problems b
 
 Every step above is done by a tool: your synthesis tool, your timing tool, your simulator, and so on.
 Which tools you use depends on your track. The ideas in these docs are the same for every track.
-The commands are in [track/README.md](../track/README.md).
+The commands are in your track's folder: [tracks/README.md](../tracks/README.md).
 
 Next: [02 — Glossary](02_glossary.md)

@@ -2,7 +2,7 @@
 # Author:      Isaac Hagedorn
 # Date:        2026-10-09
 # Description: Platform settings for the sky130_scl_9T 9-track library (SKY130, release 0.1.2). Unpacked at $(SCL_ROOT), not installed by ciel.
-# NOTE(spec-mismatch): fifth platform, not in track/course_spec.md §0; see track/spec_deviations.md.
+# NOTE(spec-mismatch): fifth platform, not in the build spec.
 
 PLATFORM_PDK  := sky130A
 STD_CELL_LIB  := sky130_scl_9T

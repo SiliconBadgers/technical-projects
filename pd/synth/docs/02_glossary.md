@@ -212,4 +212,4 @@ Worst negative slack: the slack of the worst path. Negative means the design fai
 ## X (unknown value)
 A simulation value meaning "could be 0 or 1". It shows up from flip-flops that were never reset and from undriven nets.
 
-Next: [Pick and set up your track](../track/README.md)
+Next: [Pick and set up your track](../tracks/README.md)

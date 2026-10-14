@@ -1,4 +1,4 @@
-# Python packages the Track A flow and labs use, pinned (track/course_spec.md §9.7).
+# Python packages the Track A flow and labs use, pinned.
 # Outside the container: pip install -r requirements.txt (in a venv).
 # The team image (env/Dockerfile) adds only liberty-parser and lark; the rest
 # come with IIC-OSIC-TOOLS, and the Dockerfile checks cocotb's version.
