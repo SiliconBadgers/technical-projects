@@ -66,7 +66,7 @@ def main():
     args = parser.parse_args()
     errors = []
     paths = sorted(p for p in ROOT.rglob('*.md')
-                   if not {'.git', 'build'} & set(p.relative_to(ROOT).parts))
+                   if not {'.git', '.venv', 'build'} & set(p.relative_to(ROOT).parts))
     for doc in paths:
         original = doc.read_text()
         code_spans = [(m.start(), m.end()) for m in re.finditer(
