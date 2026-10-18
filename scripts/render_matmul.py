@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Render the Stage 2 matrix multiplication animation. Requires Pillow.
 
-Run from the repository root: python3 scripts/render_matmul.py
+Run from the repository root: uv run --locked --group render python scripts/render_matmul.py
 The committed GIF can be viewed without installing Pillow.
 """
 from pathlib import Path

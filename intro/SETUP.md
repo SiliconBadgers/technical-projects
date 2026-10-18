@@ -27,12 +27,17 @@ options. The commands below run on CAE, not in a terminal on your laptop.
 
 ### 2. Get the repository on the CAE host
 
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/) 0.12.23 or
+newer in your account and make sure `uv --version` works in the terminal. uv
+manages the repository's Python environment; it does not install VCS or Icarus.
+
 Before entering the Synopsys container, run:
 
 ```sh
 cd ~
 git clone https://github.com/SiliconBadgers/technical-projects.git
 cd technical-projects
+make setup
 make check
 ```
 
@@ -51,7 +56,8 @@ This is also explained in the [CAE software guide](https://kb.wisc.edu/cae/16313
 
 ### 4. Run the exercises
 
-Inside the Synopsys container, from the repository root:
+Inside the Synopsys container, check that `uv --version` works, then run from
+the repository root:
 
 ```sh
 make smoke
@@ -108,13 +114,16 @@ copy the VCD to your computer and open it in a locally installed waveform viewer
 Use this if you already have a local setup or want to work offline. CAE is the
 recommended environment for shared project work.
 
-Install Git, Python 3.9 or newer, GNU Make, and Icarus Verilog (`iverilog` and `vvp`).
+Install Git, [uv](https://docs.astral.sh/uv/getting-started/installation/) 0.12.23
+or newer, GNU Make, and Icarus Verilog (`iverilog` and `vvp`). uv uses an available
+Python 3.9+ interpreter or downloads a compatible one when needed.
 GTKWave is optional. Follow the [Icarus installation documentation](https://steveicarus.github.io/iverilog/usage/installation.html)
 for your platform, then clone the repository and run:
 
 ```sh
 cd technical-projects
 export SIM=iverilog
+make setup
 make check
 make smoke
 ```
@@ -135,6 +144,7 @@ gtkwave build/day1/waves.vcd
 
 | Symptom | What to do |
 | --- | --- |
+| `uv` is unavailable | Follow the uv installation link above and check that its install directory is on `PATH`, including inside the Synopsys container. |
 | `module` is unavailable | Use a CAE host terminal, outside the Synopsys container. |
 | `git` is unavailable | Leave the Synopsys container and run Git on the host. |
 | VCS is unavailable | Run `module load synopsys/suite`, then `synopsys-run`, before the simulation command. |

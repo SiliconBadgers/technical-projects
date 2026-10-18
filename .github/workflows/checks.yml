@@ -7,6 +7,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: "0.12.23"
+          python-version: "3.9"
+      - name: Check locked Python environment
+        run: uv sync --locked
       - name: Install local simulator
         run: sudo apt-get update && sudo apt-get install -y iverilog
       - name: Check documentation
@@ -14,3 +21,16 @@ jobs:
       - name: Simulate completed examples
         run: make SIM=iverilog smoke
       # The PE is a student starter; make pe intentionally fails until completed.
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: "0.12.23"
+          python-version: "3.12"
+      - name: Regenerate guide images
+        run: make render
+      - name: Check documentation with rendering environment present
+        run: make check

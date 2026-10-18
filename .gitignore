@@ -12,3 +12,4 @@ ucli.key
 *.log
 __pycache__/
 .DS_Store
+.venv/
