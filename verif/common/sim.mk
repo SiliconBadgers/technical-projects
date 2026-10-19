@@ -130,7 +130,6 @@ else
 endif
 # Verilator's target is its binary, so a build whose obj/ was deleted (bughunt.py) is rebuilt
 STAMP   := $(if $(filter verilator,$(SIM)),$(BIN),$(BUILD)/.built)
-RUN_CMD := $(subst {test},$(TEST),$(subst {seed},$(SEED),$(subst {verb},$(VERB),$(subst {cov},$(RUNDIR)/coverage.dat,$(RUN_TMPL)))))
 
 .PHONY: help lint build run regress cov cov-code waves gui clean print-build print-run print-bugs
 
@@ -157,10 +156,8 @@ $(STAMP): $(DEPS)
 build: $(STAMP)
 
 run: $(STAMP)
-	@mkdir -p $(RUNDIR)
-	cd $(RUNDIR) && $(RUN_CMD) 2>&1 | tee sim.log | \
-	  grep -E 'UVM_(ERROR|FATAL) [^:]|\*\*\* TEST|Assertion|%Error|\*\* (Error|Fatal)|\*E,|\*F,|^Error-' | head -40 ; \
-	  grep -q '\*\*\* TEST PASSED' sim.log
+	$(PYTHON) $(COURSE_ROOT)/scripts/run.py --run '$(RUN_TMPL)' --test $(TEST) --seed $(SEED) \
+	  --verbosity $(VERB) --out $(BUILD)/runs
 
 regress: $(STAMP)
 	$(PYTHON) $(COURSE_ROOT)/scripts/regress.py --run '$(RUN_TMPL)' --list $(LIST) --seeds $(SEEDS) \

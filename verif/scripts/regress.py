@@ -49,10 +49,11 @@ def run_one(template, test, seed, outdir, verbosity, plusargs, timeout):
         return int(m.group(1)) if m else None
 
     n_err, n_fatal = count("UVM_ERROR"), count("UVM_FATAL")
-    passed = ("*** TEST PASSED ***" in log and n_err == 0 and n_fatal == 0 and not timed_out and rc == 0)
     m = re.search(r"\[SB\] compared (\d+)", log)
     # Questa prefixes transcript lines with "# "
     first = re.search(r"^(?:# )?(UVM_(?:ERROR|FATAL) .*?\[([^\]]+)\].*)$", log, re.M)
+    passed = ("*** TEST PASSED ***" in log and n_err == 0 and n_fatal == 0
+              and first is None and not timed_out and rc == 0)
     ids = sorted(set(re.findall(r"^(?:# )?UVM_(?:ERROR|FATAL) .*?\[([^\]]+)\]", log, re.M)))
     return {
         "test": test, "seed": seed, "passed": passed, "rc": rc, "timed_out": timed_out,
