@@ -13,3 +13,6 @@ ucli.key
 __pycache__/
 .DS_Store
 .venv/
+
+# SiliconBadgers PDK clone used by pd/ (separate repository)
+pd/silicon-badgers-sky130-pdk/
