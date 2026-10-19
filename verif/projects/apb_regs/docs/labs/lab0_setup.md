@@ -4,7 +4,7 @@
 
 ## Steps
 
-1. From the repository root, run `source env/setup.sh`. Then `cd projects/apb_regs`.
+1. Follow the [verification setup](../../../../../intro/SETUP.md#verification-track). Then, from `verif/`, run `module load synopsys/suite` and `cd projects/apb_regs`.
 2. Run `make run TEST=apb_hello_test`. It must print `*** TEST PASSED ***`.
 3. Read `docs/spec/`: `interface.md` (with the example waveform) and the spec.
 4. Re-read `../../docs/simulators.md`, in particular the Verilator issues Q1–Q7.

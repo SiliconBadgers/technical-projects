@@ -4,10 +4,10 @@ Verify a synchronous FIFO (`sb_fifo`) with UVM. This is the first onboarding pro
 
 ## Quick start
 
-From the repository root, on your own branch (see the repository README):
+From `verif/`, on your own branch, after the [verification setup](../../../intro/SETUP.md#verification-track):
 
 ```bash
-source env/setup.sh
+module load synopsys/suite
 cd projects/sync_fifo
 make run TEST=fifo_hello_test
 make help
@@ -43,10 +43,11 @@ Paths below are relative to this directory.
 
 ```bash
 make run TEST=<test> [SEED=<n>] [DUT=sanity]
-make regress SEEDS=3 && make cov      # coverage needs Verilator
+make regress SEEDS=3 && make cov      # functional coverage
+make regress CODECOV=1 && make cov-code CODECOV=1   # code coverage of the design
 make regress DEPTH=8                  # another FIFO depth (default 6); WIDTH= works the same way
-make waves TEST=<test>                # Verilator FST waves
-make run SIM=questa TEST=<test>       # or xcelium, vcs; make gui SIM=questa for the Questa GUI
+make waves TEST=<test>                # waves.vcd for GTKWave
+make run SIM=verilator TEST=<test>    # or questa, xcelium (../../docs/simulators.md); make gui SIM=questa
 ```
 
 ## Rules

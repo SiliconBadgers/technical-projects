@@ -16,6 +16,10 @@ make regress SEEDS=5
 make cov
 ```
 
+For code coverage of the design, run `make regress CODECOV=1` and then `make cov-code CODECOV=1`. Report coverage for a named scope and metric, as described in [Coverage](../../../../README.md#coverage).
+
+Optional: pick one line, toggle, or branch of the design that no test reaches, write a test that reaches it and checks the result, and rerun.
+
 ## Hints
 
 - UVM is compiled with `UVM_NO_DPI`: there is no backdoor access. Use the frontdoor only.

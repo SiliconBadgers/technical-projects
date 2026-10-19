@@ -18,6 +18,8 @@ make run TEST=<test> SEED=<seed>
 
 `<edge numbers and values from the log>`
 
+First disagreement in the waveform: `<time or edge, signal, expected and observed values>`
+
 ## Minimal case
 
 `<smallest stimulus that still fails>`

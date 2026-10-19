@@ -21,6 +21,11 @@ make run TEST=<your_smoke_test>
 make run TEST=<your_smoke_test> DUT=sanity
 ```
 
+## Hints
+
+- When a check fails, find the first edge where the waveform disagrees with the spec: [Debug in the waveform](../../../../README.md#debug-in-the-waveform).
+- Keep the logs of the golden and the sanity run. The sanity run should fail with a `uvm_error` from your scoreboard or an assertion that names the broken requirement, not with a compile error or a timeout.
+
 ## Exit criteria
 
 - [ ] Architecture diagram reviewed.

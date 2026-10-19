@@ -26,6 +26,8 @@ make run TEST=<your_smoke_test> DUT=sanity
 - The timer and `irq` are exact to the edge. Your model needs to know the edge at which each transfer completed, and it has to advance the timer on edges with no transfer too.
 - The driver must not assume a fixed transfer length: some reads have a wait state.
 - Drive at the falling edge and sample with a clocking block (Verilator issue Q7).
+- When a check fails, find the first edge where the waveform disagrees with the spec: [Debug in the waveform](../../../../README.md#debug-in-the-waveform).
+- Keep the logs of the golden and the sanity run. The sanity run should fail with a `uvm_error` from your scoreboard or an assertion that names the broken requirement, not with a compile error or a timeout.
 
 ## Exit criteria
 

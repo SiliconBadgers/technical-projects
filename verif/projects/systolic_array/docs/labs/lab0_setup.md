@@ -4,7 +4,7 @@
 
 ## Steps
 
-1. From the repository root, run `source env/setup.sh` (the first run builds the Verilator environment). Then `cd projects/systolic_array`.
+1. Follow the [verification setup](../../../../../intro/SETUP.md#verification-track). Then, from `verif/`, run `module load synopsys/suite` and `cd projects/systolic_array`.
 2. Run `make run TEST=sa_hello_test`. It must print `*** TEST PASSED ***`.
 3. Read `docs/spec/`: the block diagram, `interface.md`, the spec and `cycle_tables.md`.
 4. Read `../../docs/simulators.md`.

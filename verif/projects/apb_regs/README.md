@@ -4,10 +4,10 @@ Verify an APB4 register block with a timer and an interrupt (`sb_apb_regs`) with
 
 ## Quick start
 
-From the repository root, on your own branch (see the repository README):
+From `verif/`, on your own branch, after the [verification setup](../../../intro/SETUP.md#verification-track):
 
 ```bash
-source env/setup.sh
+module load synopsys/suite
 cd projects/apb_regs
 make run TEST=apb_hello_test
 make help
@@ -43,9 +43,10 @@ Paths below are relative to this directory.
 
 ```bash
 make run TEST=<test> [SEED=<n>] [DUT=sanity]
-make regress SEEDS=3 && make cov      # coverage needs Verilator
-make waves TEST=<test>                # Verilator FST waves
-make run SIM=questa TEST=<test>       # or xcelium, vcs; make gui SIM=questa for the Questa GUI
+make regress SEEDS=3 && make cov      # functional coverage
+make regress CODECOV=1 && make cov-code CODECOV=1   # code coverage of the design
+make waves TEST=<test>                # waves.vcd for GTKWave
+make run SIM=verilator TEST=<test>    # or questa, xcelium (../../docs/simulators.md); make gui SIM=questa
 ```
 
 ## Rules

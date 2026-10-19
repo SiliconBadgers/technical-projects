@@ -4,7 +4,7 @@
 
 ## Steps
 
-1. From the repository root, run `source env/setup.sh` (the first run builds the Verilator environment). Then `cd projects/sync_fifo`.
+1. Follow the [verification setup](../../../../../intro/SETUP.md#verification-track). Then, from `verif/`, run `module load synopsys/suite` and `cd projects/sync_fifo`.
 2. Run `make run TEST=fifo_hello_test`. It must print `*** TEST PASSED ***`.
 3. Read `docs/spec/`: the spec and `interface.md` with its examples.
 4. Read `../../docs/simulators.md`.

@@ -1,26 +1,35 @@
 # Simulators
 
-The course uses Accellera UVM 1.2 (`third_party/uvm-1.2`) on Verilator 5.052 with the z3 constraint solver. The same testbench also runs on Questa, Xcelium and VCS with `SIM=`.
+The course uses Accellera UVM 1.2 (`third_party/uvm-1.2`) on VCS by default. The same testbench also runs on Verilator, Questa, and Xcelium with `SIM=`.
 
-| `SIM=` | Simulator | `source env/setup.sh …` | Coverage, waves |
-|---|---|---|---|
-| `verilator` (default) | Verilator 5.052 | (nothing) | `make cov`, `make waves` |
-| `questa` | Questa 2025.1 | `questa` | `make gui SIM=questa` |
-| `xcelium` | Xcelium 25.09 | `xcelium` | — |
-| `vcs` | VCS 2026.03 | `vcs` | — |
+| `SIM=` | Simulator | Setup on the CAE host | Coverage | Waves |
+|---|---|---|---|---|
+| `vcs` (default) | VCS 2026.03 | `module load synopsys/suite` | `make cov`, `make cov-code` | `waves.vcd` |
+| `verilator` | Verilator 5.052 | `source env/setup.sh` | `make cov`, `make cov-code` | `waves.fst` |
+| `questa` | Questa 2025.1 | `source env/setup.sh questa` | — | `waves.vcd`, `make gui SIM=questa` |
+| `xcelium` | Xcelium 25.09 | `source env/setup.sh xcelium` | — | `waves.vcd` |
 
 ## All simulators
 
 - UVM is compiled from `third_party/uvm-1.2` with `+define+UVM_NO_DPI`. Only `+UVM_TESTNAME` is read by UVM; parse other plusargs yourself.
 - Seeds: `make run SEED=<n>`. Each simulator turns a seed into different random values, so a failing seed on one simulator does not reproduce on another.
-- `make regress` runs on every simulator; the PASS/FAIL rule is the same (the PASS banner and 0 UVM errors and fatals).
+- A run passes with exit status 0, the PASS banner, and 0 UVM errors and fatals. `make run` and `make regress` use the same rule.
+- `make waves TEST=<t> SEED=<s>` reruns one test with waves on and prints the file. Open it with `gtkwave` in a CAE desktop host terminal.
+- VCS, Questa, and Xcelium are 4-state: an undriven or uninitialized signal is X, which Verilator shows as 0. A test that passes on Verilator and fails on a 4-state simulator usually has an X problem.
+
+## VCS
+
+- Load it with `module load synopsys/suite` on the CAE host. VCS runs inside the Synopsys container: run `make` at the `synopsys>` prompt, or on the host, where the Makefile adds `synopsys-run` to each VCS command.
+- The Makefile builds with `-full64`. Without it, VCS runs 32-bit and fails to find `libelf.so.1`.
+- Each run writes its coverage to `cov.vdb` in its run directory. `make cov` and `make cov-code` merge the last regression's databases with URG and print a summary; URG's full text report is in the `regress/urg/` directory they name.
+- `simv` exits with status 0 even after `$fatal`. That is why a run also needs the PASS banner and a clean UVM error count.
 
 ## Verilator
 
+- Set it up with `source env/setup.sh` on the CAE host, not at the `synopsys>` prompt. The first run builds a conda environment in your home directory (about 1.5 GB).
 - Seeds: `make run SEED=<n>` passes `+verilator+seed+<n>`.
-- Verilator is 2-state: there is no X or Z.
 - Waves: `make waves TEST=<t> SEED=<s>` writes `waves.fst`.
-- Coverage: `make cov` after `make regress`. `get_coverage()` returns 0 during simulation.
+- Coverage: `make cov` after `make regress`. `get_coverage()` returns 0 during simulation. `CODECOV=1` collects line and toggle coverage.
 
 ### Known issues
 
@@ -41,14 +50,13 @@ The course uses Accellera UVM 1.2 (`third_party/uvm-1.2`) on Verilator 5.052 wit
 
 `scripts/verilator_quirks/run.sh` checks whether Q1–Q4 are still present.
 
-## Questa, Xcelium and VCS
+
+## Questa and Xcelium
 
 These are optional. On CAE Linux:
 
-- Load them through `source env/setup.sh questa` (or `xcelium`, `vcs`, or several). Use `cadence/xcelium/2509`: the default `cadence/xcelium` (2603) is newer than the campus license and fails at simulation with `NOLICN`.
-- They run inside the CAE containers (`mentor-run`, `cadence-run`, `synopsys-run`); the Makefile adds the wrapper. VCS runs 64-bit (`-full64`).
-- They are 4-state: an undriven or uninitialized signal is X, which Verilator would show as 0. A test that passes on Verilator and fails on a 4-state simulator usually has an X problem.
+- Load them through `source env/setup.sh questa` (or `xcelium`, or both). Use `cadence/xcelium/2509`: the default `cadence/xcelium` (2603) is newer than the campus license and fails at simulation with `NOLICN`.
+- They run inside the CAE containers (`mentor-run`, `cadence-run`); the Makefile adds the wrapper.
 - `make gui SIM=questa` opens Questa with every top-level signal in the wave window.
-- Coverage reports (`make cov`) and `make waves` are Verilator-only in this flow.
+- `make cov` and `make cov-code` support VCS and Verilator.
 - Loading `mentor/suite/2026` puts a Calibre `python3` first on `PATH` that cannot run scripts. `env/setup.sh` puts the course's Python back in front; if you load modules by hand, load them before `source env/setup.sh`.
-

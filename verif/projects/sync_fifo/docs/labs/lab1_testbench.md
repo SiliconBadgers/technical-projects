@@ -28,6 +28,8 @@ make run TEST=<your_smoke_test> DUT=sanity
 - Drive at the falling edge and sample with clocking blocks (`../../docs/simulators.md`, Q7).
 - A push, a pop and a flush can happen at the same edge. Section 7 of the spec says what happens; your model must agree.
 - A scoreboard that compares nothing passes every test. Fail the test if it compared nothing.
+- When a check fails, find the first edge where the waveform disagrees with the spec: [Debug in the waveform](../../../../README.md#debug-in-the-waveform).
+- Keep the logs of the golden and the sanity run. The sanity run should fail with a `uvm_error` from your scoreboard or an assertion that names the broken requirement, not with a compile error or a timeout.
 
 ## Exit criteria
 
