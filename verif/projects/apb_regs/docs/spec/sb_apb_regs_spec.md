@@ -99,16 +99,17 @@ At every edge that is not a completion edge, `pslverr` = 0 and `prdata` = 0.
 
 ### Timer
 
-The counter is read as `TIMER_VALUE`. At each edge where `presetn` = 1, using the values at that edge, the first row that applies sets the counter after the edge:
+The counter is read as `TIMER_VALUE`. A **strobed write** has at least one `pstrb` bit set. At each edge where `presetn` = 1, using the values at that edge, the first row that applies sets the counter after the edge:
 
 | Condition | Counter after the edge | Also |
 |---|---|---|
-| A write to `TIMER_LOAD` completes | The new `TIMER_LOAD` value | — |
+| A strobed write to `TIMER_LOAD` completes | The new `TIMER_LOAD` value | — |
 | `CTRL.EN` = 0 | Unchanged | — |
 | Counter ≠ 0 | Counter − 1 | — |
 | Counter = 0 (*expiry*) | `TIMER_LOAD` | `INT_STATUS.TMR` set; if `CTRL.RELOAD` = 0, `CTRL.EN` cleared |
 
 - A write to `CTRL` takes effect after its completion edge; the timer row at that edge uses the old `EN` and `RELOAD`.
+- A `TIMER_LOAD` write with `pstrb` = 0 leaves the load value unchanged and lets the timer count down or expire normally.
 - If a write to `CTRL` with `pstrb[0]` = 1 completes at a one-shot expiry, `CTRL` takes the written value (the write wins over the clear).
 - So: when a write sets `EN` = 1 at edge *e* with the counter at *L*, the timer expires at edge *e* + *L* + 1. In auto-reload mode it then expires every `TIMER_LOAD` + 1 edges.
 
@@ -144,16 +145,16 @@ While `presetn` = 0, every register (and the counter) holds its reset value from
 | R10 | `ID` shall read `0x5342_4150`. |
 | R11 | `CTRL.EN` and `CTRL.RELOAD` shall be read/write; `CTRL[31:2]` shall read 0 and ignore writes. |
 | R12 | `SCRATCH` shall be read/write in all 32 bits and have no other effect. |
-| R13 | A write to `TIMER_LOAD` shall update `TIMER_LOAD` and load the counter with the new value at its completion edge. |
+| R13 | A strobed write to `TIMER_LOAD` shall update `TIMER_LOAD` and load the counter with the new value at its completion edge. |
 | R14 | `INT_ENABLE[1:0]` shall be read/write; `INT_ENABLE[31:2]` shall read 0 and ignore writes. |
 | R15 | Writing 1 to an `INT_STATUS` bit shall clear it; writing 0 shall leave it unchanged; `INT_STATUS[31:2]` shall read 0. |
 | R16 | `INT_STATUS.ERR` shall be set at the completion edge of every transfer with `pslverr` = 1. |
 | R17 | A status bit set by hardware at the same edge that a write clears it shall be 1 after that edge. |
-| R18 | At an edge where `CTRL.EN` = 1, the counter ≠ 0 and no write to `TIMER_LOAD` completes, the counter shall decrement by 1. |
-| R19 | At an edge where `CTRL.EN` = 1, the counter = 0 and no write to `TIMER_LOAD` completes, the timer shall expire: `INT_STATUS.TMR` is set and the counter is loaded from `TIMER_LOAD`. |
+| R18 | At an edge where `CTRL.EN` = 1, the counter ≠ 0 and no strobed write to `TIMER_LOAD` completes, the counter shall decrement by 1. |
+| R19 | At an edge where `CTRL.EN` = 1, the counter = 0 and no strobed write to `TIMER_LOAD` completes, the timer shall expire: `INT_STATUS.TMR` is set and the counter is loaded from `TIMER_LOAD`. |
 | R20 | When the timer expires with `CTRL.RELOAD` = 0, `CTRL.EN` shall be cleared, unless a write to `CTRL` with `pstrb[0]` = 1 completes at the same edge. |
 | R21 | When the timer expires with `CTRL.RELOAD` = 1, `CTRL.EN` shall stay 1. |
-| R22 | While `CTRL.EN` = 0, the counter shall not change except by a write to `TIMER_LOAD`. |
+| R22 | While `CTRL.EN` = 0, the counter shall not change except by a strobed write to `TIMER_LOAD`. |
 | R23 | A write to `CTRL` shall affect the timer from the edge after its completion edge. |
 | R24 | `irq` shall equal \|(`INT_STATUS` & `INT_ENABLE`) at every edge. |
 | R25 | While `presetn` = 0, every register shall take its reset value, and `irq`, `pslverr` and `prdata` shall be 0. |
@@ -162,8 +163,8 @@ While `presetn` = 0, every register (and the counter) holds its reset value from
 
 | Condition | Behaviour |
 |---|---|
-| `TIMER_LOAD` written while the timer runs | Counter restarts from the new value (R13) |
-| `TIMER_LOAD` written at an expiry edge | The write wins; no expiry at that edge (R13, R19) |
+| Strobed write to `TIMER_LOAD` while the timer runs | Counter restarts from the new value (R13) |
+| Strobed write to `TIMER_LOAD` at an expiry edge | The write wins; no expiry at that edge (R13, R19) |
 | `CTRL` written at a one-shot expiry | The written `EN` and `RELOAD` win (R20) |
 | W1C clears `TMR` at the edge the timer expires | `TMR` stays 1 (R17) |
 | `EN` set while the counter is 0 | Expires at the next edge (R19) |

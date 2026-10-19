@@ -101,7 +101,7 @@ module sb_apb_regs #(
 
   assign ctrl_wr    = wr_en && (sel == SEL_CTRL);
   assign scratch_wr = wr_en && (sel == SEL_SCRATCH);
-  assign load_wr    = wr_en && (sel == SEL_LOAD);
+  assign load_wr    = wr_en && (sel == SEL_LOAD) && (|pstrb);
   assign status_wr  = wr_en && (sel == SEL_STATUS);
   assign enable_wr  = wr_en && (sel == SEL_ENABLE);
 
