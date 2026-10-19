@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Render the introductory waveform worksheets. Requires matplotlib.
 
-Run from any directory: python3 scripts/render_waveforms.py
+Run from the repository root: uv run --locked --group render python scripts/render_waveforms.py
 Outputs are committed PNG assets; reading the guides needs no plotting packages.
 """
 from pathlib import Path

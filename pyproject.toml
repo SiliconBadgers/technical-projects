@@ -1,0 +1,16 @@
+[project]
+name = "siliconbadgers-technical-projects"
+version = "0.1.0"
+requires-python = ">=3.9"
+dependencies = []
+
+[tool.uv]
+package = false
+required-version = ">=0.12.23"
+default-groups = []
+
+[dependency-groups]
+render = [
+    "matplotlib>=3.7",
+    "Pillow>=10.1",
+]

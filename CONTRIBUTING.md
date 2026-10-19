@@ -36,7 +36,7 @@ If a declaration changes, update its anchor rather than hard-coding line numbers
 After changing code or moving files, run from the repository root:
 
 ```sh
-python3 scripts/check_docs.py --fix
+uv run --locked python scripts/check_docs.py --fix
 make check
 make smoke
 ```
@@ -55,3 +55,10 @@ that same structure.
 CI checks the documentation and completed introduction examples. Passing CI does
 not mean an unfinished project is complete. Keep generated waveforms, simulator
 products, and EDA databases out of Git.
+
+## Regenerate guide images
+
+Run `make render` from the repository root to regenerate the waveform PNGs and
+matrix-multiplication GIF. It installs the locked `render` dependency group
+(matplotlib and Pillow) only for these commands. `make check` and the simulator
+runner use the standard library.
