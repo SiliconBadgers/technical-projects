@@ -20,8 +20,8 @@ MENTOR_DIR  := $(COURSE_ROOT)/mentor/projects/$(PROJECT)
 
 empty    :=
 space    := $(empty) $(empty)
-# verilator | questa | xcelium | vcs
-SIM      ?= verilator
+# vcs | verilator | questa | xcelium
+SIM      ?= vcs
 # testbench directory (contains tb.f and regress.list)
 TB       ?= tb
 # golden | sanity | broken
@@ -32,11 +32,11 @@ BUG      ?=
 SEED     ?= 1
 # UVM verbosity
 VERB     ?= UVM_MEDIUM
-# collect covergroups (Verilator)
+# collect covergroups (Verilator; the other simulators always do)
 COV      ?= 1
-# also line + toggle coverage (Verilator)
+# also code coverage: line + cond + toggle + branch (VCS), line + toggle (Verilator)
 CODECOV  ?= 0
-# FST waves (Verilator)
+# dump waves: waves.vcd (VCS, Questa, Xcelium) or waves.fst (Verilator)
 WAVES    ?= 0
 # seeds per test in a regression
 SEEDS    ?= 3
@@ -75,7 +75,8 @@ BUILD   := $(COURSE_ROOT)/build/$(PROJECT)/$(SIM)/$(TB_TAG)/$(CFG_TAG)
 RUNDIR  := $(BUILD)/runs/$(TEST)_s$(SEED)
 
 BUG_LIST := $(if $(filter ALL,$(BUG)),$(ALL_BUGS),$(BUG))
-DEFS     := +define+UVM_NO_DPI $(PROJECT_DEFS) $(foreach b,$(BUG_LIST),+define+$(BUG_PREFIX)$(b))
+DEFS     := +define+UVM_NO_DPI $(PROJECT_DEFS) $(foreach b,$(BUG_LIST),+define+$(BUG_PREFIX)$(b)) \
+            $(if $(filter 1,$(WAVES)),+define+$(WAVES_DEFINE))
 INCS     := +incdir+$(UVM_HOME) +incdir+$(TB_DIR)
 DEPS     := $(shell find $(PROJECT_ROOT)/rtl $(TB_DIR) $(if $(filter broken,$(DUT)),$(MENTOR_DIR)/broken) -type f 2>/dev/null)
 # absolute paths of every source file, for the simulators without verilator's -F
@@ -97,7 +98,7 @@ ifeq ($(SIM),verilator)
             --top-module $(TOP) --Mdir $(BUILD)/obj -o V$(TOP) \
             $(if $(filter 1,$(COV)),--coverage-user) \
             $(if $(filter 1,$(CODECOV)),--coverage-line --coverage-toggle) \
-            $(if $(filter 1,$(WAVES)),--trace-fst +define+$(WAVES_DEFINE))
+            $(if $(filter 1,$(WAVES)),--trace-fst)
   BUILD_CMD = $(VERILATOR) $(VFLAGS) $(UVM_HOME)/uvm_pkg.sv -F $(RTL_F) -F $(TB_F)
   RUN_TMPL := $(BIN) +UVM_TESTNAME={test} +verilator+seed+{seed} +UVM_VERBOSITY={verb} \
               +verilator+coverage+file+{cov} $(SIM_ARGS)
@@ -120,11 +121,14 @@ else ifeq ($(SIM),xcelium)
               +UVM_VERBOSITY={verb} $(SIM_ARGS)
 else ifeq ($(SIM),vcs)
   TOOL := vcs
-  HINT := source env/setup.sh vcs
+  HINT := module load synopsys/suite (on the CAE host, before synopsys-run)
   WRAP := $(call wrap,synopsys-run)
+  VCS_CM := $(if $(filter 1,$(CODECOV)),-cm line+cond+tgl+branch)
   BUILD_CMD = $(WRAP) vcs -full64 -sverilog -timescale=1ns/1ps $(DEFS) $(INCS) $(UVM_HOME)/uvm_pkg.sv $(FLIST) \
-              -top $(TOP) -o $(BUILD)/simv
-  RUN_TMPL := $(WRAP) $(BUILD)/simv +UVM_TESTNAME={test} +ntb_random_seed={seed} +UVM_VERBOSITY={verb} $(SIM_ARGS)
+              -top $(TOP) -o $(BUILD)/simv $(VCS_CM)
+  # each run writes its own coverage database (cov.vdb in the run directory); make cov merges them
+  RUN_TMPL := $(WRAP) $(BUILD)/simv +UVM_TESTNAME={test} +ntb_random_seed={seed} +UVM_VERBOSITY={verb} \
+              -cm_dir cov.vdb -cm_name {test}_s{seed} $(VCS_CM) $(SIM_ARGS)
 else
   $(error SIM must be verilator, questa, xcelium or vcs)
 endif
@@ -135,14 +139,16 @@ STAMP   := $(if $(filter verilator,$(SIM)),$(BIN),$(BUILD)/.built)
 
 help:
 	@echo "make lint | build | run | regress | cov | cov-code | waves | gui | clean"
-	@echo "knobs: SIM=verilator|questa|xcelium|vcs TB DUT BUG TEST SEED VERB COV CODECOV WAVES SEEDS JOBS LIST PLUSARGS"
-	@echo "e.g.   make run TEST=<test> SEED=3   make regress SEEDS=2   make run SIM=questa"
+	@echo "knobs: SIM=vcs|verilator|questa|xcelium TB DUT BUG TEST SEED VERB COV CODECOV WAVES SEEDS JOBS LIST PLUSARGS"
+	@echo "e.g.   make run TEST=<test> SEED=3   make regress SEEDS=2 && make cov   make run SIM=questa"
 
 lint:
 	$(VERILATOR) --lint-only -Wall $(if $(filter broken,$(DUT)),-Wno-UNUSED) $(LINT_ARGS) $(PROJECT_DEFS) \
 	  $(foreach b,$(BUG_LIST),+define+$(BUG_PREFIX)$(b)) -F $(RTL_F) --top-module $(DUT_TOP)
 
 $(STAMP): $(DEPS)
+	@test -f $(UVM_HOME)/uvm_pkg.sv || { echo "UVM is missing from $(UVM_HOME)."; \
+	  echo "From the repository root, run: git submodule update --init verif/third_party/uvm-1.2"; exit 1; }
 	@# /usr/local/cae/bin holds warning stubs, not simulators
 	@case "$$(command -v $(TOOL))" in ""|/usr/local/cae/bin/*) echo "$(TOOL) not found. Run: $(HINT)"; exit 1;; esac
 	$(if $(filter verilator,$(SIM)),@v=$$($(VERILATOR) --version | awk '{print $$2}'); \
@@ -163,18 +169,31 @@ regress: $(STAMP)
 	$(PYTHON) $(COURSE_ROOT)/scripts/regress.py --run '$(RUN_TMPL)' --list $(LIST) --seeds $(SEEDS) \
 	  --out $(BUILD)/regress --jobs $(JOBS)
 
+# Coverage of the last regression. VCS: URG merges the build's simv.vdb (the code coverage model)
+# with every run's cov.vdb into a text report.
+COV_DATA   = $(if $(filter vcs,$(SIM)),$(wildcard $(BUILD)/regress/*/cov.vdb),$(wildcard $(BUILD)/regress/merged.dat))
+URG_REPORT := $(BUILD)/regress/urg
+
+define cov_report
+	@test "$(SIM)" = vcs -o "$(SIM)" = verilator || { echo "coverage reports need SIM=vcs or SIM=verilator"; exit 1; }
+	@test -n "$(COV_DATA)" || { echo "no coverage in $(BUILD)/regress. Run make regress$(if $(filter 1,$(CODECOV)), CODECOV=1) first;"; \
+	  echo "a testbench without covergroups has only code coverage (CODECOV=1)"; exit 1; }
+	$(if $(filter vcs,$(SIM)),@$(WRAP) urg -full64 -dir $(BUILD)/simv.vdb $(COV_DATA) -format text -report $(URG_REPORT) \
+	  > $(BUILD)/regress/urg.log 2>&1 || { tail -20 $(BUILD)/regress/urg.log; exit 1; })
+	$(PYTHON) $(COURSE_ROOT)/scripts/cov_report.py $(if $(filter vcs,$(SIM)),--urg $(URG_REPORT),$(COV_DATA)) $(1)
+endef
+
 cov:
-	@test "$(SIM)" = verilator || { echo "coverage reports need SIM=verilator"; exit 1; }
-	$(PYTHON) $(COURSE_ROOT)/scripts/cov_report.py $(BUILD)/regress/merged.dat
+	$(call cov_report)
 
 cov-code:
-	@test "$(SIM)" = verilator || { echo "coverage reports need SIM=verilator"; exit 1; }
-	$(PYTHON) $(COURSE_ROOT)/scripts/cov_report.py $(BUILD)/regress/merged.dat --code
+	$(call cov_report,--code)
+
+WAVES_RUNDIR = $(subst $(CFG_TAG),$(subst _waves,,$(CFG_TAG))_waves,$(BUILD))/runs/$(TEST)_s$(SEED)
 
 waves:
-	@test "$(SIM)" = verilator || { echo "waves needs SIM=verilator; with Questa use make gui SIM=questa"; exit 1; }
 	$(MAKE) --no-print-directory run WAVES=1 TEST=$(TEST) SEED=$(SEED)
-	@echo "waves: $(subst $(CFG_TAG),$(subst _waves,,$(CFG_TAG))_waves,$(BUILD))/runs/$(TEST)_s$(SEED)/waves.fst"
+	@for f in waves.vcd waves.fst; do test -f $(WAVES_RUNDIR)/$$f && echo "waves: $(WAVES_RUNDIR)/$$f"; done; true
 
 # Questa only: interactive GUI with every top-level signal in the wave window
 gui: $(STAMP)

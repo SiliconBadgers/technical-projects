@@ -50,7 +50,11 @@ module tb_top;
 
   initial begin
 `ifdef FIFO_WAVES
-    $dumpfile("waves.fst");
+`ifdef VERILATOR
+    $dumpfile("waves.fst");             // FST for Verilator
+`else
+    $dumpfile("waves.vcd");
+`endif
     $dumpvars(0, tb_top);
 `endif
     run_test();

@@ -27,6 +27,23 @@ def read_list(path, default_seeds):
     return tests
 
 
+# simulator name and the pattern that finds its version in a run log
+SIM_VERSIONS = (
+    ("VCS", r"Runtime version (\S+?);"),
+    ("Questa", r"^# //\s+Version (\S+)"),
+    ("Xcelium", r"^xrun\(64\): (\S+?):"),
+    ("Verilator", r"R e p o r t: Verilator (\S+)"),
+)
+
+
+def sim_version(log):
+    for name, pattern in SIM_VERSIONS:
+        m = re.search(pattern, log, re.M)
+        if m:
+            return f"{name} {m.group(1)}"
+    return None
+
+
 def run_one(template, test, seed, outdir, verbosity, plusargs, timeout):
     rundir = os.path.join(outdir, f"{test}_s{seed}")
     os.makedirs(rundir, exist_ok=True)
@@ -55,12 +72,14 @@ def run_one(template, test, seed, outdir, verbosity, plusargs, timeout):
     passed = ("*** TEST PASSED ***" in log and n_err == 0 and n_fatal == 0
               and first is None and not timed_out and rc == 0)
     ids = sorted(set(re.findall(r"^(?:# )?UVM_(?:ERROR|FATAL) .*?\[([^\]]+)\]", log, re.M)))
+    vdb = os.path.join(rundir, "cov.vdb")      # VCS writes a coverage database per run
     return {
         "test": test, "seed": seed, "passed": passed, "rc": rc, "timed_out": timed_out,
+        "simulator": sim_version(log),
         "errors": n_err, "fatals": n_fatal, "compared": int(m.group(1)) if m else None,
         "error_ids": ids, "first_error": first.group(1)[-300:] if first else None,
         "seconds": round(time.time() - t0, 1), "dir": rundir,
-        "coverage": cov if os.path.exists(cov) else None,
+        "coverage": cov if os.path.exists(cov) else (vdb if os.path.isdir(vdb) else None),
     }
 
 
@@ -102,16 +121,19 @@ def main():
     n_pass = sum(r["passed"] for r in results)
 
     merged = os.path.join(args.out, "merged.dat")
-    covs = [r["coverage"] for r in results if r["coverage"]]
+    covs = [r["coverage"] for r in results if r["coverage"] and r["coverage"].endswith(".dat")]
     if covs and shutil.which("verilator_coverage"):
         subprocess.run(["verilator_coverage", "--write", merged] + covs,
                        stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
     with open(os.path.join(args.out, "results.json"), "w", encoding="utf-8") as fh:
-        json.dump({"passed": n_pass, "total": len(results), "runs": results}, fh, indent=1)
+        simulator = next((r["simulator"] for r in results if r["simulator"]), None)
+        json.dump({"passed": n_pass, "total": len(results), "simulator": simulator, "runs": results}, fh, indent=1)
 
+    vdbs = any(r["coverage"] and r["coverage"].endswith(".vdb") for r in results)
     print(f"\n{n_pass}/{len(results)} runs passed"
-          + (f"; merged coverage: {merged}" if os.path.exists(merged) else ""))
+          + (f"; merged coverage: {merged}" if os.path.exists(merged) else "")
+          + ("; coverage report: make cov" if vdbs else ""))
     for r in results:
         if not r["passed"]:
             print(f"  FAILED {r['test']} seed {r['seed']}: {r['first_error'] or ('timeout' if r['timed_out'] else 'no PASS banner')}")
