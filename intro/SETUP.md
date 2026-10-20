@@ -35,11 +35,13 @@ Before entering the Synopsys container, run:
 
 ```sh
 cd ~
-git clone https://github.com/SiliconBadgers/technical-projects.git
+git clone --recurse-submodules https://github.com/SiliconBadgers/technical-projects.git
 cd technical-projects
 make setup
 make check
 ```
+
+`--recurse-submodules` also fetches the UVM library that the verification track uses.
 
 ### 3. Enter the simulation environment
 
@@ -53,6 +55,16 @@ synopsys-run
 The prompt changes to `synopsys>`. `module load synopsys/suite` is necessary to run synopsys commands.
 This is also explained in the [CAE software guide](https://kb.wisc.edu/cae/163133) and
 [EDA quickstart](https://kb.wisc.edu/cae/163136).
+
+You now type commands in one of three places. Each command in these guides belongs to one of them:
+
+| Prompt | Where you are | Run here |
+| --- | --- | --- |
+| Your laptop's terminal | Your own computer | `ssh` to CAE, copying files to or from CAE |
+| CAE host terminal | A CAE Linux machine | `git`, `module load`, `make setup`, `make check`, `gtkwave`, `source verif/env/setup.sh` |
+| `synopsys>` | The Synopsys container, started with `synopsys-run` | `make smoke`, `make pe`, the verification `make` commands, `vcs`, `urg` |
+
+`exit` leaves the container and returns you to the CAE host prompt.
 
 ### 4. Run the exercises
 
@@ -109,6 +121,33 @@ For Day 1, compare `a`, `b`, `c`, `out1`, and `out2` over the first 80 ns.
 Plain SSH does not provide a desktop. Use the browser desktop for the viewer, or
 copy the VCD to your computer and open it in a locally installed waveform viewer.
 
+## Verification track
+
+The verification projects use VCS and the UVM 1.2 library, a submodule at
+`verif/third_party/uvm-1.2`. If you cloned without `--recurse-submodules`, fetch it
+from the repository root on the CAE host:
+
+```sh
+git submodule update --init verif/third_party/uvm-1.2
+```
+
+VCS needs only `module load synopsys/suite`. Run the verification `make` commands at
+the `synopsys>` prompt or on the CAE host; on the host, the Makefile starts each VCS
+command in the container for you. Check the setup from the repository root:
+
+```sh
+module load synopsys/suite
+cd verif/projects/sync_fifo
+make run TEST=fifo_hello_test
+```
+
+It prints `*** TEST PASSED ***`. The [verification track](../verif/README.md) continues from there.
+
+Verilator, Questa, and Xcelium are optional. Set them up on the CAE host, not at the
+`synopsys>` prompt. `source verif/env/setup.sh` builds a Verilator environment in your
+home directory the first time (about 1.5 GB), and `source verif/env/setup.sh questa xcelium`
+also loads those simulators. [Simulators](../verif/docs/simulators.md) covers the differences.
+
 ## Local simulation (optional)
 
 Use this if you already have a local setup or want to work offline. CAE is the
@@ -154,3 +193,6 @@ gtkwave build/day1/waves.vcd
 | GUI cannot open over SSH | Use the CAE browser desktop for waveforms. |
 | Icarus runs when you expected VCS | Run `unset SIM` or select VCS explicitly with `make SIM=vcs smoke`. |
 | PE simulation fails | The starter is unfinished; follow the [PE guide](README.md#stage-3-implement-a-processing-element). |
+| `UVM is missing` in a verification project | Run `git submodule update --init verif/third_party/uvm-1.2` from the repository root on the CAE host. |
+| `source verif/env/setup.sh` fails with `conda: command not found` | You are at the `synopsys>` prompt. Run it on the CAE host. |
+| A command acts differently after `synopsys-run` than typed at `synopsys>` | `synopsys-run` reads its arguments as a new shell command line, so quotes and `$` change meaning. Start the container and type the command, or put it in a script. |

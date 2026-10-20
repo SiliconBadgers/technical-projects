@@ -1,0 +1,3 @@
+[submodule "verif/third_party/uvm-1.2"]
+	path = verif/third_party/uvm-1.2
+	url = https://github.com/SiliconBadgers/UVM_Library.git
