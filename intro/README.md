@@ -4,7 +4,9 @@
 
 Over the next three weeks, we'll work through digital logic, SystemVerilog, and a
 processing element project. You're welcome to work ahead. After the introduction,
-you'll choose the RTL/design or verification track. Follow the [CAE setup guide](SETUP.md)
+you'll choose RTL/design, verification, or physical design. See the
+[project plan](../README.md#project-plan) for each track's work and leads.
+Follow the [CAE setup guide](SETUP.md)
 before Stage 3; you can also use that environment to run the optional examples in
 Stages 1 and 2.
 
@@ -398,8 +400,9 @@ checkpoint is complete when all seven configurations print `CHECKED:` and the ru
 PASS: PE acceptance suite (7 configurations; all checks complete)
 ```
 
-After this final shared stage, continue to the [RTL track](../rtl/README.md#rtl-track)
-or [verification track](../verif/README.md#verification-track).
+After this final shared stage, continue to the [RTL track](../rtl/README.md#rtl-track),
+[verification track](../verif/README.md#verification-track), or
+[physical-design plan](../README.md#physical-design-turn-working-rtl-into-gates).
 
 ## Resources
 
