@@ -39,10 +39,11 @@ The scripts use standard commands of recent releases. Assumed:
 
 ## Setup (once)
 
-1. **Get the PDK repo** (the library files) next to this repo, so the two folders sit side by side:
+1. **Get the PDK repo** (the library files). Clone it next to the course folder (the folder with `docs/`, `labs/` and `tracks/`), three folders up from `tracks/b2`:
    ```
-   cd <the folder that holds this repo>
+   cd ../../..
    git clone <PDK repo URL> silicon-badgers-sky130-pdk     # ask a mentor for the URL; keep this folder name
+   cd -
    ```
    Somewhere else? Set `SB_PDK` to its path (`export SB_PDK=<path>`).
 2. **Load the tools.** Every site does this differently, for example `module load synopsys` or sourcing a setup script. Ask your mentor. Then check:
@@ -76,7 +77,7 @@ The scripts use standard commands of recent releases. Assumed:
 
 | Variable | Meaning | Default |
 |---|---|---|
-| `SB_PDK` | the SiliconBadgers sky130 PDK repo | `silicon-badgers-sky130-pdk` next to this repo (`../../../silicon-badgers-sky130-pdk` from `tracks/b2`) |
+| `SB_PDK` | the SiliconBadgers sky130 PDK repo | `../../../silicon-badgers-sky130-pdk` from `tracks/b2`, next to the course folder |
 
 ## Running a step
 

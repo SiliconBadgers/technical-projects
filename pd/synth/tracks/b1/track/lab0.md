@@ -18,7 +18,7 @@ make check DESIGN=gcd
 ## Finding the library files
 
 The Lab 0 scripts read [libraries.yaml](libraries.yaml): `sky130_scl_9T` (this track's library) and `sky130_fd_sc_hd` (for comparison only).
-`$SB_PDK` is the PDK repo; if you did not set it, it is `silicon-badgers-sky130-pdk` next to this repo (`../../../silicon-badgers-sky130-pdk` from here).
+`$SB_PDK` is the PDK repo; if you did not set it, it is `../../../silicon-badgers-sky130-pdk` from here, next to the course folder.
 
 ```
 python3 ../../libs/lab0/platforms.py                      # every library and corner, with its file

@@ -14,7 +14,7 @@ TRACK_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 SB_ROOT   := $(abspath $(TRACK_DIR)/../..)
 FLOW      := $(TRACK_DIR)/flow
 
-# --- library: sky130_scl_9T from the SiliconBadgers PDK repo (cloned next to this repo) ---
+# --- library: sky130_scl_9T from the SiliconBadgers PDK repo (cloned next to the course folder) ---
 SB_PDK   ?= $(abspath $(SB_ROOT)/../silicon-badgers-sky130-pdk)
 export SB_PDK
 LIB_NAME := sky130_scl_9T

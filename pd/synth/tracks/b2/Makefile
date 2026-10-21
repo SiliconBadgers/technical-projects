@@ -17,7 +17,7 @@ FLOW    := $(TRACK_DIR)/flow
 DESIGN  ?= gcd
 LIBRARY := sky130_fd_sc_hd
 
-# --- library (SiliconBadgers sky130 PDK repo, cloned next to this repo) ---
+# --- library (SiliconBadgers sky130 PDK repo, cloned next to the course folder) ---
 SB_PDK ?= $(abspath $(ROOT)/../silicon-badgers-sky130-pdk)
 VIEWS  := $(SB_PDK)/synopsys/views
 CELLS  := $(SB_PDK)/synopsys/$(LIBRARY)

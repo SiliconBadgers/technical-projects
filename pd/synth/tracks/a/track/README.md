@@ -33,14 +33,14 @@ A container is a ready-made Linux box with every tool at the right version, so e
 
 ```
 env/start.sh build      # once, and again whenever pdk.lock changes
-env/start.sh shell      # opens a shell inside the container
-cd /foss/designs/silicon-badgers-synth-onboarding/tracks/a
+env/start.sh shell      # opens a shell inside the container and prints the cd line below
+cd /foss/designs/<course folder>/tracks/a
 make env-check          # PDKs and tools match pdk.lock
 ```
 
 - Needs Docker or Podman.
-- The folder that holds your clone is mounted at `/foss/designs`.
-- The container sets `PDK_ROOT` and `SCL_ROOT` for you.
+- The folder that holds the course folder (the folder with `docs/`, `labs/` and `tracks/`) is mounted at `/foss/designs`; `<course folder>` is that folder's name.
+- The container sets `PDK_ROOT` and `SCL_ROOT` for you. `SCL_ROOT` is `/foss/designs/sky130_scl_9T_0.1.2`, so for the `sky130scl` library unpack its tarball next to the course folder.
 
 ### Option 2: tools on your own machine
 

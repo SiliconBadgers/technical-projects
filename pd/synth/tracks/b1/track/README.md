@@ -71,11 +71,12 @@ export PATH=/var/tmp/$USER/sb-py/bin:$PATH
 
 ### 3. The PDK repo
 
-Clone the PDK repo next to this repo, under exactly this folder name: `git clone <PDK repo URL> silicon-badgers-sky130-pdk`.
+Clone the PDK repo next to the course folder (the folder with `docs/`, `labs/` and `tracks/`), three folders up from `tracks/b1`, under exactly this folder name:
 
 ```
-<your folder>/silicon-badgers-synth-onboarding    <- this repo
-<your folder>/silicon-badgers-sky130-pdk          <- the PDK repo
+cd ../../..
+git clone <PDK repo URL> silicon-badgers-sky130-pdk     # ask a mentor for the URL
+cd -
 ```
 
 Somewhere else? `export SB_PDK=<path to silicon-badgers-sky130-pdk>`.

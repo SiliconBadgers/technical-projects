@@ -7,8 +7,8 @@ Run everything from this track's folder, `tracks/a`.
 
 ```
 env/start.sh build      # once
-env/start.sh shell      # then, inside the container:
-cd /foss/designs/silicon-badgers-synth-onboarding/tracks/a
+env/start.sh shell      # then, inside the container (start.sh prints this cd line):
+cd /foss/designs/<course folder>/tracks/a
 make env-check
 make all   PDK=sky130hd DESIGN=gcd
 make check PDK=sky130hd DESIGN=gcd
