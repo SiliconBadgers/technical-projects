@@ -1,0 +1,44 @@
+# File:        targets.yaml
+# Author:      Isaac Hagedorn
+# Date:        2026-10-09
+# Description: Lab 2 timing and area targets per platform.
+# T0: min passing period at ss, all *_PIPE = 0 (sweep.py --find-min, 2026-10-08).
+# bronze: all checks pass at bronze_period_ns (T0 rounded up to a whole MHz).
+# silver: setup at ss <= silver_period_ns (0.70 x T0), hold at ff, area <= 1.25 x bronze.
+# gold: silver on a second PDK, plus 8x8 at the bronze period (mentor-checked).
+platforms:
+  sky130hd:
+    T0_ns: 17.5
+    bronze_mhz: 57
+    bronze_period_ns: 17.544
+    bronze_area_um2: 168527
+    silver_period_ns: 12.25
+    silver_max_area_um2: 210659
+  sky130hs:
+    T0_ns: 10.3
+    bronze_mhz: 97
+    bronze_period_ns: 10.309
+    bronze_area_um2: 197029
+    silver_period_ns: 7.21
+    silver_max_area_um2: 246286
+  gf180_7t:
+    T0_ns: 30.0
+    bronze_mhz: 33
+    bronze_period_ns: 30.303
+    bronze_area_um2: 600547
+    silver_period_ns: 21.0
+    silver_max_area_um2: 750684
+  gf180_9t:
+    T0_ns: 26.0
+    bronze_mhz: 38
+    bronze_period_ns: 26.316
+    bronze_area_um2: 700462
+    silver_period_ns: 18.2
+    silver_max_area_um2: 875578
+  sky130scl:
+    T0_ns: 11.0
+    bronze_mhz: 90
+    bronze_period_ns: 11.111
+    bronze_area_um2: 227964
+    silver_period_ns: 7.7
+    silver_max_area_um2: 284955

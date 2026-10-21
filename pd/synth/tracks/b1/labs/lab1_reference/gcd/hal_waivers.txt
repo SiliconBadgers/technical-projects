@@ -1,0 +1,16 @@
+# File:        hal_waivers.txt
+# Author:      Isaac Hagedorn
+# Date:        2026-10-09
+# Description: Lint waivers for make lint (Track B1): HAL warnings that are checked and harmless. One per line, with the reason.
+# Format: <message code> [<file pattern>]   # why it is harmless
+# Example: UNUSED */ibex_decoder.sv   # clk_i and rst_ni are unused in this configuration
+# gcd.v is PyMTL-generated Verilog from OpenROAD-flow-scripts, used as shipped; none of these change its function.
+INTTOB  */gcd.v   # generated code assigns integer 0/1 to 1-bit outputs (req_rdy = 1)
+ULCMPE  */gcd.v   # 2-bit state compared with 32-bit integer localparams; values fit in 2 bits
+OLDALW  */gcd.v   # Verilog-2001 always @(*) / always @(posedge clk) from the generator
+USEPRT  */gcd.v   # every generated submodule has clk and reset ports, used or not
+USEPAR  */gcd.v   # generated mux parameter nports is not read
+URDREG  */gcd.v   # do_sub is computed in the control block but not used
+LATBAS  */gcd.v   # do_swap/do_sub are assigned and read only in the STATE_CALC branch: the latch has no load, synthesis removes it (0 latches)
+LATMLG  */gcd.v   # same do_swap/do_sub latch as LATBAS
+POOBID  */gcd.v   # a_mux selects in_[sel] with a 2-bit sel over 3 inputs; sel 3 is never driven

@@ -1,6 +1,6 @@
 # Silicon Badgers technical projects
 
-Start with the shared introduction, then choose RTL or verification.
+Start with the shared introduction, then choose RTL, verification or physical design.
 
 | Read | What is there |
 | --- | --- |
@@ -8,6 +8,7 @@ Start with the shared introduction, then choose RTL or verification.
 | **[Shared introduction](intro/README.md)** | Digital logic, waveform exercises, SystemVerilog, and the PE project. |
 | **[RTL track](rtl/README.md)** | Build the systolic array design. |
 | **[Verification track](verif/README.md)** | Develop tests, follow the verification plan, and complete the testbench. |
+| **[Physical design](pd/README.md)** | Synthesis course: RTL to gates, timing constraints, static timing, and equivalence checking. |
 
 Each page has a short contents list for jumping between sections. Links to code
 open the relevant file and line range.

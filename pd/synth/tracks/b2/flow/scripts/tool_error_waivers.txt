@@ -1,0 +1,6 @@
+# File:        tool_error_waivers.txt
+# Author:      Isaac Hagedorn
+# Date:        2026-10-11
+# Description: "Error:" messages of dc_shell, pt_shell, fm_shell and lc_shell that make does not fail on (flow/scripts/tool_errors.py).
+#              Only errors that are harmless in a passing run; one message ID per line, then '#' and the reason.
+PT-063  # PrimeTime startup note when Library Compiler is a separate install (X-2025.06 here); STA reads the .db and is unaffected

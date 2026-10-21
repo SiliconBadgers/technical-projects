@@ -1,0 +1,25 @@
+# File:        libraries.yaml
+# Author:      Isaac Hagedorn
+# Date:        2026-10-09
+# Description: Track A Liberty files per library and corner, read by the Lab 0 scripts. Same files as flow/platforms/<name>.mk.
+libraries:
+  sky130hd:     # sky130_fd_sc_hd, SkyWater 130 nm high density
+    tt: ${PDK_ROOT}/sky130A/libs.ref/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+    ss: ${PDK_ROOT}/sky130A/libs.ref/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__ss_100C_1v60.lib
+    ff: ${PDK_ROOT}/sky130A/libs.ref/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__ff_n40C_1v95.lib
+  sky130hs:     # sky130_fd_sc_hs, SkyWater 130 nm high speed
+    tt: ${PDK_ROOT}/sky130A/libs.ref/sky130_fd_sc_hs/lib/sky130_fd_sc_hs__tt_025C_1v80.lib
+    ss: ${PDK_ROOT}/sky130A/libs.ref/sky130_fd_sc_hs/lib/sky130_fd_sc_hs__ss_100C_1v60.lib
+    ff: ${PDK_ROOT}/sky130A/libs.ref/sky130_fd_sc_hs/lib/sky130_fd_sc_hs__ff_n40C_1v95.lib
+  gf180_7t:     # gf180mcu_fd_sc_mcu7t5v0, GF180MCU 7-track, 5 V
+    tt: ${PDK_ROOT}/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu7t5v0/lib/gf180mcu_fd_sc_mcu7t5v0__tt_025C_5v00.lib
+    ss: ${PDK_ROOT}/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu7t5v0/lib/gf180mcu_fd_sc_mcu7t5v0__ss_125C_4v50.lib
+    ff: ${PDK_ROOT}/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu7t5v0/lib/gf180mcu_fd_sc_mcu7t5v0__ff_n40C_5v50.lib
+  gf180_9t:     # gf180mcu_fd_sc_mcu9t5v0, GF180MCU 9-track, 5 V
+    tt: ${PDK_ROOT}/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu9t5v0/lib/gf180mcu_fd_sc_mcu9t5v0__tt_025C_5v00.lib
+    ss: ${PDK_ROOT}/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu9t5v0/lib/gf180mcu_fd_sc_mcu9t5v0__ss_125C_4v50.lib
+    ff: ${PDK_ROOT}/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu9t5v0/lib/gf180mcu_fd_sc_mcu9t5v0__ff_n40C_5v50.lib
+  sky130scl:    # sky130_scl_9T 0.1.2, 9-track (not redistributable: ask a mentor)
+    tt: ${SCL_ROOT}/sky130_scl_9T/lib/sky130_tt_1.8_25_nldm.lib.gz
+    ss: ${SCL_ROOT}/sky130_scl_9T/lib/sky130_ss_1.62_125_nldm.lib.gz
+    ff: ${SCL_ROOT}/sky130_scl_9T/lib/sky130_ff_1.98_0_nldm.lib.gz

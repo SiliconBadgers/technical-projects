@@ -1,0 +1,13 @@
+# File:        libraries.yaml
+# Author:      Isaac Hagedorn
+# Date:        2026-10-09
+# Description: Track B1 Liberty files per library and corner, read by the Lab 0 scripts. SB_PDK is the SiliconBadgers PDK repo (default: next to this repo).
+libraries:
+  sky130_scl_9T:      # the library of this track's flow: SkyWater 130 nm, 9-track
+    tt: ${SB_PDK}/cadence/sky130_scl_9T/lib/sky130_tt_1.8_25_nldm.lib.gz
+    ss: ${SB_PDK}/cadence/sky130_scl_9T/lib/sky130_ss_1.62_125_nldm.lib.gz
+    ff: ${SB_PDK}/cadence/sky130_scl_9T/lib/sky130_ff_1.98_0_nldm.lib.gz
+  sky130_fd_sc_hd:    # for comparison in Lab 0 only: SkyWater 130 nm high density (the flow does not use it)
+    tt: ${SB_PDK}/synopsys/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+    ss: ${SB_PDK}/synopsys/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__ss_100C_1v60.lib
+    ff: ${SB_PDK}/synopsys/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__ff_n40C_1v95.lib
