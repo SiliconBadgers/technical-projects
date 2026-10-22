@@ -20,6 +20,8 @@ jobs:
         run: make check
       - name: Simulate completed examples
         run: make SIM=iverilog smoke
+      - name: Check verification runner and APB timer
+        run: uv run --locked python -m unittest discover -s verif/scripts/tests -v
       # The PE is a student starter; make pe intentionally fails until completed.
   render:
     runs-on: ubuntu-latest

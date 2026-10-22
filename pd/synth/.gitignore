@@ -1,0 +1,33 @@
+# File:        .gitignore
+# Author:      Isaac Hagedorn
+# Date:        2026-10-09
+# Description: Files git ignores: run outputs, Python caches and simulator and tool work files of every track.
+# run outputs
+build/
+# Python
+__pycache__/
+*.pyc
+# simulation
+sim_build/
+*.vcd
+*.fst
+*.shm/
+xcelium.d/
+INCA_libs/
+simv*
+csrc/
+*.daidir/
+ucli.key
+# synthesis and equivalence work files
+alib-52/
+WORK/
+*.svf
+.cadence/
+fv/
+# logs and command histories
+*.log
+*.cmd
+*.cmd~
+lc_output.txt
+# mentor material (separate repo)
+mentor/

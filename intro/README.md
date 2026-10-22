@@ -2,10 +2,12 @@
 
 [Home](../README.md) · [CAE setup](SETUP.md) · [RTL](../rtl/README.md#rtl-track) · [Verification](../verif/README.md#verification-track)
 
-Over the next three weeks, we'll work through digital logic, SystemVerilog, and a
-processing element project. You're welcome to work ahead. After the introduction,
-you'll choose RTL/design, verification, or physical design. See the
-[project plan](../README.md#project-plan) for each track's work and leads.
+Everyone starts with an overview of chip design and how the subteams fit together.
+Software members then continue into Akanksha's onboarding track. RTL, verification,
+and physical-design members use this guide for the hardware foundation: digital
+logic, SystemVerilog, and a processing element project over about three weeks.
+You're welcome to work ahead. The [project plan](../README.md#project-plan) identifies
+the leads and the common-overview boundary they still need to define.
 Follow the [CAE setup guide](SETUP.md)
 before Stage 3; you can also use that environment to run the optional examples in
 Stages 1 and 2.
@@ -400,9 +402,9 @@ checkpoint is complete when all seven configurations print `CHECKED:` and the ru
 PASS: PE acceptance suite (7 configurations; all checks complete)
 ```
 
-After this final shared stage, continue to the [RTL track](../rtl/README.md#rtl-track),
+After this shared hardware stage, continue to the [RTL track](../rtl/README.md#rtl-track),
 [verification track](../verif/README.md#verification-track), or
-[physical-design plan](../README.md#physical-design-turn-working-rtl-into-gates).
+[physical-design plan](../README.md#physical-design-scope-the-onboarding-assignment).
 
 ## Resources
 
@@ -455,4 +457,4 @@ relevant lines. In a local editor, search for the listed signal, task, or module
 | PE signals | [`pe ports`](projects/processing-element/rtl/pe.sv#L7-L11)<!-- region:interface --> | [PE contract](projects/processing-element/spec/pe.md) |
 | Student implementation | [`pe body`](projects/processing-element/rtl/pe.sv#L13-L21)<!-- region:implementation --> | [PE guide](#stage-3-implement-a-processing-element) |
 | Testbench driver/checker | [`check_outputs and step`](projects/processing-element/tb/pe_tb.sv#L75-L107)<!-- region:checker --> | [Verification](../verif/README.md#getting-started-with-verification) |
-| PE acceptance cases | [`run_tests`](projects/processing-element/tb/pe_tb.sv#L137-L242)<!-- region:stimulus --> | [Verification plan](../verif/README.md#pe-verification-plan) |
+| PE acceptance cases | [`run_tests`](projects/processing-element/tb/pe_tb.sv#L137-L242)<!-- region:stimulus --> | [Test-plan template](../templates/README.md#verification-plan-template) |

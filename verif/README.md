@@ -2,147 +2,124 @@
 
 [Home](../README.md) · [Shared introduction](../intro/README.md#shared-introduction) · [CAE setup](../intro/SETUP.md) · [RTL](../rtl/README.md#rtl-track)
 
-After the [shared PE checkpoint](../intro/README.md#pe-checkpoint), you'll use its
-supplied testbench to learn how to find design bugs. Then you'll build a testbench
-for the RTL track's systolic array, starting with directed tests and growing into
-scoreboards, coverage, and UVM.
+**Lead: Harsh.** After the [shared PE foundation](../intro/README.md#pe-checkpoint),
+you verify supplied designs. Each project gives you a specification and a
+design. You write the test plan and the UVM testbench, run them against the design,
+and find the bugs in broken versions your instructors keep hidden.
 
-The track materials are incomplete. We'll add detailed lessons and more resources
-as the project develops.
+Harsh will identify the required onboarding subset of this course and its
+interview rubric in the [project plan](../README.md#verification-build-an-environment-for-a-supplied-array).
+The onboarding target is a UVM environment for a supplied reference systolic
+array; you do not need to implement the full array or wait for an RTL recruit.
 
 ## On this page
 
-- [Getting started](#getting-started-with-verification)
-- [PE verification plan](#pe-verification-plan)
-- [Verification roadmap](#verification-roadmap)
+- [Projects](#projects)
+- [Getting started with verification](#getting-started-with-verification)
+- [Debug in the waveform](#debug-in-the-waveform)
+- [Coverage](#coverage)
+- [Layout](#layout)
+- [Rules](#rules)
 - [Testbench completion](#testbench-completion)
-- [Resources](#verification-resources)
-- [Project files](#project-files)
+
+## Projects
+
+Do them in this order:
+
+| # | Project | Design | You build | Time |
+|---|---|---|---|---|
+| 1 | [`sync_fifo`](projects/sync_fifo/README.md) | Synchronous FIFO with valid/ready on both sides, flags and flush | Write and read agents, a queue model, scoreboard, coverage, a test plan | 1–2 weeks |
+| 2 | [`apb_regs`](projects/apb_regs/README.md) | APB4 register block with a timer and an interrupt | An APB agent, a UVM register model, a timer model, coverage, a test plan | ~2 weeks |
+| 3 | [`systolic_array`](projects/systolic_array/README.md) | 4 × 4 int8 systolic array with valid/ready channels | Three agents, a reference model, scoreboard, coverage, a test plan | 6 weeks |
+
+Each project has its own labs under `projects/<project>/docs/labs/` and a hidden
+set of seeded bugs for the final bug hunt, which your instructors score against.
 
 ## Getting started with verification
 
-### Read the supplied testbench
+Set up CAE and the UVM library as described in [CAE setup](../intro/SETUP.md#verification-track).
+All your work lives on a branch in your fork. `main` is the course.
 
-A testbench drives a design's inputs and checks its outputs against the behavior
-in the specification. Start with the [PE ports](../intro/projects/processing-element/rtl/pe.sv#L7-L11)<!-- region:interface -->
-and [cycle rules](../intro/projects/processing-element/spec/pe.md#cycle-rules),
-then see how the supplied tests check them:
-
-| Read | What to notice |
-| --- | --- |
-| [`step` and output checker](../intro/projects/processing-element/tb/pe_tb.sv#L75-L107)<!-- region:checker --> | Inputs change on falling edges. Outputs are checked before the rising edge to catch early changes, and afterward to check the registered update. |
-| [Reference model](../intro/projects/processing-element/tb/pe_tb.sv#L32-L74)<!-- region:model --> | Shift/add multiplication computes the expected product independently of the RTL. The model also tracks accumulation and forwarded operands. |
-| [Test phases](../intro/projects/processing-element/tb/pe_tb.sv#L137-L242)<!-- region:stimulus --> | Small, targeted cases check individual behaviors; operand sweeps and reproducible random sequences exercise more combinations. |
-| [Width configurations](../intro/projects/processing-element/tb/pe_tb.sv#L244-L272)<!-- region:configurations --> | Narrow and wide configurations catch assumptions about fixed operand or accumulator widths. |
-
-An independent reference helps catch mistakes that copying the RTL's calculation
-could carry into the testbench. For each test, look for the requirement it checks
-and the observation that would reveal a bug.
-
-### Try detecting a bug (optional practice)
-
-From the repository root in the [CAE environment](../intro/SETUP.md), run the suite
-against your working PE:
-
-```sh
-make pe
+```bash
+cd ~/technical-projects
+git switch -c <your-netid>
+module load synopsys/suite
+cd verif/projects/sync_fifo
+make run TEST=fifo_hello_test
 ```
 
-A passing run ends with `PASS: PE acceptance suite (7 configurations; all checks complete)`.
-The untouched starter fails until you implement the PE.
+The test prints `*** TEST PASSED ***`. VCS is the default simulator. Add `SIM=verilator`,
+`SIM=questa`, or `SIM=xcelium` to a `make` command to use another one;
+[Simulators](docs/simulators.md) covers their setup and differences.
 
-Temporarily change the PE to accumulate during a bubble, then rerun the suite.
-Use the failure message's inputs and actual/expected outputs to locate the
-mismatch. Restore your working implementation and rerun to confirm it passes.
-See the [PE debugging instructions](../intro/README.md#use-the-supplied-reference-testbench)
-for waveforms, seeds, and later failures.
+| You edit | Course material (do not edit) |
+|---|---|
+| `projects/<project>/tb/` (testbench, `tb.f`, `regress.list`) | `projects/<project>/rtl/`, `docs/`, `model/` |
+| `projects/<project>/docs/testplan/` | `common/`, `scripts/`, `third_party/`, `env/` |
 
-### Build checks for the array
+Push your branch to your fork (`git push -u origin <your-netid>`) and open a PR
+to the club repository for review. To pick up course updates, run
+`git fetch upstream` and `git merge upstream/main` from your working branch.
+Resolve any conflicts with the updated course material before continuing.
 
-Work with the RTL track to define the [array's behavior](../rtl/README.md#build-a-systolic-array)
-in a shared specification. Compute expected matrix results independently, then
-compare them with the array's outputs. Track which results are due and when;
-this tracking and comparison is called a scoreboard.
+## Debug in the waveform
 
-Start with directed tests: choose inputs and timing to exercise one requirement
-at a time, such as reset during work or consecutive matrix operations. Add
-reproducible random stimulus to vary operands and control sequences. Use
-functional coverage to record which cases you've exercised, and SystemVerilog
-assertions to check timing rules.
+When a check fails, the log tells you which check failed and when. The waveform shows
+why. `make waves TEST=<test> SEED=<seed>` reruns the test with waves on and prints the
+file to open: `waves.vcd`, or `waves.fst` with Verilator. Open it with
+`gtkwave <file>` in a CAE desktop host terminal.
 
-Keep an array verification plan using the [PE plan](#pe-verification-plan) or
-[plan template](../templates/README.md#verification-plan-template) as a starting
-point. Map each requirement to its stimulus and checker so you can see where tests
-are missing. Put the new testbench and regression scripts in the [track project](#project-files).
+1. Before you open the viewer, write a short table from the spec: a few clock edges
+   around the failure and the values you expect at each one.
+2. Show the clock, reset, and the DUT's inputs and outputs, then zoom to the failure
+   time from the log.
+3. Read every signal at one clock edge. A registered output changes just after the
+   edge, so compare the values just before and just after it.
+4. Step back edge by edge to the first time the waveform disagrees with your table.
+   Write down that time and signal.
+5. Open the code that drives or samples that signal: your driver, monitor, or model in
+   `tb/`, or the DUT port it comes from. It's a design bug only if your testbench
+   followed the spec at that edge.
 
-## PE verification plan
+To compare with a passing run, run `make waves` for the passing seed or design too and
+look at both at the same time.
 
-The supplied suite checks the [PE specification](../intro/projects/processing-element/spec/pe.md)
-as follows:
+## Coverage
 
-| Requirement | Supplied check |
-| --- | --- |
-| Reset and clear zero all state; clear ignores valid input | Directed cases and all 64 transitions between reset/clear/valid combinations, with nonzero state loaded before each case. |
-| State updates only on rising edges | Compare outputs before and after the rising edge. |
-| Signed multiply-accumulate | Independent shift/add reference; every operand pair at widths 1, 2, 4, and 8. |
-| Forward valid operands; hold data and deassert valid during bubbles | Compare both forwarded operands, the accumulator, and `valid_out` every step, including repeated bubbles with changing inputs. |
-| Consecutive valid cycles | Back-to-back operand sweeps and directed dot products. |
-| Arithmetic boundaries | Pair minimum, minimum+1, −1, 0, 1, maximum−1, and maximum operands. |
-| Accumulator wraparound | Accumulate through positive and negative overflow, including the default 32-bit accumulator. The one-bit case checks positive wraparound because its operands are only −1 and 0. |
-| Parameterization | Test `DATA_W/ACC_W` configurations `1/2`, `2/4`, `4/11`, `8/16`, `8/32`, `17/40`, and `33/72`. |
-| Mixed traffic and restart | Run 4,000 reproducible random cycles per configuration with occasional reset and clear, then reset, idle, and restart. |
-| Suite completes | Check phase counters and all seven completion flags; a timeout catches a stalled run. |
+`make regress` collects functional coverage from your covergroups, and `make cov` lists
+each covergroup and coverpoint with its percentage and the bins no test hit.
 
-Operand-pair sweeps cover widths through 8 bits. Wider configurations use boundary
-and random cases.
+Code coverage of the design is separate: run `make regress CODECOV=1`, then
+`make cov-code CODECOV=1`. With VCS it prints line, condition, toggle, and branch
+coverage of `tb_top.dut`, and `modinfo.txt` in the report directory it names lists
+each line, condition, toggle, and branch that no test reached.
 
-## Verification roadmap
+Report coverage with its scope and metric, for example "`tb_top.dut` branch 100%". A
+report's total score also counts your testbench's own modules and interfaces, so it
+doesn't describe the design. Coverage counts only where a check looks at the behavior.
 
-| Stage | What you'll practice |
-| --- | --- |
-| 1. Directed tests and debugging | Read the PE suite, connect requirements to checks, and see how failures identify design bugs. |
-| 2. Scoreboards and coverage | Build array stimulus, an independent matrix reference, timing assertions, and coverage goals. |
-| 3. UVM and integration | Organize reusable testbench components and build regressions for the array and larger subsystems. |
+## Layout
 
-UVM (Universal Verification Methodology) provides a structure for reusable
-components: a driver applies inputs, a monitor observes transfers, and a
-scoreboard checks the results. DPI-C (Direct Programming Interface for C) lets a
-SystemVerilog testbench call C code, for example to use a C reference model.
-These build on the checking techniques you learn with the PE and array.
+All paths below are under `verif/`.
+
+| Path | Contents |
+|---|---|
+| `projects/<project>/` | Spec, labs, design, model, and your `tb/` and test plan |
+| `common/sim.mk` | Build, run, regression and coverage flow every project uses (`SIM=vcs\|verilator\|questa\|xcelium`) |
+| `scripts/` | Regression runner, coverage report, Verilator quirk checks |
+| `docs/simulators.md` | Simulator notes and known Verilator issues |
+| `docs/templates/` | Test-plan and bug-report templates |
+| `env/` | Optional simulators: `setup.sh` and the Verilator conda env |
+| `third_party/uvm-1.2/` | `SiliconBadgers/UVM_Library` submodule (UVM 1.2) |
+
+## Rules
+
+1. Build your model from the spec, not the RTL.
+2. Never edit the RTL. Report disagreements as bugs or spec questions.
+3. Report every failed check with `uvm_error`.
 
 ## Testbench completion
 
-Run your completed array testbench against a correct implementation. Use your
-verification plan to check that it covers the array's requirements and edge cases.
-Introduce representative design bugs and confirm that the tests report failures,
-then restore the correct design and rerun. Document the regression command so
-someone else can run the same checks.
-
-## Verification resources
-
-### Verification
-
-| Resource | Use it for |
-| --- | --- |
-| [Siemens Verification Academy: UVM basics](https://verificationacademy.com/topics/uvm-universal-verification-methodology/uvm-basics/) | Learn how drivers, monitors, and scoreboards fit together. |
-| [Doulos SystemVerilog assertions tutorial](https://www.doulos.com/knowhow/systemverilog/systemverilog-tutorials/systemverilog-assertions-tutorial/) | Write timing checks for behavior such as reset and valid signaling. |
-| [UVM video series](https://www.youtube.com/watch?v=imH4CFmVGWE&list=PLBIILfL2t1lnvzw7vF0arlvu36Wj4--D7) | Supplement the UVM readings with worked explanations. |
-
-### Tools and shared prerequisites
-
-- [CAE setup](../intro/SETUP.md#environment-setup): simulation and waveform viewing.
-- [PE specification](../intro/projects/processing-element/spec/pe.md): the behavior checked by the supplied suite.
-- [Verification-plan template](../templates/README.md#verification-plan-template): organize requirements, checks, and coverage gaps.
-
-## Project files
-
-| File | Role |
-| --- | --- |
-| [PE specification](../intro/projects/processing-element/spec/pe.md) | Defines the shared block's behavior. |
-| [PE RTL](../intro/projects/processing-element/rtl/pe.sv) | The design being tested. |
-| [Acceptance testbench](../intro/projects/processing-element/tb/pe_tb.sv) | The supplied reference model, stimulus, and checks. |
-
-You'll build the array testbench under `verif/projects/pe-verification/tb/` and
-regression scripts under `verif/projects/pe-verification/scripts/`. Reference the
-shared PE and the RTL track's array design and specification. Keep the supplied
-PE acceptance suite available for the shared checkpoint.
+Complete the project test plan and UVM testbench, then run the project regression.
+The checkpoint is complete when the testbench checks the specification and detects
+design errors.

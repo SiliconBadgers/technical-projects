@@ -1,0 +1,49 @@
+# File:        pdk.lock
+# Author:      Isaac Hagedorn
+# Date:        2026-10-08
+# Description: Pinned container, tool and PDK versions. Read by env/start.sh, make env-check and ci/checks.py.
+
+container: hpretl/iic-osic-tools:2026.09
+# multi-arch index digest
+container_digest: sha256:b87b3f1af9ba72d9486466ea777cf4248e96e20d9dba76d67259bc185db3859c
+
+# ciel version shipped in the image
+ciel_version: 2.6.1
+
+pdks:
+  sky130:
+    open_pdks: 1689ac3f2dc763876eaf967227c7dfe831b031ae   # open_pdks tag 1.0.608 (2026-08-27)
+    variant: sky130A
+    libraries: [sky130_fd_sc_hd, sky130_fd_sc_hs, sky130_fd_pr]
+    sources:   # library commits used by open_pdks 1.0.608
+      sky130_fd_sc_hd: { repo: fossi-foundation/skywater-pdk-libs-sky130_fd_sc_hd, commit: 9cb2d7cb8ed4619094263614039a61b6b2d22a88 }
+      sky130_fd_sc_hs: { repo: fossi-foundation/skywater-pdk-libs-sky130_fd_sc_hs, commit: c3d7991a9bcb4fc33cbd43262b44bb5560d6fdd0 }
+      sky130_fd_pr:    { repo: fossi-foundation/skywater-pdk-libs-sky130_fd_pr,    commit: 403964dc7f9cca5ec1a8cc7b4f2a6f532b781676 }
+  gf180mcu:
+    open_pdks: 1689ac3f2dc763876eaf967227c7dfe831b031ae   # same open_pdks release
+    variant: gf180mcuD
+    libraries: [gf180mcu_fd_sc_mcu7t5v0, gf180mcu_fd_sc_mcu9t5v0]
+    supply: 5v0   # corners tt_025C_5v00 / ss_125C_4v50 / ff_n40C_5v50
+    sources:   # library commits used by open_pdks 1.0.608
+      gf180mcu_fd_sc_mcu7t5v0: { repo: fossi-foundation/globalfoundries-pdk-libs-gf180mcu_fd_sc_mcu7t5v0, commit: 0ef8889a8df0acf959683fbe73013f342a2206a2 }
+      gf180mcu_fd_sc_mcu9t5v0: { repo: fossi-foundation/globalfoundries-pdk-libs-gf180mcu_fd_sc_mcu9t5v0, commit: 02b7af3f8d88c0b014d9af3db6a17f02aa983305 }
+
+# sky130_scl_9T (platform sky130scl): not redistributed, ask a mentor for the tarball
+extra_libraries:
+  sky130_scl_9T:
+    release: 0.1.2
+    tarball: sky130_scl_9T_0.1.2.tgz
+    sha256: c28363b936f3845fb02df8ea03b7106b17ffcf28ed6accfa3e1ea9fefd3f4c71
+
+# tool versions inside the container (fixed by container_digest)
+tools:
+  yosys:         { version: v0.69, commit: 9f75ca1f9834a39a863915b5dae0c7b1e33533bc }   # read_slang built in
+  eqy:           { version: v0.69, commit: 4a72eb94fc253062464afee4d0018359017bb846 }
+  sv_elab:       { repo: povik/sv-elab, commit: 43a93f44b790ae5af57a25bfb5177c4dff0b22f9 }  # SystemVerilog frontend plugin
+  opensta:       { repo: The-OpenROAD-Project/OpenSTA, commit: f89887b59600cd3a2a10c3de31bda4235d904cdf, version: 3.1.0 }
+  verilator:     { version: v5.052, commit: ea338be98e1e838d3518809ce8899f85a009963c }
+  verible:       { version: v0.0-4294-gc1d8f5e8 }
+  iverilog:      { commit: d1982fc7d823f1786f4788a88551f0664c16d7e7 }   # master after v13_0
+  cocotb:        { version: 2.1.0 }
+  kepler_formal: { commit: f025fa2f254efd6c702cef004e55995c1f13a11a }   # second LEC engine (optional)
+  orfs_reference: { commit: 3a964e13f11a4e435aac01ffa14db0a7d2853720 }  # ORFS commit of the image's OpenROAD

@@ -1,0 +1,6 @@
+# File:        tool_error_waivers.txt
+# Author:      Isaac Hagedorn
+# Date:        2026-10-11
+# Description: Error messages of Genus, Tempus and Conformal that make does not fail on (flow/scripts/tool_errors.py).
+#              Only errors that are harmless in a passing run; one message ID per line, then '#' and the reason.
+# (none: no Tempus 23.14/25.13 run of gcd, ibex or the tile printed an error)

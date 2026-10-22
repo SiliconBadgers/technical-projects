@@ -32,7 +32,7 @@ Outputs are shown after each rising edge. Start with reset, then supply:
 
 The result is the dot product `2*3 + (-1)*4 = 2`.
 See the [implementation guide](../../../README.md#stage-3-implement-a-processing-element)
-and the [verification plan](../../../../verif/README.md#pe-verification-plan).
+and the [test-plan template](../../../../templates/README.md#verification-plan-template).
 
 The [supplied acceptance testbench](../tb/pe_tb.sv) checks this contract. Run
 `make pe` from the repository root; the [PE checkpoint instructions](../../../README.md#pe-checkpoint)
