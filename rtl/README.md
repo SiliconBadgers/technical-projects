@@ -1,5 +1,8 @@
 # RTL track
 
+**Lead: Zeb.** See the [project plan](../README.md#rtl-build-the-full-systolic-array)
+for the onboarding scope and interview rubric to define for this track.
+
 [Home](../README.md) · [Shared introduction](../intro/README.md#shared-introduction) · [CAE setup](../intro/SETUP.md) · [Verification](../verif/README.md#verification-track)
 
 After the [shared PE checkpoint](../intro/README.md#pe-checkpoint), you'll connect

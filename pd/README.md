@@ -1,5 +1,10 @@
 # Physical design
 
+**Lead: Isaac.** The [onboarding plan](../README.md#physical-design-scope-the-onboarding-assignment)
+asks Isaac to define the required subset, deliverables, and interview rubric.
+The full synthesis course below is available learning material; its entire
+six-week sequence is not automatically the onboarding requirement.
+
 This area covers how RTL becomes a chip. It starts with synthesis: turning RTL into gates, writing the timing constraints, and checking that the gates are correct and fast enough. Place-and-route material will be added here later.
 
 | Read | What is there |

@@ -2,9 +2,13 @@
 
 [Home](../README.md) · [CAE setup](SETUP.md) · [RTL](../rtl/README.md#rtl-track) · [Verification](../verif/README.md#verification-track)
 
-Over the next three weeks, we'll work through digital logic, SystemVerilog, and a
-processing element project. You're welcome to work ahead. After the introduction,
-you'll choose the RTL/design or verification track. Follow the [CAE setup guide](SETUP.md)
+Everyone starts with an overview of chip design and how the subteams fit together.
+Software members then continue into Akanksha's onboarding track. RTL, verification,
+and physical-design members use this guide for the hardware foundation: digital
+logic, SystemVerilog, and a processing element project over about three weeks.
+You're welcome to work ahead. The [project plan](../README.md#project-plan) identifies
+the leads and the common-overview boundary they still need to define.
+Follow the [CAE setup guide](SETUP.md)
 before Stage 3; you can also use that environment to run the optional examples in
 Stages 1 and 2.
 
@@ -398,8 +402,9 @@ checkpoint is complete when all seven configurations print `CHECKED:` and the ru
 PASS: PE acceptance suite (7 configurations; all checks complete)
 ```
 
-After this final shared stage, continue to the [RTL track](../rtl/README.md#rtl-track)
-or [verification track](../verif/README.md#verification-track).
+After this shared hardware stage, continue to the [RTL track](../rtl/README.md#rtl-track),
+[verification track](../verif/README.md#verification-track), or
+[physical-design plan](../README.md#physical-design-scope-the-onboarding-assignment).
 
 ## Resources
 

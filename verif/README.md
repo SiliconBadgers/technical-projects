@@ -2,10 +2,15 @@
 
 [Home](../README.md) · [Shared introduction](../intro/README.md#shared-introduction) · [CAE setup](../intro/SETUP.md) · [RTL](../rtl/README.md#rtl-track)
 
-The verification track is a UVM onboarding course: after the shared introduction
-you verify designs you have not seen. Each project gives you a specification and a
+**Lead: Harsh.** After the [shared PE foundation](../intro/README.md#pe-checkpoint),
+you verify supplied designs. Each project gives you a specification and a
 design. You write the test plan and the UVM testbench, run them against the design,
 and find the bugs in broken versions your instructors keep hidden.
+
+Harsh will identify the required onboarding subset of this course and its
+interview rubric in the [project plan](../README.md#verification-build-an-environment-for-a-supplied-array).
+The onboarding target is a UVM environment for a supplied reference systolic
+array; you do not need to implement the full array or wait for an RTL recruit.
 
 ## On this page
 
@@ -33,7 +38,7 @@ set of seeded bugs for the final bug hunt, which your instructors score against.
 ## Getting started with verification
 
 Set up CAE and the UVM library as described in [CAE setup](../intro/SETUP.md#verification-track).
-All your work lives on your own branch. `main` is the course.
+All your work lives on a branch in your fork. `main` is the course.
 
 ```bash
 cd ~/technical-projects
@@ -52,9 +57,10 @@ The test prints `*** TEST PASSED ***`. VCS is the default simulator. Add `SIM=ve
 | `projects/<project>/tb/` (testbench, `tb.f`, `regress.list`) | `projects/<project>/rtl/`, `docs/`, `model/` |
 | `projects/<project>/docs/testplan/` | `common/`, `scripts/`, `third_party/`, `env/` |
 
-Push your branch for review (`git push -u origin <your-netid>`). To pick up course
-updates, merge `main` into your branch (`git fetch && git merge origin/main`);
-since you only edit `tb/` and `docs/testplan/`, the merge is clean.
+Push your branch to your fork (`git push -u origin <your-netid>`) and open a PR
+to the club repository for review. To pick up course updates, run
+`git fetch upstream` and `git merge upstream/main` from your working branch.
+Resolve any conflicts with the updated course material before continuing.
 
 ## Debug in the waveform
 

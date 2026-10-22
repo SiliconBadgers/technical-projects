@@ -31,17 +31,24 @@ Install [uv](https://docs.astral.sh/uv/getting-started/installation/) 0.12.23 or
 newer in your account and make sure `uv --version` works in the terminal. uv
 manages the repository's Python environment; it does not install VCS or Icarus.
 
-Before entering the Synopsys container, run:
+Fork [technical-projects](https://github.com/SiliconBadgers/technical-projects)
+into your GitHub account. Before entering the Synopsys container, replace
+`YOUR_GITHUB_USERNAME` with your username and run:
 
 ```sh
 cd ~
-git clone --recurse-submodules https://github.com/SiliconBadgers/technical-projects.git
+git clone --recurse-submodules https://github.com/YOUR_GITHUB_USERNAME/technical-projects.git
 cd technical-projects
+git remote add upstream https://github.com/SiliconBadgers/technical-projects.git
+git switch -c onboarding
 make setup
 make check
 ```
 
 `--recurse-submodules` also fetches the UVM library that the verification track uses.
+`origin` is your fork, where you push your work; `upstream` is the club's course
+repository. Open your submission PR from your fork into the club repository.
+The solution is reviewed without merging it into the course.
 
 ### 3. Enter the simulation environment
 
