@@ -1,7 +1,7 @@
 # Track A: open-source tools
 
-Track A runs every step of the course with free, open-source tools. No license and no special machine are needed: a laptop is enough.
-Track A lives in the folder `tracks/a`. The course itself (concepts, labs, designs) is the same on every track and sits at the repo root; this folder holds Track A's flow, and these pages say how to do each step here.
+Track A runs every step of the course with free, open-source tools. No license and no special machine are needed: a laptop or a UW CAE machine is enough.
+Track A lives in the folder `tracks/a`. The course itself (concepts, labs, designs) is the same on every track and sits in the course folder, two levels up (the folder with `docs/`, `labs/` and `tracks/`); this folder holds Track A's flow, and these pages say how to do each step here.
 Run every command on these pages from `tracks/a`; paths are relative to it.
 
 ## The tools
@@ -20,16 +20,36 @@ Run every command on these pages from `tracks/a`; paths are relative to it.
 | Timing | OpenSTA | Static timing analysis at the tt, ss and ff corners. |
 | Equivalence | eqy | Proves the netlist does the same as the RTL. |
 | PDK install | ciel | Downloads the open PDKs at the exact pinned version. |
-| Everything | IIC-OSIC-TOOLS | A container image that holds all of the above. |
+| Install | conda-forge, `env/install.sh` | Puts all of the above in your home folder ([Setup](#setup), Option 1). |
+| Install | IIC-OSIC-TOOLS | A container image that holds all of the above ([Setup](#setup), Option 2). |
 
 Think of Yosys as the translator (RTL into gates) and ABC as the shopper who picks real parts from the library catalog.
 Exact versions: [pins.md](pins.md). New words: [glossary](../../../docs/02_glossary.md).
 
 ## Setup
 
-### Option 1: the container (recommended)
+Track A needs no license and no sudo. Get the tools one of two ways.
 
-A container is a ready-made Linux box with every tool at the right version, so everyone gets the same results.
+### Option 1: the install script (no container)
+
+`env/install.sh` puts every tool and both PDKs (process design kits: the factory's files, including the cell libraries) in your home folder, at the versions in [pins.md](pins.md).
+It needs `git` and a conda-forge package manager (`mamba`, `micromamba` or `conda`).
+
+```
+env/install.sh          # once: about 6 GB; 25 minutes in a CAE home folder, 2 on a local disk
+source env/setup.sh     # in every new terminal
+make env-check          # PDKs and tools match pdk.lock
+```
+
+- **UW CAE:** run `module load conda-forge/26.3.2` before `env/install.sh` (it gives `mamba`). Run the flow on the CAE host; this track does not use `synopsys-run`.
+- **Your own Linux machine:** install [Miniforge](https://conda-forge.org/download/) in your home folder first (no sudo needed).
+- macOS and Windows are not tested with the script. Use Option 2 there.
+- The tools go to `~/.conda/envs/sb-track-a` and the PDKs to `~/.ciel`. For other folders, set `SB_TRACK_A_ENV` and `PDK_ROOT` before both commands.
+- The script builds eqy, sby and OpenSTA from source. If it stops, fix the problem it prints and run it again; it skips what is already installed.
+
+### Option 2: the container
+
+A container is a ready-made Linux box with every tool at the right version. It needs Docker or Podman.
 
 ```
 env/start.sh build      # once, and again whenever pdk.lock changes
@@ -38,30 +58,16 @@ cd /foss/designs/<course folder>/tracks/a
 make env-check          # PDKs and tools match pdk.lock
 ```
 
-- Needs Docker or Podman.
 - The folder that holds the course folder (the folder with `docs/`, `labs/` and `tracks/`) is mounted at `/foss/designs`; `<course folder>` is that folder's name.
 - The container sets `PDK_ROOT` and `SCL_ROOT` for you. `SCL_ROOT` is `/foss/designs/sky130_scl_9T_0.1.2`, so for the `sky130scl` library unpack its tarball next to the course folder.
 
-### Option 2: tools on your own machine
-
-1. Install the tool versions in [pins.md](pins.md).
-2. `pip install -r requirements.txt` (in a virtual environment).
-3. Install the PDKs (process design kits: the factory's files, including the cell libraries) with ciel, at the `open_pdks` hashes in [`pdk.lock`](../pdk.lock):
-   ```
-   ciel enable --pdk-root <dir> --pdk-family sky130   -l sky130_fd_sc_hd -l sky130_fd_sc_hs <sky130 hash>
-   ciel enable --pdk-root <dir> --pdk-family gf180mcu -l gf180mcu_fd_sc_mcu7t5v0 -l gf180mcu_fd_sc_mcu9t5v0 <gf180mcu hash>
-   ```
-4. Point the flow at them, then check:
-   ```
-   export PDK_ROOT=<dir>                          # holds sky130A/ and gf180mcuD/
-   export SCL_ROOT=<path>/sky130_scl_9T_0.1.2     # only for the sky130scl library
-   make env-check
-   ```
+Both options give the same slack and area: the synthesis, timing and equivalence tools and the PDKs are the same versions ([pins.md](pins.md)).
 
 | Variable | Meaning | Default |
 |---|---|---|
 | `PDK_ROOT` | ciel install of `sky130A` and `gf180mcuD` | `~/.ciel` |
 | `SCL_ROOT` | unpacked `sky130_scl_9T` 0.1.2 release (not redistributable: ask a mentor for the tarball) | `$PDK_ROOT/sky130_scl_9T_0.1.2` |
+| `SB_TRACK_A_ENV` | the tools from `env/install.sh` | `~/.conda/envs/sb-track-a` |
 
 ## Running a step
 
@@ -96,6 +102,7 @@ Add `KNOB=value` to any `make` line.
 |---|---|
 | `CLOCK_PERIOD=<ns>` | override the SDC clock period; output in `build/<design>/<library>_p<ns>/` |
 | `DESIGN_PARAMS="A=1 B=2"` | top-level parameters; output in a folder named after them |
+| `BUGS=1` | Lab 2 Task 1: build the copy with the seeded bugs (`rtl_bugs/`); output in `build/<design>/<library>_bugs/` |
 | `SYNTH_CORNER` | Liberty corner synthesis maps to (default `ss`) |
 | `SYNTH_FLATTEN` | 1 = flatten the hierarchy (default), 0 = keep modules |
 | `SYNTH_RETIME` | 1 = let ABC move registers (LEC gets harder) |

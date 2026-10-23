@@ -3,8 +3,10 @@
 # Date:        2026-10-08
 # Description: Lab 2 design config for sb_systolic_tile, the int8 systolic MAC array.
 TOP          := sb_systolic_tile
-RTL_FILES    := $(addprefix $(DESIGN_DIR)/rtl/,reset_sync.sv pe.sv pe_ctrl.sv readout.sv tile_top.sv)
-RTL_INCDIRS  := $(DESIGN_DIR)/rtl
+# BUGS=1: the copy with the seeded bugs (rtl_bugs/), for Task 1
+RTL_DIR      := $(DESIGN_DIR)/$(if $(filter 1,$(BUGS)),rtl_bugs,rtl)
+RTL_FILES    := $(addprefix $(RTL_DIR)/,reset_sync.sv pe.sv pe_ctrl.sv readout.sv tile_top.sv)
+RTL_INCDIRS  := $(RTL_DIR)
 RTL_DEFINES  :=
 # Multiplier is a (* keep_hierarchy *) module; it gets 35 % of ABC's delay target.
 SLANG_HIERARCHY := 1

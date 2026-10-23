@@ -2,7 +2,7 @@
 
 **Goal:** fix a broken design using tool output. `sb_systolic_tile` is an int8 [systolic](../../docs/02_glossary.md#systolic-array) multiply-accumulate array. Read [spec.md](spec.md) first.
 
-- The RTL has several bugs.
+- `rtl_bugs/` is a copy of the RTL with several bugs.
 - There is no SDC.
 - The timing target is not reachable without design changes.
 
@@ -15,14 +15,16 @@ Commands for your track: its `track/lab2.md` ([tracks/README.md](../../tracks/RE
 | Path | What |
 |---|---|
 | [spec.md](spec.md) | interface and timing contract |
-| `rtl/` | `tile_top.sv` (top: `sb_systolic_tile`), `pe.sv`, `pe_ctrl.sv`, `readout.sv`, `reset_sync.sv`, `params.svh` |
+| `rtl/` | the working RTL: `tile_top.sv` (top: `sb_systolic_tile`), `pe.sv`, `pe_ctrl.sv`, `readout.sv`, `reset_sync.sv`, `params.svh`. Tasks 2–6 start from it |
+| `rtl_bugs/` | the same files with the seeded bugs, for Task 1. Add `BUGS=1` to a `make` line to build this copy |
 | `macros/` | weight-buffer SRAM: black box for synthesis (`sb_sram_256x8.v`) and simulation model (`sb_sram_256x8_model.v`); your track adds its fake timing models |
 | `tb/test_tile.py` | the testbench. Do not change it to make something pass |
 | your SDC | you write it; your track's `track/lab2.md` says where it goes |
 
 ## Tasks
 
-1. **Make it correct.** Start with lint, then simulation, then synthesis. Equivalence checking and GLS also have something to tell you.
+1. **Make it correct.** Fix the bugs in `rtl_bugs/`, with `BUGS=1` on every `make` line. Start with lint, then simulation, then synthesis. Equivalence checking and GLS also have something to tell you.
+   Do not compare the files with `rtl/`: find each bug from tool output. You are done when your track's checks give the same results with `BUGS=1` as without it.
    See [04](../../docs/04_synthesis.md), [07](../../docs/07_equivalence.md), [08](../../docs/08_gate_level_sim.md).
 2. **Write the SDC** from [spec.md](spec.md): every port constrained, right units, drive and load, uncertainty, and a decision (with a comment) for `cfg_k_len` and `rst_n`.
    See [05](../../docs/05_sdc.md). Check hold at `ff` after every change to timing exceptions.
@@ -35,7 +37,7 @@ Commands for your track: its `track/lab2.md` ([tracks/README.md](../../tracks/RE
 
 ## Deliverables
 
-1. A PR with the fixed RTL, your SDCs, updated parameters, and passing checks.
+1. A PR with your fixes in `rtl_bugs/`, your SDCs, updated parameters, and passing checks.
 2. `lab2_report.md` (≤ 3 pages): per bug, symptom → tool output → fix; critical path before and after; QoR table; the high-fanout discussion.
 3. A mentor review of your SDC: every multicycle or false path needs a comment saying why it is safe.
 

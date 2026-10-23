@@ -5,10 +5,10 @@ Run everything from this track's folder, `tracks/a`.
 
 ## 0. Environment
 
+Set up the tools first ([README.md](README.md#setup)), then:
+
 ```
-env/start.sh build      # once
-env/start.sh shell      # then, inside the container (start.sh prints this cd line):
-cd /foss/designs/<course folder>/tracks/a
+source env/setup.sh     # with the install script; in the container, skip this line
 make env-check
 make all   PDK=sky130hd DESIGN=gcd
 make check PDK=sky130hd DESIGN=gcd
@@ -16,7 +16,6 @@ make check PDK=sky130hd DESIGN=gcd
 
 - `make env-check` prints `OK` for both PDKs.
 - `make check` ends with every check OK.
-- Not using the container? See [README.md](README.md#setup).
 
 ## Finding the library files
 
