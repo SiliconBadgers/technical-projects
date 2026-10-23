@@ -10,7 +10,7 @@ SHELL       := /bin/bash
 # keep generated files such as *.env
 .SECONDARY:
 
-# TRACK_DIR: this track's folder (tracks/a: flow, design.mk, SDCs, build/); SB_ROOT: the repo root (shared RTL, testbenches)
+# TRACK_DIR: this track's folder (tracks/a: flow, design.mk, SDCs, build/); SB_ROOT: the course folder (shared RTL, testbenches)
 TRACK_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST)))/..)
 SB_ROOT  := $(abspath $(TRACK_DIR)/../..)
 FLOW     := $(TRACK_DIR)/flow
@@ -39,6 +39,8 @@ GLS_SIM ?= icarus
 ABC_SCRIPT    ?=
 RTL_FRONTEND  ?= slang
 WAVES         ?= 0
+# 1 = Lab 2's copy of the RTL with the seeded bugs (rtl_bugs/, read by its design.mk); own build folder, ..._bugs
+BUGS          ?= 0
 
 # PDK_ROOT: ciel install of sky130A / gf180mcuD. SCL_ROOT: unpacked sky130_scl_9T release.
 PDK_ROOT ?= $(HOME)/.ciel
@@ -54,7 +56,7 @@ endif
 include $(PLATFORM_MK)
 
 include $(TRACK_DIR)/labs/designs.mk
-# DESIGN_DIR: the lab folder at the repo root (RTL, testbench, macro models);
+# DESIGN_DIR: the lab folder in the course folder (RTL, testbench, macro models);
 # TRACK_DESIGN_DIR: the same folder in this track (design.mk, SDCs, lint waivers, macro Liberty)
 DESIGN_DIR := $(SB_ROOT)/$(DESIGN_DIR_$(DESIGN))
 TRACK_DESIGN_DIR := $(TRACK_DIR)/$(DESIGN_DIR_$(DESIGN))
@@ -88,7 +90,7 @@ SYNTH_RTL      := $(foreach c,$(PLATFORM_CELLS),$(FLOW)/platforms/cells/$(PDK)_$
 # clock period override in ns (needs [sb_clock_period <ns>] in the SDC)
 CLOCK_PERIOD ?=
 PARAMS_TAG := $(if $(filter command line,$(origin DESIGN_PARAMS)),_$(subst =,,$(subst $(eval) ,_,$(strip $(DESIGN_PARAMS)))))
-BUILD    ?= $(TRACK_DIR)/build/$(DESIGN)/$(PDK)$(PARAMS_TAG)$(if $(CLOCK_PERIOD),_p$(CLOCK_PERIOD))
+BUILD    ?= $(TRACK_DIR)/build/$(DESIGN)/$(PDK)$(PARAMS_TAG)$(if $(CLOCK_PERIOD),_p$(CLOCK_PERIOD))$(if $(filter 1,$(BUGS)),_bugs)
 TIMES    := $(BUILD)/runtimes.txt
 TIMED    := $(SCRIPTS)/util/timed.sh $(TIMES)
 
@@ -112,6 +114,7 @@ help:
 	@echo "  PDK:          sky130hd sky130hs gf180_7t gf180_9t sky130scl (flow/platforms/*.mk)"
 	@echo "  DESIGN:       see labs/designs.mk"
 	@echo "  CLOCK_PERIOD: override the SDC clock period (ns); output in build/<DESIGN>/<PDK>_p<ns>/"
+	@echo "  BUGS=1:       Lab 2 with the seeded bugs (rtl_bugs/); output in build/<DESIGN>/<PDK>_bugs/"
 	@echo "outputs: build/<DESIGN>/<PDK>/ (each step writes <stage>.env to rerun it by hand)"
 
 info:

@@ -3,8 +3,10 @@
 # Date:        2026-10-09
 # Description: Lab 2 design settings for sb_systolic_tile, the int8 systolic MAC array, Track B1.
 TOP         := sb_systolic_tile
-RTL_FILES   := $(addprefix $(DESIGN_DIR)/rtl/,reset_sync.sv pe.sv pe_ctrl.sv readout.sv tile_top.sv)
-RTL_INCDIRS := $(DESIGN_DIR)/rtl
+# BUGS=1: the copy with the seeded bugs (rtl_bugs/), for Task 1
+RTL_DIR     := $(DESIGN_DIR)/$(if $(filter 1,$(BUGS)),rtl_bugs,rtl)
+RTL_FILES   := $(addprefix $(RTL_DIR)/,reset_sync.sv pe.sv pe_ctrl.sv readout.sv tile_top.sv)
+RTL_INCDIRS := $(RTL_DIR)
 
 # weight-buffer SRAM: black box (lint), simulation model, fake Liberty per corner (synthesis, STA, LEC)
 MACRO_VERILOG    := $(DESIGN_DIR)/macros/sb_sram_256x8.v

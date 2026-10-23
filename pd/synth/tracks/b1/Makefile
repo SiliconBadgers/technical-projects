@@ -9,12 +9,12 @@ SHELL         := /bin/bash
 .DEFAULT_GOAL := help
 .DELETE_ON_ERROR:
 
-# TRACK_DIR: this track's folder (tracks/b1: flow, design.mk, SDCs, build/); SB_ROOT: the repo root (shared RTL, testbenches)
+# TRACK_DIR: this track's folder (tracks/b1: flow, design.mk, SDCs, build/); SB_ROOT: the course folder (shared RTL, testbenches)
 TRACK_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 SB_ROOT   := $(abspath $(TRACK_DIR)/../..)
 FLOW      := $(TRACK_DIR)/flow
 
-# --- library: sky130_scl_9T from the SiliconBadgers PDK repo (cloned next to this repo) ---
+# --- library: sky130_scl_9T from the SiliconBadgers PDK repo (cloned next to the course folder) ---
 SB_PDK   ?= $(abspath $(SB_ROOT)/../silicon-badgers-sky130-pdk)
 export SB_PDK
 LIB_NAME := sky130_scl_9T
@@ -55,10 +55,12 @@ DESIGN_DIR_sb_systolic_tile := labs/lab2_systolic
 ifeq ($(DESIGN_DIR_$(DESIGN)),)
   $(error DESIGN=$(DESIGN) is unknown. Use gcd, ibex or sb_systolic_tile)
 endif
-# DESIGN_DIR: the lab folder at the repo root (RTL, testbench, macro models);
+# DESIGN_DIR: the lab folder in the course folder (RTL, testbench, macro models);
 # TRACK_DESIGN_DIR: the same folder in this track (design.mk, SDCs, HAL waivers, macro Liberty)
 DESIGN_DIR       := $(SB_ROOT)/$(DESIGN_DIR_$(DESIGN))
 TRACK_DESIGN_DIR := $(TRACK_DIR)/$(DESIGN_DIR_$(DESIGN))
+# 1 = Lab 2's copy of the RTL with the seeded bugs (rtl_bugs/, read by its design.mk); own build folder, ..._bugs
+BUGS             ?= 0
 include $(TRACK_DESIGN_DIR)/design.mk
 
 # optional design.mk settings
@@ -104,7 +106,7 @@ LEC_MODE      ?= genus
 export SB_DESIGN_PARAMS := $(DESIGN_PARAMS)
 
 PARAMS_TAG := $(if $(filter command line,$(origin DESIGN_PARAMS)),_$(subst =,,$(subst $(eval) ,_,$(strip $(DESIGN_PARAMS)))))
-BUILD      ?= $(TRACK_DIR)/build/$(DESIGN)/$(LIB_NAME)$(PARAMS_TAG)$(if $(CLOCK_PERIOD),_p$(CLOCK_PERIOD))
+BUILD      ?= $(TRACK_DIR)/build/$(DESIGN)/$(LIB_NAME)$(PARAMS_TAG)$(if $(CLOCK_PERIOD),_p$(CLOCK_PERIOD))$(if $(filter 1,$(BUGS)),_bugs)
 SYNTH_RTL  := $(SYNTH_EXTRA) $(RTL_FILES)
 COCOTB     := $(TOOL_WRAP) python3 $(FLOW)/xcelium/run_cocotb.py --timeout $(SIM_TIMEOUT)
 FLOW_DEPS  := $(TRACK_DESIGN_DIR)/design.mk
@@ -119,6 +121,7 @@ help:
 	@echo "  DESIGN:  gcd ibex sb_systolic_tile"
 	@echo "  knobs:   SYNTH_EFFORT=low|medium|high  SYNTH_ADDER=auto|ripple  SYNTH_RETIME=0|1  SYNTH_CORNER=ss"
 	@echo "           WAVES=1  SIM_TIMEOUT=<s>  LEC_MODE=genus|own  TOOL_WRAP=<cmd>  BUILD=<dir>"
+	@echo "           BUGS=1 (Lab 2: the RTL copy with the seeded bugs, rtl_bugs/)"
 	@echo "  library: $(LIB_NAME) from SB_PDK=$(SB_PDK)"
 	@echo "outputs: build/<DESIGN>/$(LIB_NAME)/ (see track/README.md)"
 

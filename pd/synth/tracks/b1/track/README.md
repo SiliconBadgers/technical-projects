@@ -1,7 +1,7 @@
 # Track B1: Cadence tools
 
 Track B1 runs every step of the course with Cadence's commercial tools. They need a license, so you work on a licensed Linux machine (ask your mentor which one).
-Track B1 lives in the folder `tracks/b1`. The course itself (concepts, labs, designs) is the same on every track and sits at the repo root; this folder holds Track B1's flow, and these pages say how to do each step here.
+Track B1 lives in the folder `tracks/b1`. The course itself (concepts, labs, designs) is the same on every track and sits in the course folder, two levels up (the folder with `docs/`, `labs/` and `tracks/`); this folder holds Track B1's flow, and these pages say how to do each step here.
 Run every command on these pages from `tracks/b1`; paths are relative to it.
 
 ## The tools
@@ -61,21 +61,26 @@ python3 -m venv ~/sb-venv && source ~/sb-venv/bin/activate
 pip install cocotb==2.1.0 pyyaml liberty-parser==0.0.29 numpy matplotlib pytest
 ```
 
-**UW CAE machines**, or anywhere the tools run inside a container (`TOOL_WRAP=cadence-run`): `make sim` and `make gls` run `python3` inside the container. It has no Python of its own and cannot use a venv made from the host's Python, and your home folder is small. Build a conda-forge Python on a path the container mounts (local scratch) and put it first on `PATH`:
+**UW CAE machines**, or anywhere the tools run inside a container (`TOOL_WRAP=cadence-run`): `make sim` and `make gls` run `python3` inside the container. It has no Python of its own and cannot use a venv made from the host's Python.
+Build a conda-forge Python in your home folder instead (the container sees it) and put it first on `PATH`. On the CAE host, once:
 
 ```
-mamba create -y -p /var/tmp/$USER/sb-py -c conda-forge python=3.10 pip     # or micromamba; /var/tmp belongs to one machine
-/var/tmp/$USER/sb-py/bin/pip install cocotb==2.1.0 pyyaml liberty-parser==0.0.29 numpy matplotlib pytest
-export PATH=/var/tmp/$USER/sb-py/bin:$PATH
+module load conda-forge/26.3.2                        # gives mamba
+export CONDA_PKGS_DIRS=/var/tmp/$USER/conda-pkgs      # download cache on local scratch, not in your home folder
+mamba create -y -p ~/.conda/envs/sb-py -c conda-forge python=3.10 pip      # about 750 MB, a few minutes
+~/.conda/envs/sb-py/bin/pip install --no-cache-dir cocotb==2.1.0 pyyaml liberty-parser==0.0.29 numpy matplotlib pytest
 ```
+
+Then in every new terminal, after the `module load` lines: `export PATH=$HOME/.conda/envs/sb-py/bin:$PATH`.
 
 ### 3. The PDK repo
 
-Clone the PDK repo next to this repo, under exactly this folder name: `git clone <PDK repo URL> silicon-badgers-sky130-pdk`.
+Clone the PDK repo next to the course folder (the folder with `docs/`, `labs/` and `tracks/`), three folders up from `tracks/b1`, under exactly this folder name:
 
 ```
-<your folder>/silicon-badgers-synth-onboarding    <- this repo
-<your folder>/silicon-badgers-sky130-pdk          <- the PDK repo
+cd ../../..
+git clone <PDK repo URL> silicon-badgers-sky130-pdk     # ask a mentor for the URL
+cd -
 ```
 
 Somewhere else? `export SB_PDK=<path to silicon-badgers-sky130-pdk>`.
@@ -107,7 +112,7 @@ make <step> DESIGN=<design>
 | `all` | all of the above, in order | |
 | `check` | the course's checks (`flow/scripts/check.py`) | PASS/FAIL per check |
 
-- `DESIGN=`: `gcd`, `ibex`, `sb_systolic_tile`. Each has a `design.mk` in its lab folder here (top module, SDC, and the RTL files and testbench from the lab folder at the repo root).
+- `DESIGN=`: `gcd`, `ibex`, `sb_systolic_tile`. Each has a `design.mk` in its lab folder here (top module, SDC, and the RTL files and testbench from the lab folder in the course folder).
 - Outputs go to `build/<design>/sky130_scl_9T/`, e.g. `build/gcd/sky130_scl_9T/`.
 - `flow.env` there holds every input of the Tcl scripts. To rerun a tool by hand: `cd build/gcd/sky130_scl_9T && source flow.env && genus -files $FLOW_DIR/genus/synth.tcl`.
 - A failing step prints the file to read. A failing check prints the page to read.
@@ -145,6 +150,7 @@ Add `KNOB=value` to any `make` line. The synthesis knobs match the rows of [09 â
 | `SYNTH_RETIME` | `1` = let Genus move registers across logic ([retiming](../../../docs/02_glossary.md#retiming)); LEC gets harder |
 | `SYNTH_CORNER` | Liberty corner Genus maps to (default `ss`) |
 | `DESIGN_PARAMS="A=1 B=2"` | top-level parameters for synthesis and simulation; output in a folder named after them |
+| `BUGS=1` | Lab 2 Task 1: build the copy with the seeded bugs (`rtl_bugs/`); output in `build/sb_systolic_tile/sky130_scl_9T_bugs/` |
 | `WAVES=1` | save waveforms in `sim_rtl/` or `sim_gls/` (`cocotb_waves.shm`; open it with `simvision`) |
 | `SIM_TIMEOUT=<s>` | wall-clock limit of one `sim` or `gls` run (default 900 s); a run that hits it is killed and fails |
 | `LEC_MODE` | `genus` (default: run the script Genus wrote) or `own` (only `flow/conformal/lec.do`) |

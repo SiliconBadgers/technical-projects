@@ -1,6 +1,6 @@
 # Version pins (Track A)
 
-- Every version below is pinned in [`pdk.lock`](../pdk.lock) (read by `env/start.sh`, `env/Dockerfile` and `make env-check`).
+- Every version below is pinned in [`pdk.lock`](../pdk.lock) (read by `env/start.sh`, `env/Dockerfile`, `env/install.sh` and `make env-check`).
 - Python packages are pinned in [`requirements.txt`](../requirements.txt).
 - To move a pin: change `pdk.lock` and this file in one PR, then rerun Lab 1a on every platform.
 
@@ -48,5 +48,22 @@ Not installed by ciel: `sky130_scl_9T` 0.1.2 (`extra_libraries` in `pdk.lock`, w
 | cocotb | `2.1.0` |
 | kepler-formal | `f025fa2f254efd6c702cef004e55995c1f13a11a` |
 | ORFS reference | `3a964e13f11a4e435aac01ffa14db0a7d2853720` |
+
+## Without the container
+
+`env/install.sh` ([README.md](README.md#setup), Option 1) installs the same versions where it can:
+
+| Tool | From | Same as the container |
+|---|---|---|
+| yosys (with `read_slang`), verilator | conda-forge, [`env/environment.yml`](../env/environment.yml) | yes: 0.69 and 5.052 |
+| eqy, sby | built from YosysHQ's `v0.69` tags | yes |
+| OpenSTA | built from the commit above, with CUDD 3.0.0 | yes |
+| iverilog | conda-forge | the 13.0 release, not the later commit above |
+| verible | conda-forge | an older build; it only gives style advice |
+| cocotb and the other Python packages | [`requirements.txt`](../requirements.txt) | yes |
+| PDKs | ciel, at the `pdk.lock` hashes | yes |
+| kepler-formal | not installed; the flow does not use it | |
+
+To move a pin: change `pdk.lock`, `env/environment.yml` and this file in one PR.
 
 Next: [README.md](README.md)

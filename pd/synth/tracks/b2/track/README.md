@@ -1,7 +1,7 @@
 # Track B2: Synopsys tools
 
 Track B2 runs every step of the course with Synopsys tools on the open SkyWater 130 nm library `sky130_fd_sc_hd`.
-Track B2 lives in the folder `tracks/b2`. The course itself (concepts, labs, designs) is the same on every track and sits at the repo root; this folder holds Track B2's flow, and these pages say how to do each step here.
+Track B2 lives in the folder `tracks/b2`. The course itself (concepts, labs, designs) is the same on every track and sits in the course folder, two levels up (the folder with `docs/`, `labs/` and `tracks/`); this folder holds Track B2's flow, and these pages say how to do each step here.
 Run every command on these pages from `tracks/b2`; paths are relative to it.
 
 These are commercial tools: they need a **license** (a permission file served by a license server on your network).
@@ -39,13 +39,14 @@ The scripts use standard commands of recent releases. Assumed:
 
 ## Setup (once)
 
-1. **Get the PDK repo** (the library files) next to this repo, so the two folders sit side by side:
+1. **Get the PDK repo** (the library files). Clone it next to the course folder (the folder with `docs/`, `labs/` and `tracks/`), three folders up from `tracks/b2`:
    ```
-   cd <the folder that holds this repo>
+   cd ../../..
    git clone <PDK repo URL> silicon-badgers-sky130-pdk     # ask a mentor for the URL; keep this folder name
+   cd -
    ```
    Somewhere else? Set `SB_PDK` to its path (`export SB_PDK=<path>`).
-2. **Load the tools.** Every site does this differently, for example `module load synopsys` or sourcing a setup script. Ask your mentor. Then check:
+2. **Load the tools.** Every site does this differently, for example `module load synopsys` or sourcing a setup script. Ask your mentor (UW CAE: [below](#on-uw-cae)). Then check:
    ```
    which dc_shell pt_shell fm_shell vcs lc_shell
    which vc_static_shell      # optional; without it, make lint uses vcs
@@ -62,12 +63,7 @@ The scripts use standard commands of recent releases. Assumed:
    python3 -m venv ~/venvs/sb && source ~/venvs/sb/bin/activate
    pip install cocotb==2.1.0 pyyaml liberty-parser==0.0.29 numpy matplotlib pytest
    ```
-   **UW CAE machines**, or anywhere the tools run inside a container (`synopsys-run`): `make sim` and `make gls` run `python3` inside the container. It has no Python of its own and cannot use a venv made from the host's Python, and your home folder is small. Build a conda-forge Python on a path the container mounts (local scratch) and put it first on `PATH`:
-   ```
-   mamba create -y -p /var/tmp/$USER/sb-py -c conda-forge python=3.10 pip     # or micromamba; /var/tmp belongs to one machine
-   /var/tmp/$USER/sb-py/bin/pip install cocotb==2.1.0 pyyaml liberty-parser==0.0.29 numpy matplotlib pytest
-   export PATH=/var/tmp/$USER/sb-py/bin:$PATH
-   ```
+   Tools inside a container (UW CAE's `synopsys-run`): `make sim` and `make gls` run `python3` inside the container. It has no Python of its own and cannot use a venv made from the host's Python. Use a conda-forge Python on a path the container mounts instead, as [below](#on-uw-cae).
 5. **Smoke test** (in `tracks/b2`):
    ```
    make all DESIGN=gcd
@@ -76,7 +72,28 @@ The scripts use standard commands of recent releases. Assumed:
 
 | Variable | Meaning | Default |
 |---|---|---|
-| `SB_PDK` | the SiliconBadgers sky130 PDK repo | `silicon-badgers-sky130-pdk` next to this repo (`../../../silicon-badgers-sky130-pdk` from `tracks/b2`) |
+| `SB_PDK` | the SiliconBadgers sky130 PDK repo | `../../../silicon-badgers-sky130-pdk` from `tracks/b2`, next to the course folder |
+
+### On UW CAE
+
+The Synopsys tools run inside a container that `synopsys-run` starts. The container has no `git`, no `module` command and no Python of its own.
+So clone the PDK (step 1) and build the Python (step 4) on the CAE host first:
+
+```
+# on the CAE host, once
+module load conda-forge/26.3.2                        # gives mamba
+export CONDA_PKGS_DIRS=/var/tmp/$USER/conda-pkgs      # download cache on local scratch, not in your home folder
+mamba create -y -p ~/.conda/envs/sb-py -c conda-forge python=3.10 pip      # about 750 MB, a few minutes
+~/.conda/envs/sb-py/bin/pip install --no-cache-dir cocotb==2.1.0 pyyaml liberty-parser==0.0.29 numpy matplotlib pytest
+
+# on the CAE host, in every new terminal
+module load synopsys/suite
+export PATH=$HOME/.conda/envs/sb-py/bin:$PATH        # after the module: it puts its own python3 first
+synopsys-run                                          # the prompt changes to synopsys>
+```
+
+At the `synopsys>` prompt, `cd` to `tracks/b2`, then run steps 2, 3 and 5 and every `make` command there.
+`synopsys-run <command>` also runs one command and returns, but it reads its arguments as a new command line, so quotes and `$` change meaning. Put such commands in a script.
 
 ## Running a step
 
@@ -135,6 +152,7 @@ Add `KNOB=value` to any `make` line.
 |---|---|
 | `CLOCK_PERIOD=<ns>` | replaces the `set clk_period` line of the SDC; output in `build/<design>/sky130_fd_sc_hd_p<ns>/` |
 | `DESIGN_PARAMS="A=1 B=2"` | top-level parameters for synthesis, LEC and simulation; output in a folder named after them |
+| `BUGS=1` | Lab 2 Task 1: build the copy with the seeded bugs (`rtl_bugs/`); output in `build/sb_systolic_tile/sky130_fd_sc_hd_bugs/` |
 | `SYNTH_CORNER` | corner Design Compiler optimizes for (default `ss`) |
 | `DC_COMPILE` | `compile_ultra` (default; strongest optimization) or `compile` (simpler) |
 | `SYNTH_RETIME=1` | `compile_ultra -retime`: Design Compiler may move registers across logic |

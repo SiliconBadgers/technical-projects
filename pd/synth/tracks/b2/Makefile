@@ -10,14 +10,14 @@ SHELL         := /bin/bash
 # keep generated files such as *.env
 .SECONDARY:
 
-# TRACK_DIR: this track's folder (tracks/b2: flow, design.mk, SDCs, build/); ROOT: the repo root (shared RTL, testbenches)
+# TRACK_DIR: this track's folder (tracks/b2: flow, design.mk, SDCs, build/); ROOT: the course folder (shared RTL, testbenches)
 TRACK_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 ROOT    := $(abspath $(TRACK_DIR)/../..)
 FLOW    := $(TRACK_DIR)/flow
 DESIGN  ?= gcd
 LIBRARY := sky130_fd_sc_hd
 
-# --- library (SiliconBadgers sky130 PDK repo, cloned next to this repo) ---
+# --- library (SiliconBadgers sky130 PDK repo, cloned next to the course folder) ---
 SB_PDK ?= $(abspath $(ROOT)/../silicon-badgers-sky130-pdk)
 VIEWS  := $(SB_PDK)/synopsys/views
 CELLS  := $(SB_PDK)/synopsys/$(LIBRARY)
@@ -42,7 +42,7 @@ DESIGN_DIR_sb_systolic_tile := labs/lab2_systolic
 ifeq ($(DESIGN_DIR_$(DESIGN)),)
   $(error DESIGN=$(DESIGN) is unknown: use gcd, ibex or sb_systolic_tile)
 endif
-# DESIGN_DIR: the lab folder at the repo root (RTL, testbench, macro models);
+# DESIGN_DIR: the lab folder in the course folder (RTL, testbench, macro models);
 # TRACK_DESIGN_DIR: the same folder in this track (design.mk, SDCs, macro Liberty)
 DESIGN_DIR       := $(ROOT)/$(DESIGN_DIR_$(DESIGN))
 TRACK_DESIGN_DIR := $(TRACK_DIR)/$(DESIGN_DIR_$(DESIGN))
@@ -61,6 +61,8 @@ MACROS           :=
 MACRO_SIM_MODELS :=
 # asynchronous reset input: STA counts the flip-flops hanging straight on it
 ASYNC_RESET_PORT :=
+# 1 = Lab 2's copy of the RTL with the seeded bugs (rtl_bugs/, read by its design.mk); own build folder, ..._bugs
+BUGS             ?= 0
 include $(TRACK_DESIGN_DIR)/design.mk
 
 SYNTH_RTL := $(foreach c,$(PLATFORM_CELLS),$(FLOW)/cells/$(LIBRARY)_$(c).v) $(RTL_FILES)
@@ -84,7 +86,7 @@ SIM_TIMEOUT   ?= 900
 empty :=
 space := $(empty) $(empty)
 PARAMS_TAG := $(if $(strip $(DESIGN_PARAMS)),_$(subst =,,$(subst $(space),_,$(strip $(DESIGN_PARAMS)))))
-BUILD      ?= $(TRACK_DIR)/build/$(DESIGN)/$(LIBRARY)$(PARAMS_TAG)$(if $(CLOCK_PERIOD),_p$(CLOCK_PERIOD))
+BUILD      ?= $(TRACK_DIR)/build/$(DESIGN)/$(LIBRARY)$(PARAMS_TAG)$(if $(CLOCK_PERIOD),_p$(CLOCK_PERIOD))$(if $(filter 1,$(BUGS)),_bugs)
 # compiled macro libraries, shared by all builds of the design
 MACRO_DB_DIR := $(TRACK_DIR)/build/$(DESIGN)/macros
 macro_dbs     = $(foreach m,$(MACROS),$(MACRO_DB_DIR)/$(m)_$(LIBRARY)_$(1).db)
@@ -109,6 +111,7 @@ help:
 	@echo "  DESIGN:  gcd ibex sb_systolic_tile"
 	@echo "  knobs:   CLOCK_PERIOD=<ns>  DESIGN_PARAMS=\"A=1 B=2\"  DC_COMPILE=compile_ultra|compile"
 	@echo "           SYNTH_RETIME=1  DC_EXTRA=<file.tcl>  LINT_TOOL=auto|vc|vcs  WAVES=1  SIM_TIMEOUT=<s>  SB_PDK=<dir>"
+	@echo "           BUGS=1 (Lab 2: the RTL copy with the seeded bugs, rtl_bugs/)"
 	@echo "outputs: build/<design>/$(LIBRARY)/ (see track/README.md)"
 
 # print one variable, e.g. make -s print-CELL_VERILOG

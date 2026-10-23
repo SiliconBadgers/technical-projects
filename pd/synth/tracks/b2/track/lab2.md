@@ -5,7 +5,7 @@ This page only shows how to run them here. Your clock target: [README.md](README
 
 ## Your SDC
 
-Your SDC goes in **`tracks/b2/labs/lab2_systolic/sdc/sky130_fd_sc_hd.sdc`** (this track's lab folder, not the one at the repo root). Until it exists, `make synth` stops and says so.
+Your SDC goes in **`tracks/b2/labs/lab2_systolic/sdc/sky130_fd_sc_hd.sdc`** (this track's lab folder, not the one in the course's `labs/`). Until it exists, `make synth` stops and says so.
 
 - Write plain SDC: Design Compiler and PrimeTime both read it (with `source`: their `read_sdc` does not know `remove_from_collection`). There are no helper procedures in this track.
 - Put the period on its own line, `set clk_period <ns>`, and compute the rest from it. `make ... CLOCK_PERIOD=<ns>` replaces that line.
@@ -16,6 +16,19 @@ Your SDC goes in **`tracks/b2/labs/lab2_systolic/sdc/sky130_fd_sc_hd.sdc`** (thi
 - Example of the style: [the gcd SDC](../labs/lab1_reference/gcd/sdc/sky130_fd_sc_hd.sdc). Rules and conventions: [docs/05_sdc.md](../../../docs/05_sdc.md).
 
 Check it with `make sta DESIGN=sb_systolic_tile`, then read the first sections of `sta_ss.rpt` (`check_timing` and the coverage) before any path ([reading_logs.md](reading_logs.md#timing)).
+
+## Task 1: the seeded bugs
+
+The bugs are in the copy `labs/lab2_systolic/rtl_bugs/` (in the course folder). Add `BUGS=1` to every `make` line to build that copy:
+
+```
+make lint  DESIGN=sb_systolic_tile BUGS=1
+make sim   DESIGN=sb_systolic_tile BUGS=1
+make synth DESIGN=sb_systolic_tile BUGS=1
+```
+
+Its outputs go to `build/sb_systolic_tile/sky130_fd_sc_hd_bugs/`. Fix the bugs in `rtl_bugs/`.
+Without `BUGS=1` the flow builds `rtl/`, the working RTL that tasks 2 to 6 start from.
 
 ## Run the steps one at a time
 
@@ -59,7 +72,7 @@ The testbench reads the same `DESIGN_PARAMS` (as `SB_DESIGN_PARAMS`), so it chec
 
 | Task | Look at |
 |---|---|
-| 1. Make it correct | `lint.log`, `sim.log` and `results.xml`, `synth.log` and `synth_check_design.rpt`, `synth_latches.rpt`, `lec_run.log` and `lec_failing.rpt`, `gls.log` |
+| 1. Make it correct (`..._bugs/`) | `lint.log`, `sim.log` and `results.xml`, `synth.log` and `synth_check_design.rpt`, `synth_latches.rpt`, `lec_run.log` and `lec_failing.rpt`, `gls.log` |
 | 2. SDC | `sta_<corner>.rpt`: the `check_timing` and coverage sections, the reset section, and the hold paths at `ff` |
 | 3. Bronze | [this track's checks](README.md#this-tracks-checks) |
 | 4. Silver | `sta_ss.rpt` setup paths, `qor.csv`, `synth_cells.rpt` |

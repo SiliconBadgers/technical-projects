@@ -16,7 +16,7 @@ Read the first **error** first: later messages are often caused by it. Then read
 
 - The word before the colon is the part of the tool that complained: `halcheck`, `halsynth`, `halstruct` are HAL's lint, synthesizability and structure checks; `xmvlog` compiles, `xmelab` elaborates, `xmsim` simulates. `xmhelp <that part> <CODE>` explains an Xcelium code; HAL's rules are listed by `hal -rules_list` (run it through your `TOOL_WRAP`).
 - The `<ID>` of a Genus or Tempus message is the key to look it up in the Cadence documentation (`cdnshelp`).
-- Lines starting with `SB:` or `SB-WARNING:` come from this repo's scripts, not from the tool.
+- Lines starting with `SB:` or `SB-WARNING:` come from the course's scripts, not from the tool.
 - `make synth`, `make sta` and `make lec` fail when the tool's log has an error line (`Error   :` in Genus, `**ERROR:` in Tempus, `// Error:` in Conformal), even if the tool went on and exited normally: the make output shows the first ones (`SB-ERROR: ... error line(s)`). The only exceptions are the message IDs in `flow/scripts/tool_error_waivers.txt`, each with its reason.
 
 ## Lint
