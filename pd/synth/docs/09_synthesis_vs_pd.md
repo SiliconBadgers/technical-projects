@@ -3,9 +3,6 @@
 Synthesis turns RTL into gates. [Physical design](02_glossary.md#physical-design-pd) (PD) turns gates into a layout: placement, [clock tree](02_glossary.md#clock-tree-synthesis-cts), routing, and repair.
 Some problems belong to synthesis, some to PD, and some only to the RTL.
 
-Analogy: synthesis decides which buildings a town needs and how big they are. PD places them and lays the roads.
-Traffic jams caused by long roads only show up once the roads exist.
-
 ## Synthesis can fix
 
 | Problem | What synthesis can do |

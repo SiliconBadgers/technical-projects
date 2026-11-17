@@ -113,7 +113,7 @@ Many are harmless (an unused port of a reused module); each one deserves a look 
 `sta_<corner>.rpt` has these sections, in this order. Read the first two before any path ([05](../../../docs/05_sdc.md#checking-your-sdc)).
 
 1. `check_timing`: unconstrained endpoints, inputs without an input delay, loops, clocks.
-2. Analysis coverage of the checks your SDC decides (setup, hold, recovery, removal, outputs): how many are met, violated or **untested** (untested = nothing checks them). A short section after it covers the library's pulse-width checks; reset pins are untested there (`no_clock`: a reset is not a clock), which is expected.
+2. Analysis coverage of the checks your SDC decides (setup, hold, recovery, removal, outputs): how many are met, violated or untested (untested = nothing checks them). A short section after it covers the library's pulse-width checks; reset pins are untested there (`no_clock`: a reset is not a clock), which is expected.
 3. Setup paths, then hold paths (10 each).
 4. Slack summary (`report_global_timing`): WNS, TNS and the number of violating paths, for setup and hold.
 5. All violators (`report_constraint -all_violators`): setup, hold, max transition, max capacitance, max fanout.
@@ -169,7 +169,10 @@ Many are harmless (an unused port of a reused module); each one deserves a look 
 ### Unconstrained endpoints
 
 - `check_timing` prints a warning such as `There are 5 endpoints which are not constrained for maximum delay`, then lists them.
-- The coverage section shows them as `untested`, with a reason. Two kinds are fine: recovery/removal of the reset synchronizer's two flip-flops, which only `rst_n` reaches (`no_startpoint_clock`, or `false_paths`), and pins driven by a constant (`constant_disabled`, `no_paths`: the synchronizer's first `D` input; in ibex, the six outputs its configuration ties to a constant, `instr_addr_o[1:0]`, `data_addr_o[1:0]`, `alert_minor_o` and `alert_major_o`). Any other untested check is a hole in your SDC.
+- The coverage section shows them as `untested`, with a reason. Two kinds are fine:
+  - Recovery/removal of the reset synchronizer's two flip-flops, which only `rst_n` reaches (`no_startpoint_clock`, or `false_paths`).
+  - Pins driven by a constant (`constant_disabled`, `no_paths`). These are the synchronizer's first `D` input and, in ibex, the six outputs its configuration ties to a constant: `instr_addr_o[1:0]`, `data_addr_o[1:0]`, `alert_minor_o` and `alert_major_o`.
+- Any other untested check is a hole in your SDC.
 - Fix the SDC (a missing `set_input_delay` or `set_output_delay`), not the design ([05](../../../docs/05_sdc.md#unconstrained)).
 
 ### Recovery and removal
@@ -188,8 +191,8 @@ In Lab 2 the synchronized reset is launched by `clk`, so these checks are timed 
 Formality proves that the netlist (implementation, `i:`) does the same as the RTL (reference, `r:`).
 
 1. Reads `synth.svf`, Design Compiler's change log, so it knows about renamed and merged registers.
-2. Reads the RTL and the netlist, then **matches** compare points by name: outputs, flip-flops (`DFF`), latches (`LAT`), black-box pins (`BBPin`).
-3. **Verifies** each matched pair: the logic in front of it must compute the same value in both designs.
+2. Reads the RTL and the netlist, then matches compare points by name: outputs, flip-flops (`DFF`), latches (`LAT`), black-box pins (`BBPin`).
+3. Verifies each matched pair: the logic in front of it must compute the same value in both designs.
 
 The result block in `lec_run.log`:
 

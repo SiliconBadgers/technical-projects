@@ -3,8 +3,6 @@
 A [Liberty](02_glossary.md#liberty) file (`.lib`, sometimes gzipped as `.lib.gz`) is the datasheet of a [standard-cell library](02_glossary.md#standard-cell-library) at one [corner](02_glossary.md#corner-pvt).
 Your synthesis tool reads it to choose cells. Your timing tool reads it to compute delays.
 
-Analogy: a parts catalog. For every part it lists the size, the price in power, what it does, and how fast it is for a given job.
-
 Find your track's files and open one, from your track's folder (`tracks/<track>`):
 
 ```
@@ -55,7 +53,8 @@ cell_rise ("del_1_7_7") {
 - Which axis is slew and which is load is set by the `lu_table_template` of the same name near the top of the file.
 - Between grid points, the timing tool [interpolates](02_glossary.md#interpolation) from the four surrounding entries (bilinear interpolation). Outside the grid it extrapolates.
 
-Analogy: a table of travel times by distance and traffic. For a trip between two listed distances you estimate from the nearest rows and columns.
+A table of travel times by distance and traffic has no entry for a trip between two listed distances, so you estimate it from the nearest rows and columns.
+A delay table between its grid points works the same way.
 
 Lab 0's script prints a table and does a lookup:
 
@@ -75,8 +74,6 @@ One Liberty file per corner. The same cell has different delays in each.
 | `ff` | fast | high | cold | [hold](02_glossary.md#hold) |
 
 Example, `sky130_fd_sc_hd`: `ss_100C_1v60`, `tt_025C_1v80`, `ff_n40C_1v95`.
-
-Analogy: the same car on a hot day uphill with a heavy load (`ss`), and on a cool day downhill (`ff`). A schedule must work on both days.
 
 ## Physical views (LEF)
 

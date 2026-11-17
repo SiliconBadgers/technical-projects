@@ -15,16 +15,15 @@ Run every command on these pages from `tracks/b1`; paths are relative to it.
 | Equivalence | Conformal LEC | Proves the netlist does the same as the RTL. |
 | Gate-level simulation | Xcelium + cocotb | The same testbench on the netlist, with the cell models. |
 
-Think of Genus as the translator (RTL into gates) that also shops for real parts in the library catalog, Tempus as the person checking the train timetable, and Conformal as the proofreader who compares the translation with the original.
 New words: [glossary](../../../docs/02_glossary.md).
 
 ### Library
 
-This track uses one library: **`sky130_scl_9T`**, a 9-track standard-cell library for SkyWater 130 nm (a "track" here is one routing wire's width plus spacing; Lab 0 explains it).
+This track uses one library: `sky130_scl_9T`, a 9-track standard-cell library for SkyWater 130 nm (a "track" here is one routing wire's width plus spacing; Lab 0 explains it).
 Its files are in the SiliconBadgers PDK repo (PDK, process design kit: the factory's files, including the cell libraries), folder `cadence/`.
 [libraries.yaml](libraries.yaml) also lists `sky130_fd_sc_hd` for comparisons in Lab 0. The flow does not use it, so for Labs 1 and 2 this track has one library.
 
-The **tie cells** `TIEHI` and `TIELO` are in a separate small Liberty file, `$SB_PDK/cadence/sky130_scl_9T_tech/lib/sky130_scl_9T_phyCells.lib`, with one typical corner that the flow uses at every corner.
+The tie cells `TIEHI` and `TIELO` are in a separate small Liberty file, `$SB_PDK/cadence/sky130_scl_9T_tech/lib/sky130_scl_9T_phyCells.lib`, with one typical corner that the flow uses at every corner.
 A tie cell is a cell whose output is always 1 (`TIEHI`) or always 0 (`TIELO`). Genus connects every constant input to one, so no gate input is wired straight to the power or ground rail.
 
 ## Setup
@@ -177,7 +176,7 @@ make gls DESIGN=gcd            # runs synth first if the netlist is missing
 
 ## Clock targets
 
-All periods are a **starting point** taken from Track A's numbers for the same library. Genus gives different results than Track A's tools, so they are recalibrated after the first runs on a licensed machine.
+All periods are a starting point taken from Track A's numbers for the same library. Genus gives different results than Track A's tools, so they are recalibrated after the first runs on a licensed machine.
 
 ### Lab 1 (the period is the `set clk_period` line of each SDC)
 
@@ -191,7 +190,7 @@ All periods are a **starting point** taken from Track A's numbers for the same l
 | Tier | Clock | Period at `ss` | Area |
 |---|---|---|---|
 | Bronze | 90 MHz | 11.111 ns | |
-| Silver | 0.70 × Bronze | 7.778 ns | ≤ 1.25 × your Bronze area |
+| Silver | 0.70 × T0 (11 ns) | 7.7 ns | ≤ 1.25 × your Bronze area |
 | Gold | Silver, plus `N_ROWS = N_COLS = 8` closed at the Bronze period | | |
 
 This track has one library, so Gold is the 8 × 8 part. `make check` prints your tier and leaderboard score (`BRONZE_PERIOD_NS` and `SILVER_PERIOD_NS` in `labs/lab2_systolic/design.mk`).
@@ -211,28 +210,5 @@ This track's SDCs are plain SDC, read by both Genus and Tempus: `labs/lab1_refer
 | [lab0.md](lab0.md), [lab1.md](lab1.md), [lab2.md](lab2.md) | commands for each lab |
 | [reading_logs.md](reading_logs.md) | reading this track's logs and reports |
 | [libraries.yaml](libraries.yaml) | Liberty files for the Lab 0 scripts |
-
-## First run checklist
-
-For the maintainer, on the first run on a licensed machine (and after a tool upgrade). The flow was written against the tool documentation; these are the places to confirm.
-
-1. `make env-check`: every tool found. If a tool cannot start without a wrapper, set `TOOL_WRAP` (cocotb then needs Python inside that wrapper too).
-2. Start-up flags: `GENUS_FLAGS=-no_gui`, `TEMPUS_FLAGS="-stylus -no_gui"` (older Tempus: `-nowin`), `LEC_FLAGS="-xl -nogui"`. Each tool must exit by itself at the end (the scripts end with `exit`; stdin is `/dev/null`).
-3. Gzipped Liberty (`.lib.gz`): Genus, Tempus and Conformal read it. If one does not, unzip a copy and pass `LIB_ss=<file> LIB_tt=... LIB_ff=...`.
-4. `make synth DESIGN=gcd`: `synth.log` has no `SB-WARNING` about `hdl_error_on_latch`, `hdl_error_on_blackbox` or `hdl_track_filename_row_col`; if one is unknown, find the equivalent attribute (`get_db -category hdl`) and update `flow/genus/synth.tcl`.
-5. `check_design.rpt` and `check_timing.rpt` contain the summary rows that `flow/scripts/check.py` reads (`Unresolved References`, `Multidriven ...`, `Undriven ...`, `Sequential clock pins without clock waveform`, `Inputs/Outputs without clocked external delays`, `Loop-breaking cells ...`). If the wording differs, update the labels in `check.py`.
-6. Tie cells: `grep -cE '^ *TIE(HI|LO) ' build/gcd/sky130_scl_9T/netlist.v` is not 0 and `synth.log` has no `SB-WARNING: no tie cells added` (else check the options of `add_tieoffs` in `flow/genus/synth.tcl`). Warnings that the phyCells library has other operating conditions than the ss/ff libraries are expected (it has one typical corner).
-7. `make synth DESIGN=ibex`: `grep -c ICGPRECX1 build/ibex/sky130_scl_9T/netlist.v` is not 0 (Genus kept the instantiated clock gate although the library marks it `dont_use`).
-8. `make synth DESIGN=sb_systolic_tile DESIGN_PARAMS="N_ROWS=8 N_COLS=8"` (with a Lab 2 SDC): the netlist's top module is still `sb_systolic_tile` (`rename_obj` in `synth.tcl`), and the SRAM is an instance of the Liberty cell `sb_sram_256x8`.
-9. `SYNTH_ADDER=ripple`: `synth.log` says `set on N adder instances` with N > 0 and `datapath.rpt` changes. If N is 0, find Genus's attribute for a datapath instance's architecture and update `synth.tcl`.
-10. `SYNTH_RETIME=1`: no `SB-WARNING`, and LEC still passes.
-11. `make sta DESIGN=gcd`: `sta.log` builds three views; `sta_summary.txt` has numbers, not `NA`, and `period_ns` is the SDC period in ns (`NA` means `report_timing -collection` or `get_db <path> .slack` did not work; `qor.py` then reads the first path of each report and leaves TNS empty). `sta_check_timing.rpt` and `sta_drv.rpt` exist.
-12. Reset check: for a correct Lab 2 tile, `sta_summary.txt` says `reset_port_async_pins 2`. A much larger number on a correct tile means `all_fanout` went through the flip-flops' reset-to-output arcs; fix the count in `flow/tempus/sta.tcl`.
-13. `make lec` for gcd and ibex: `lec_run.log` says it ran the Genus dofile and ends with `No of diff points = 0`. Also try `LEC_MODE=own` on gcd. Break the netlist on purpose (swap two cell types in a copy) and see LEC fail.
-14. `make lint`: HAL messages look like `*W,<CODE> (<file>,<line>|<col>): ...`. Add the harmless warnings in third-party code (gcd, ibex) to `labs/lab1_reference/<design>/hal_waivers.txt`, each with a reason, until `make lint` passes.
-15. `make sim gls` for all three designs pass. Lab 2 `DESIGN_PARAMS` reach the simulation (cocotb passes them as `-gpg`); GLS with the Liberate cell models gives no X on the outputs.
-16. Recovery/removal in Genus, before calibrating. Tempus times them by default (`timing_analysis_async_checks`, `auto` in 23.14); Genus must too, or it builds the tile's reset tree (about 810 reset pins) without regard to them. (On Track B2, Design Compiler skips them by default: the tile failed at `ss` by 1.36 ns on recovery, its reset tree a chain of seven `buf_1`, until `enable_recovery_removal_arcs true`.) Check, with a mentor's Lab 2 SDC, after `make synth sta DESIGN=sb_systolic_tile`: in Genus, `report_timing -from u_reset_sync/rst_n_o_reg/CK` ends at a flip-flop's `RN` as a recovery check with a slack, not as an unconstrained path without a capture clock; `sta_ss_setup.rpt` has no failing `Recovery Check`. If Genus does not time them, find its attribute for asynchronous checks (`get_db -category timing`; try Tempus's name first), set it in `flow/genus/synth.tcl`, and rerun.
-17. Calibrate: find each design's shortest passing period at `ss`, then update the SDC periods, the tables above, and `BRONZE_PERIOD_NS`/`SILVER_PERIOD_NS`.
-18. Note the run times and disk use of an ibex build in [lab1.md](lab1.md).
 
 Next: [docs/03_liberty.md](../../../docs/03_liberty.md)

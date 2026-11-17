@@ -115,7 +115,7 @@ Fanout      Cap     Slew    Delay     Time   Description
 
 ```
 cd build/gcd/sky130hd && source sta_ss.env
-sta -no_init -no_splash $SB_ROOT/flow/scripts/sta/sta.tcl     # no -exit: you stay at the sta prompt
+sta -no_init -no_splash $SB_ROOT/tracks/a/flow/scripts/sta/sta.tcl     # no -exit: you stay at the sta prompt
 report_checks -through [get_pins _123_/Y] -fields {slew cap fanout}
 report_checks -to [get_ports <port>]
 ```
@@ -147,8 +147,6 @@ How eqy works:
 2. Matches key points by name: ports, register outputs, black-box outputs.
 3. Cuts both designs into small pieces (partitions) at the matched nets.
 4. Proves each pair of pieces equal: strategy `sat` first, then `abc` for what is left.
-
-Like checking two translations of a book chapter by chapter instead of all at once: the chapter breaks are the matched names.
 
 - `Could not prove … using strategy 'sat': timeout` is normal. Only the final `DONE` line counts.
 - `SYNTH_FSM=1` or `SYNTH_RETIME=1` renames or moves registers, so they no longer match.

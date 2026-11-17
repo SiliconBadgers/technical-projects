@@ -46,6 +46,7 @@ def main() -> int:
     ap.add_argument("--design", required=True)
     ap.add_argument("--library", required=True)
     ap.add_argument("--corners", nargs="+", default=["tt", "ss", "ff"])
+    ap.add_argument("--synth-corner", default="ss", help="corner of the synthesis power report")
     ap.add_argument("--out", required=True, type=Path)
     a = ap.parse_args()
 
@@ -60,7 +61,7 @@ def main() -> int:
                         "period_ns": s.get("period_ns", ""),
                         "setup_wns_ns": s.get("setup_wns_ns", ""), "setup_tns_ns": s.get("setup_tns_ns", ""),
                         "hold_wns_ns": s.get("hold_wns_ns", ""), "hold_tns_ns": s.get("hold_tns_ns", ""),
-                        "area_um2": cell_area, "cell_count": cells, "leakage": leak})
+                        "area_um2": cell_area, "cell_count": cells, "leakage": leak if corner == a.synth_corner else ""})
     return 0
 
 

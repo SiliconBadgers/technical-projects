@@ -21,7 +21,6 @@ DESIGN   ?= gcd
 CORNERS  ?= tt ss ff
 # Liberty corner used for mapping
 SYNTH_CORNER ?= ss
-CORNER   ?= ss
 
 SYNTH_FLATTEN ?= 1
 SYNTH_RETIME  ?= 0
@@ -109,7 +108,7 @@ FLOW_DEPS := $(PLATFORM_MK) $(TRACK_DESIGN_DIR)/design.mk
 .PHONY: help info env-check all lint sim synth sta lec gls qor check lec-mutation clean FORCE
 FORCE:
 help:
-	@echo "usage: make <stage> PDK=<platform> DESIGN=<design> [CORNER=<corner>] [CLOCK_PERIOD=<ns>]"
+	@echo "usage: make <stage> PDK=<platform> DESIGN=<design> [CORNERS='tt ss ff'] [CLOCK_PERIOD=<ns>]"
 	@echo "  stages:       lint sim synth sta lec gls qor | all | check | lec-mutation | clean | info | env-check"
 	@echo "  PDK:          sky130hd sky130hs gf180_7t gf180_9t sky130scl (flow/platforms/*.mk)"
 	@echo "  DESIGN:       see labs/designs.mk"

@@ -1,16 +1,13 @@
 # 07 — Equivalence checking
 
-[Equivalence checking](02_glossary.md#equivalence-checking-lec) (LEC) proves that the netlist does the same as the RTL, for **every** input sequence.
+[Equivalence checking](02_glossary.md#equivalence-checking-lec) (LEC) proves that the netlist does the same as the RTL, for every input sequence.
 Simulation tries the inputs a testbench happens to give. LEC covers all of them, with math instead of test cases.
-
-Analogy: checking a translation of a book. Simulation reads a few chapters in both languages and compares.
-LEC proves, sentence by sentence, that the two books say the same thing.
 
 ## What it proves, and what it does not
 
 - It proves: synthesis did not change the logic. No optimization or mapping step broke anything.
 - It does not prove the RTL is right. If the RTL has a bug, the netlist has the same bug, and LEC passes.
-- It compares against the RTL **as the synthesis tool reads it**. If simulation reads the RTL differently ([mismatch](02_glossary.md#mismatch-simulation-vs-synthesis)), LEC cannot see it. That is a job for [gate-level simulation](08_gate_level_sim.md).
+- It compares against the RTL as the synthesis tool reads it. If simulation reads the RTL differently ([mismatch](02_glossary.md#mismatch-simulation-vs-synthesis)), LEC cannot see it. That is a job for [gate-level simulation](08_gate_level_sim.md).
 
 ## How it works
 

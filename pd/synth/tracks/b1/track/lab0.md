@@ -12,7 +12,7 @@ make check DESIGN=gcd
 ```
 
 - `make env-check` finds every tool and every library file.
-- `make check` ends with `all checks OK`. If it does not on the first ever run, tell your mentor which check failed (see the [First run checklist](README.md#first-run-checklist)).
+- `make check` ends with `all checks OK`. If it does not on the first ever run, tell your mentor which check failed.
 - `make all` stops at the first failing step. `make -k all` keeps going with the steps that do not depend on it.
 
 ## Finding the library files

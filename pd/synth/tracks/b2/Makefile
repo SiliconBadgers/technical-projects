@@ -266,5 +266,5 @@ $(BUILD)/lec.log: $(BUILD)/lec.env $(BUILD)/netlist.v $(SYNTH_RTL) $(FLOW)/fm/le
 # --- qor ---
 $(BUILD)/qor.csv: $(BUILD)/netlist.v $(foreach c,$(CORNERS),$(BUILD)/sta_$(c).rpt) $(FLOW)/qor/collect_qor.py
 	python3 $(FLOW)/qor/collect_qor.py --build $(BUILD) --design $(DESIGN) --library $(LIBRARY) \
-	  --corners $(CORNERS) --out $@
+	  --corners $(CORNERS) --synth-corner $(SYNTH_CORNER) --out $@
 	@column -s, -t < $@

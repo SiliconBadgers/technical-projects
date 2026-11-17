@@ -5,14 +5,17 @@ This page only shows how to run them here. Your clock target: [README.md](README
 
 ## Your SDC
 
-Your SDC goes in **`tracks/b2/labs/lab2_systolic/sdc/sky130_fd_sc_hd.sdc`** (this track's lab folder, not the one in the course's `labs/`). Until it exists, `make synth` stops and says so.
+Your SDC goes in `tracks/b2/labs/lab2_systolic/sdc/sky130_fd_sc_hd.sdc` (this track's lab folder, not the one in the course's `labs/`). Until it exists, `make synth` stops and says so.
 
 - Write plain SDC: Design Compiler and PrimeTime both read it (with `source`: their `read_sdc` does not know `remove_from_collection`). There are no helper procedures in this track.
 - Put the period on its own line, `set clk_period <ns>`, and compute the rest from it. `make ... CLOCK_PERIOD=<ns>` replaces that line.
 - Input driver: `set_driving_cell -lib_cell sky130_fd_sc_hd__buf_2 -pin X <ports>`.
 - Output load: `set_load <pF> <ports>`. Look up the input capacitance of `sky130_fd_sc_hd__buf_4` pin `A` in the Liberty file (Lab 0 tools) and write it in a comment.
 - To leave some ports out of a list: `remove_from_collection [all_inputs] [get_ports {<ports>}]`.
-- `rst_n` is asynchronous and gets no input delay (spec). It reaches only the reset synchronizer: false-path it there, `set_false_path -from [get_ports rst_n]`, with a comment. Do not false-path the flip-flops' reset pins (`all_registers -async_pins`, which Design Compiler does not even know): the synchronized reset is launched by `clk`, and its recovery and removal checks must be timed ([reading_logs.md](reading_logs.md#recovery-and-removal)).
+- `rst_n` is asynchronous and gets no input delay (spec).
+  - It reaches only the reset synchronizer. False-path it there, `set_false_path -from [get_ports rst_n]`, with a comment.
+  - Do not false-path the flip-flops' reset pins (`all_registers -async_pins`, which Design Compiler does not know).
+  - The synchronized reset is launched by `clk`, and its recovery and removal checks must be timed ([reading_logs.md](reading_logs.md#recovery-and-removal)).
 - Example of the style: [the gcd SDC](../labs/lab1_reference/gcd/sdc/sky130_fd_sc_hd.sdc). Rules and conventions: [docs/05_sdc.md](../../../docs/05_sdc.md).
 
 Check it with `make sta DESIGN=sb_systolic_tile`, then read the first sections of `sta_ss.rpt` (`check_timing` and the coverage) before any path ([reading_logs.md](reading_logs.md#timing)).
@@ -44,7 +47,7 @@ make qor   DESIGN=sb_systolic_tile
 
 Or `make all DESIGN=sb_systolic_tile`. Outputs: `build/sb_systolic_tile/sky130_fd_sc_hd/`.
 
-- The weight-buffer SRAM is a **macro**: a ready-made block that synthesis does not build. Its fake timing models are `labs/lab2_systolic/macros/sb_sram_256x8_sky130_fd_sc_hd_<corner>.lib`.
+- The weight-buffer SRAM is a macro: a ready-made block that synthesis does not build. Its fake timing models are `labs/lab2_systolic/macros/sb_sram_256x8_sky130_fd_sc_hd_<corner>.lib`.
   `make synth` and `make sta` compile them to `.db` first (`make macros`; output in `build/sb_systolic_tile/macros/`).
 
 ## Trying changes
@@ -77,7 +80,14 @@ The testbench reads the same `DESIGN_PARAMS` (as `SB_DESIGN_PARAMS`), so it chec
 | 3. Bronze | [this track's checks](README.md#this-tracks-checks) |
 | 4. Silver | `sta_ss.rpt` setup paths, `qor.csv`, `synth_cells.rpt` |
 | 5. Gold | the same, for the 8 × 8 build |
-| 6. High fanout | `synth_fanout.rpt`: first the nets with more than 16 loads as your RTL wrote them (before compile: find the net with the most loads), then the same after compile, where `-tree` counts the loads behind the buffers Design Compiler added (fanout and buffer depth); it may also duplicate the driving logic instead. One tree in detail: `report_buffer_tree -net <net>` at the `dc_shell` prompt ([README.md](README.md#running-a-tool-by-hand)). With `set_max_fanout 16` in your SDC, Design Compiler fixes fanout during compile, so `sta_ss.rpt` "All violators" usually lists none |
+| 6. High fanout | `synth_fanout.rpt` (below) |
+
+For task 6:
+
+- `synth_fanout.rpt` first lists the nets with more than 16 loads as your RTL wrote them (before compile). Find the net with the most loads.
+- Then it lists the same after compile, where `-tree` counts the loads behind the buffers Design Compiler added (fanout and buffer depth). Design Compiler may also duplicate the driving logic instead.
+- One tree in detail: `report_buffer_tree -net <net>` at the `dc_shell` prompt ([README.md](README.md#running-a-tool-by-hand)).
+- With `set_max_fanout 16` in your SDC, Design Compiler fixes fanout during compile, so `sta_ss.rpt` "All violators" usually lists none.
 
 How to read each file: [reading_logs.md](reading_logs.md).
 

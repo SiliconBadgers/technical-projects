@@ -2,7 +2,7 @@
 # Author:      Isaac Hagedorn
 # Date:        2026-10-09
 # Description: Platform settings for GF180MCU 9-track 5 V cells (gf180mcu_fd_sc_mcu9t5v0). Cell choices follow OpenROAD-flow-scripts.
-# NOTE(spec-mismatch): corner voltages differ (5.00 / 4.50 / 5.50 V).
+# Corner supplies: 5.00 V (tt), 4.50 V (ss), 5.50 V (ff).
 
 PLATFORM_PDK  := gf180mcuD
 STD_CELL_LIB  := gf180mcu_fd_sc_mcu9t5v0

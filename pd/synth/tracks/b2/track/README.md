@@ -4,7 +4,7 @@ Track B2 runs every step of the course with Synopsys tools on the open SkyWater 
 Track B2 lives in the folder `tracks/b2`. The course itself (concepts, labs, designs) is the same on every track and sits in the course folder, two levels up (the folder with `docs/`, `labs/` and `tracks/`); this folder holds Track B2's flow, and these pages say how to do each step here.
 Run every command on these pages from `tracks/b2`; paths are relative to it.
 
-These are commercial tools: they need a **license** (a permission file served by a license server on your network).
+These are commercial tools: they need a license (a permission file served by a license server on your network).
 Work on a machine where your group has the tools installed. Ask your mentor which one.
 
 ## The tools
@@ -18,13 +18,11 @@ Work on a machine where your group has the tools installed. Ask your mentor whic
 | Equivalence | Formality (`fm_shell`) | Proves the netlist does the same as the RTL. |
 | Library compile | Library Compiler (`lc_shell`) | Turns a text Liberty file (`.lib`) into the binary `.db` the other tools read. |
 
-Think of Design Compiler as the translator (RTL into gates), PrimeTime as the inspector with a stopwatch, and Formality as the proofreader who checks the translation line by line.
-
 Words used on these pages:
 
 - **Shell**: each tool is a command prompt that understands Tcl (`dc_shell`, `pt_shell`, ...). The flow gives it a script with `-f <script>`.
-- **`.db`**: a Liberty file compiled to binary. Same content as the `.lib`, but the Synopsys tools only read `.db`. Like a program and its source code.
-- **SVF**: a file Design Compiler writes for Formality, listing what it changed (renamed, merged or moved). A change log for the proofreader.
+- **`.db`**: a Liberty file compiled to binary. Same content as the `.lib`, but the Synopsys tools only read `.db`.
+- **SVF**: a file Design Compiler writes for Formality, listing what it changed (renamed, merged or moved).
 
 ### Versions
 
@@ -161,18 +159,18 @@ Add `KNOB=value` to any `make` line.
 | `WAVES=1` | VCS writes `waves.vcd` in `sim_rtl/` or `sim_gls/` (open it with Verdi or GTKWave) |
 | `SIM_TIMEOUT=<s>` | wall-clock limit of one `sim` or `gls` run (default 900 s); a run that hits it is killed and fails |
 
-Design Compiler picks adder and multiplier structures itself, from its **DesignWare** library of ready-made arithmetic blocks; `synth_resources.rpt` lists what it picked.
+Design Compiler picks adder and multiplier structures itself, from its DesignWare library of ready-made arithmetic blocks; `synth_resources.rpt` lists what it picked.
 
 ## Clock targets
 
-These were calibrated on the first licensed run, with Design Compiler and PrimeTime Y-2026.03 (checklist item 15): Lab 1 = the shortest period that passes setup at `ss`, plus 5 %; Lab 2 (all `*_PIPE = 0`) Bronze = the shortest passing period (7.5 ns) rounded up to a whole MHz, Silver = 0.70 × that period.
+These were calibrated on the first licensed run, with Design Compiler and PrimeTime Y-2026.03: Lab 1 = the shortest period that passes setup at `ss`, plus 5 %; Lab 2: T0 = 7.5 ns, so Bronze = 133 MHz and Silver = 0.70 × T0 = 5.25 ns ([targets](../../../labs/lab2_systolic/spec.md#targets)).
 Design Compiler and PrimeTime estimate wire delay before layout from the library's wire-load table, so the numbers belong to these tools; after a tool upgrade the team recalibrates them.
 
 | Design | Clock target | Constraint file |
 |---|---|---|
 | gcd (Lab 1) | 3.8 ns | `labs/lab1_reference/gcd/sdc/sky130_fd_sc_hd.sdc` |
 | ibex (Lab 1) | 11.6 ns | `labs/lab1_reference/ibex/sdc/sky130_fd_sc_hd.sdc` |
-| sb_systolic_tile (Lab 2), **Bronze** | **133 MHz** (7.519 ns) | you write `tracks/b2/labs/lab2_systolic/sdc/sky130_fd_sc_hd.sdc` |
+| sb_systolic_tile (Lab 2), Bronze | 133 MHz (7.519 ns) | you write `tracks/b2/labs/lab2_systolic/sdc/sky130_fd_sc_hd.sdc` |
 | sb_systolic_tile (Lab 2), Silver | 5.25 ns at `ss` | the same file |
 
 ## This track's checks
@@ -187,32 +185,19 @@ The labs ask that "your track's checks" pass. Here they are, with where to look 
 | Synthesis is clean | `make synth` passes: no `Error`, every instance linked (no `LINK-5` in `synth.log`) |
 | Setup | worst setup slack at `ss` is ≥ 0 (`sta_ss.txt`, `qor.csv`) |
 | Hold | worst hold slack at `ff` is ≥ 0 (`sta_ff.txt`, `qor.csv`) |
-| No unconstrained endpoints | in every `sta_<corner>.rpt`: `check_timing` lists no unconstrained endpoints and no input without an input delay except `rst_n` (Lab 2: asynchronous, by the spec), and the coverage of the SDC checks shows nothing untested except (a) recovery/removal of the reset synchronizer's two flip-flops, which only `rst_n` reaches (`no_startpoint_clock`, or `false_paths` if you gave `rst_n` an input delay; comment your false path) and (b) pins driven by a constant (`constant_disabled`, `no_paths`: the synchronizer's first `D` input, ibex's constant outputs). The pulse-width checks, in their own section after the coverage, are not part of this check: every flip-flop reset pin is untested there (`no_clock`: a reset is not a clock), as expected |
+| No unconstrained endpoints | in every `sta_<corner>.rpt`: `check_timing` lists no unconstrained endpoints and no input without an input delay except `rst_n` (Lab 2: asynchronous, by the spec), and the coverage of the SDC checks shows nothing untested except (a) and (b) below |
 | Reset synchronizer (Lab 2) | `reset_port_async_pins` in `sta_ss.txt` is at most 2 (the synchronizer's own flip-flops) |
 | Equivalence | `make lec`: `Verification SUCCEEDED` |
 | GLS | `make gls`: the same tests as `make sim`, all passing |
 | QoR | `make qor` writes `qor.csv` |
 
-## First run checklist
+Untested checks that are allowed in the coverage:
 
-For the mentor who runs this track first on a new machine or after a tool upgrade. The scripts were written against the tool documentation; confirm each item once.
+- (a) Recovery/removal of the reset synchronizer's two flip-flops, which only `rst_n` reaches. The reason is `no_startpoint_clock`, or `false_paths` if you gave `rst_n` an input delay. Comment your false path.
+- (b) Pins driven by a constant (`constant_disabled`, `no_paths`): the synchronizer's first `D` input, ibex's constant outputs.
 
-1. `ls $SB_PDK/synopsys/views/*.db` shows the tt, ss and ff files.
-2. `make synth DESIGN=gcd`: `dc_shell` exits by itself; `synth.log` has no `Error`. The `analyze -define` list form works (`make synth DESIGN=ibex`, which defines `SYNTHESIS`).
-3. ibex: `sb_icg` links to `sky130_fd_sc_hd__sdlclkp_1` (no `LINK-5`), and `dw_foundation.sldb` is found.
-4. `read_sdc` in Design Compiler and PrimeTime accepts the Lab 1 SDCs, which use `remove_from_collection`. If it does not, read them with `source` in `synth.tcl` and `sta.tcl`.
-5. `make sta DESIGN=gcd`: three reports, numbers in `sta_<corner>.txt`, no unconstrained endpoints. `report_analysis_coverage -status_details untested` is accepted.
-6. `report_power` either writes `synth_power.rpt` or prints the `SB:` note; in both cases `synth.log` has no `Error` line from it.
-7. `make lec DESIGN=gcd`, then `DESIGN=ibex`: `Verification SUCCEEDED`. Formality accepts `read_sverilog -vcs "+incdir+... +define+..."` (ibex uses both).
-8. `make sim gls DESIGN=gcd`, then `DESIGN=ibex`: cocotb finds VCS, the cell models compile, every test passes. `WAVES=1` writes `waves.vcd` (`+vcs+dumpvars`).
-9. `make lint DESIGN=gcd LINT_TOOL=vc` (if VC SpyGlass is installed: `configure_lint_setup -goal lint_rtl`, `report_lint -file`) and `LINT_TOOL=vcs`.
-10. Lab 2, with a mentor solution SDC: `make macros DESIGN=sb_systolic_tile` writes three `.db` files (read `build/sb_systolic_tile/macros/*.log`). `make all` passes, and with `DESIGN_PARAMS="N_ROWS=8 N_COLS=8"` the netlist's top module is still `sb_systolic_tile` and LEC passes (`set_top -parameter`).
-11. Lab 2 reset check: on a correct tile, `reset_port_async_pins` in `sta_ss.txt` is 2, and the check fails on anything larger.
-12. The Lab 1 ripple-adder snippet in [lab1.md](lab1.md) works with your DesignWare version (`report_synlib dw_foundation.sldb` lists the implementation names).
-13. The message IDs in [reading_logs.md](reading_logs.md) match your version (`man LINK-5` at the `dc_shell` prompt).
-14. Each Lab 2 seeded bug shows up in this track's logs.
-15. Recalibrate the clock targets: sweep `CLOCK_PERIOD` for gcd, ibex and the tile, take the shortest period that passes setup at `ss` plus 5 %, and update the SDCs and the table above.
-    For Lab 2 (all `*_PIPE = 0`): Bronze = the shortest passing period, rounded up to a whole MHz; Silver = 0.70 × the shortest passing period.
+The pulse-width checks, in their own section after the coverage, are not part of this check.
+Every flip-flop reset pin is untested there (`no_clock`: a reset is not a clock), as expected.
 
 ## Pages in this track
 

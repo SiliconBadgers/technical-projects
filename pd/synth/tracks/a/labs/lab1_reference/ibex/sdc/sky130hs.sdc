@@ -7,7 +7,7 @@ current_design ibex_core
 
 set clk_name core_clock
 set clk_port_name clk_i
-# NOTE(spec-mismatch): team period, not ORFS's 6.5 ns (min passing at ss +5 %, 2026-10-08).
+# ORFS uses 6.5 ns. This period is the shortest that passes at ss, plus 5 %.
 set clk_period [sb_clock_period 16]
 set clk_io_pct 0.2
 

@@ -36,8 +36,6 @@ The last row is a team rule. A missing signal in a hand-written list makes simul
 A latch appears when a combinational block does not assign a signal on every path through it.
 The hardware must then "remember" the old value, and the only way to remember without a clock edge is a latch.
 
-Analogy: a form with a box you forgot to fill in. The clerk keeps whatever was written there last time.
-
 - Latches are hard to time, and the team's checks fail if the netlist has any.
 - The synthesis log lists the latches it made. The team's checks also scan the netlist for latch cells.
 - A missed assignment in `always_comb` does not always give a latch or a warning.
@@ -46,8 +44,6 @@ Analogy: a form with a box you forgot to fill in. The clerk keeps whatever was w
 
 A [combinational loop](02_glossary.md#combinational-loop) is a gate whose output feeds back into its own input with no flip-flop in between.
 
-Analogy: a microphone held next to its own speaker.
-
 - The value may oscillate or depend on gate delays.
 - The timing tool cannot time a loop. It cuts it somewhere, and the paths through the cut go unchecked.
 - The synthesis check (below) reports it. Lint may also report it, but lint sometimes flags loops that are not real (for example, two different bits of one bus).
@@ -55,8 +51,6 @@ Analogy: a microphone held next to its own speaker.
 ## Multiple drivers
 
 [Multiple drivers](02_glossary.md#multiple-drivers): one net driven from two places, for example two `always` blocks assigning the same signal.
-
-Analogy: two people talking into the same phone line at once.
 
 - In silicon, one driver pulls high while the other pulls low: a short circuit.
 - Simulation may hide it (the last assignment wins). Lint and the synthesis check report it.

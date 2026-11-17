@@ -23,7 +23,6 @@ Run every command on these pages from `tracks/a`; paths are relative to it.
 | Install | conda-forge, `env/install.sh` | Puts all of the above in your home folder ([Setup](#setup), Option 1). |
 | Install | IIC-OSIC-TOOLS | A container image that holds all of the above ([Setup](#setup), Option 2). |
 
-Think of Yosys as the translator (RTL into gates) and ABC as the shopper who picks real parts from the library catalog.
 Exact versions: [pins.md](pins.md). New words: [glossary](../../../docs/02_glossary.md).
 
 ## Setup

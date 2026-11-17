@@ -23,7 +23,7 @@ SDC_FILE    := $(TRACK_DESIGN_DIR)/sdc/sky130_scl_9T.sdc
 
 # targets for make check (starting point from Track A's sky130_scl_9T numbers; recalibrate on first run)
 BRONZE_PERIOD_NS := 11.111
-SILVER_PERIOD_NS := 7.778
+SILVER_PERIOD_NS := 7.7
 
 # cocotb testbench
 TB_DIR      := $(DESIGN_DIR)/tb
