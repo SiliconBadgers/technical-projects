@@ -7,7 +7,7 @@ current_design gcd
 
 set clk_name core_clock
 set clk_port_name clk
-# NOTE(spec-mismatch): team period, not ORFS's 1.1 ns (min passing at ss +5 %, 2026-10-08).
+# ORFS uses 1.1 ns. This period is the shortest that passes at ss, plus 5 %.
 set clk_period [sb_clock_period 6]
 set clk_io_pct 0.2
 

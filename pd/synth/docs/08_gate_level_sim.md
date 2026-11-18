@@ -5,8 +5,6 @@
 [Gate-level simulation](02_glossary.md#gate-level-simulation-gls) (GLS) runs the same [testbench](02_glossary.md#testbench) you used on the RTL, but on the synthesized netlist.
 The simulator reads the netlist plus a simulation model of every library cell.
 
-Analogy: a dress rehearsal. The script (testbench) is the same; now the real cast (the gates) plays it.
-
 GLS can catch what the other checks miss:
 
 - **Simulation/synthesis [mismatches](02_glossary.md#mismatch-simulation-vs-synthesis)**: RTL that simulates one way but is built another way. [Equivalence checking](07_equivalence.md) compares against the RTL as the synthesis tool reads it, so it cannot see these.

@@ -1,0 +1,26 @@
+# File:        environment.yml
+# Author:      Isaac Hagedorn
+# Date:        2026-10-23
+# Description: Track A tools without the container, from conda-forge at the pdk.lock versions. env/install.sh creates it and adds eqy, sby and OpenSTA.
+name: sb-track-a
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - pip
+  - click            # eqy and sby
+  - yosys=0.69       # read_slang built in
+  - verilator=5.052
+  - iverilog=13.0
+  - verible          # style advice only
+  - make
+  - git
+  - cxx-compiler     # Verilator, and the builds below
+  # to build eqy, sby, CUDD and OpenSTA (env/install.sh)
+  - cmake
+  - swig
+  - bison
+  - flex
+  - eigen=3.4
+  - tk=8.6           # Tcl 8.6 for OpenSTA
+  - zlib

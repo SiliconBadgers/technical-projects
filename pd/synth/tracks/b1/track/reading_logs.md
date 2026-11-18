@@ -5,7 +5,7 @@ Every file below is in `build/<design>/sky130_scl_9T/`. The exact layout of a re
 
 ## Message format
 
-Read the first **error** first: later messages are often caused by it. Then read the warnings.
+Read the first error first: later messages are often caused by it. Then read the warnings.
 
 | Tool | Log | A warning looks like | An error looks like |
 |---|---|---|---|
@@ -16,7 +16,7 @@ Read the first **error** first: later messages are often caused by it. Then read
 
 - The word before the colon is the part of the tool that complained: `halcheck`, `halsynth`, `halstruct` are HAL's lint, synthesizability and structure checks; `xmvlog` compiles, `xmelab` elaborates, `xmsim` simulates. `xmhelp <that part> <CODE>` explains an Xcelium code; HAL's rules are listed by `hal -rules_list` (run it through your `TOOL_WRAP`).
 - The `<ID>` of a Genus or Tempus message is the key to look it up in the Cadence documentation (`cdnshelp`).
-- Lines starting with `SB:` or `SB-WARNING:` come from this repo's scripts, not from the tool.
+- Lines starting with `SB:` or `SB-WARNING:` come from the course's scripts, not from the tool.
 - `make synth`, `make sta` and `make lec` fail when the tool's log has an error line (`Error   :` in Genus, `**ERROR:` in Tempus, `// Error:` in Conformal), even if the tool went on and exited normally: the make output shows the first ones (`SB-ERROR: ... error line(s)`). The only exceptions are the message IDs in `flow/scripts/tool_error_waivers.txt`, each with its reason.
 
 ## Lint
@@ -34,12 +34,12 @@ Read the first **error** first: later messages are often caused by it. Then read
 
 ### Latches
 
-[04 — Latches](../../../docs/04_synthesis.md#latches). The flow sets `hdl_error_on_latch`, so Genus **stops** during elaboration with an `Error` that names the signal, the file and the line.
+[04 — Latches](../../../docs/04_synthesis.md#latches). The flow sets `hdl_error_on_latch`, so Genus stops during elaboration with an `Error` that names the signal, the file and the line.
 Search: `grep -n -i latch synth.log`. As a second net, `make check` looks for latch cells (`TLATX1`, `TLATSRX1`) in `netlist.v`.
 
 ### Black boxes and missing modules
 
-[04 — Black boxes](../../../docs/04_synthesis.md#black-boxes). A module whose file was not read is an **unresolved reference**.
+[04 — Black boxes](../../../docs/04_synthesis.md#black-boxes). A module whose file was not read is an unresolved reference.
 The flow sets `hdl_error_on_blackbox`, so Genus stops with an `Error` naming the module. `check_design.rpt` counts them in the `Unresolved References` row.
 Lab 2's SRAM is a black box on purpose: Genus reads its Liberty model, so it is a library cell (`sb_sram_256x8`), not an unresolved reference.
 
@@ -59,7 +59,7 @@ After synthesis, `check_design.rpt` lists them by name, with a count per kind in
 
 ### SDC
 
-Right after `read_sdc`, Genus prints how many SDC commands it ran and lists the ones that failed, with the line of your file. A failed command was **not applied**.
+Right after `read_sdc`, Genus prints how many SDC commands it ran and lists the ones that failed, with the line of your file. A failed command was not applied.
 `netlist.sdc` is the constraint set as Genus understood it.
 
 ### Reports
@@ -73,7 +73,7 @@ Right after `read_sdc`, Genus prints how many SDC commands it ran and lists the 
 | `datapath.rpt` | adders, multipliers, comparators and the structure Genus picked | changes with `SYNTH_ADDER` |
 | `power.rpt` | leakage, internal and switching power per category | only leakage means something here (no real activity) |
 
-Genus usually prints times in **ps** and capacitance in **fF**. Tempus uses the library's units: **ns** and **pF**.
+Genus usually prints times in ps and capacitance in fF. Tempus uses the library's units: ns and pF.
 
 ## Constraint checks
 
@@ -90,12 +90,21 @@ Genus usually prints times in **ps** and capacitance in **fF**. Tempus uses the 
 | `Timing exceptions with no effect`, `Suspicious multi_cycle exceptions` | an exception that matches nothing, or looks wrong |
 
 `sta_check_timing.rpt` (Tempus) is the same kind of check at sign-off, per view. `make check` fails on unclocked flip-flops and on ports without delays; the asynchronous reset input may be the one exception, if your SDC handles it another way (with a comment).
-With a correct Lab 2 SDC its summary lists only: `ideal_clock_waveform` (no clock tree before layout), `no_drive` on `clk` and `rst_n`, `no_input_delay` on `rst_n` (asynchronous, by the spec), and `uncons_endpoint` only on (a) the reset synchronizer's two flip-flops' `RN`, behind your `rst_n` false path, and (b) pins driven by a constant (the synchronizer's first `D`, tied to 1). Any other unconstrained endpoint is a hole in your SDC.
+With a correct Lab 2 SDC its summary lists only:
+
+- `ideal_clock_waveform` (no clock tree before layout).
+- `no_drive` on `clk` and `rst_n`.
+- `no_input_delay` on `rst_n` (asynchronous, by the spec).
+- `uncons_endpoint`, only on:
+  - (a) the reset synchronizer's two flip-flops' `RN`, behind your `rst_n` false path;
+  - (b) pins driven by a constant (the synchronizer's first `D`, tied to 1).
+
+Any other unconstrained endpoint is a hole in your SDC.
 ibex (Lab 1) has one more case of (b), expected: the six outputs its configuration ties to a constant, `instr_addr_o[1:0]`, `data_addr_o[1:0]`, `alert_minor_o` and `alert_major_o` (`uncons_endpoint` 18: one line per output and view).
 
 ## Timing (Tempus)
 
-[06 — Reading timing reports](../../../docs/06_timing_reports.md). One Tempus run checks three **views**: one per corner (`view_tt`, `view_ss`, `view_ff`), each with your SDC and that corner's Liberty files (`flow/tempus/mmmc.tcl`).
+[06 — Reading timing reports](../../../docs/06_timing_reports.md). One Tempus run checks three views: one per corner (`view_tt`, `view_ss`, `view_ff`), each with your SDC and that corner's Liberty files (`flow/tempus/mmmc.tcl`).
 
 ### Setup
 
@@ -104,7 +113,7 @@ ibex (Lab 1) has one more case of (b), expected: the six outputs its configurati
 1. A header: `Path 1: MET` or `VIOLATED`, the slack, and the check: `Setup Check with Pin <instance>/<pin>` for a flip-flop, `Late Output Delay Assertion` for an output port.
 2. The start point, the endpoint, the clock edges and the view.
 3. The required time: the capture clock edge, minus setup, minus uncertainty.
-4. The arrival time, then **Slack** = required − arrival.
+4. The arrival time, then Slack = required − arrival.
 5. A table with one line per pin on the path: instance and cell, edge (rise or fall), delay of that stage, arrival time so far.
 
 Sign-off reads setup at `ss` ([06 — Setup](../../../docs/06_timing_reports.md#setup)).
@@ -128,8 +137,8 @@ Paths that end on a reset pin of a flip-flop are called `Recovery Check` (like s
 
 1. Which script ran (`SB: running ...`).
 2. Reading the libraries, the RTL (golden) and the netlist (revised). `// Error` here means a file did not read. `report_black_box` lists the black boxes; on Lab 2 that is only the SRAM.
-3. Mapping: Conformal pairs the [key points](../../../docs/02_glossary.md#key-point) of both sides. **Unmapped points** are key points with no partner, often renamed or removed registers.
-4. Compare: each compare point is **equivalent**, **non-equivalent**, **aborted** (gave up: too hard) or **not compared**.
+3. Mapping: Conformal pairs the [key points](../../../docs/02_glossary.md#key-point) of both sides. Unmapped points are key points with no partner, often renamed or removed registers.
+4. Compare: each compare point is equivalent, non-equivalent, aborted (gave up: too hard) or not compared.
 5. The last lines: `No of compare points`, `No of diff points` (non-equivalent), `No of abort points`, `No of unknown points`. Pass = compare points above 0, the other three 0.
 
 When points are non-equivalent, the Genus script may also write `noneq.*` files in the build folder: the non-equivalent points, the source lines involved, and an input pattern that shows the difference.

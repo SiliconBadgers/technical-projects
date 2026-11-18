@@ -104,7 +104,7 @@ def yosys_check(c: Ctx):
     m = re.search(r"Found and reported (\d+) problems", txt)
     ok = m is not None and m.group(1) == "0"
     problems = [ln.strip() for ln in txt.splitlines() if "Warning" in ln][:10]
-    return ok, ("Yosys `check -assert` passed" if ok else
+    return ok, ("Yosys `check` found no problems" if ok else
                 "Yosys `check` found multiple drivers, undriven nets or logic loops"), problems
 
 

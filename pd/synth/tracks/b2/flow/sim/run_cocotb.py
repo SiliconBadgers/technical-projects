@@ -104,7 +104,8 @@ def main() -> int:
               "A simulation that never advances is often a combinational loop: read the loop reports "
               "(synth_check_timing.rpt, check_timing in sta_<corner>.rpt) and ../../docs/04_synthesis.md#combinational-loops")
         return 1
-    signal.alarm(0)
+    finally:
+        signal.alarm(0)
     num_tests, num_failed = get_results(Path(results))
     print(f"SB: {num_tests - num_failed}/{num_tests} cocotb tests passed -> {args.results}")
     return 1 if num_failed else 0

@@ -28,8 +28,8 @@ The `*_PIPE` parameters change latency, never results. The testbench needs no ch
 | Port | Dir | Width | Description |
 |---|---|---|---|
 | `clk` | in | 1 | clock, rising edge |
-| `rst_n` | in | 1 | reset, active low. **Asserted and released asynchronously**; the tile must release its internal reset synchronously to `clk` |
-| `cfg_k_len` | in | 8 | K − 1 for the next tile. **Quasi-static**: changes only while idle, stable ≥ 2 cycles before the first activation beat |
+| `rst_n` | in | 1 | reset, active low. Asserted and released asynchronously; the tile must release its internal reset synchronously to `clk` |
+| `cfg_k_len` | in | 8 | K − 1 for the next tile. Quasi-static: changes only while idle, stable ≥ 2 cycles before the first activation beat |
 | `w_we` | in | 1 | write one weight this cycle (only while idle) |
 | `w_addr` | in | log2(N_COLS) + 8 | `{column, k}`: weight W[k][column] |
 | `w_data` | in | 8 | the weight, signed |
@@ -54,8 +54,8 @@ The `*_PIPE` parameters change latency, never results. The testbench needs no ch
 | Clock frequency | the clock target for your library is in your track's `track/README.md` |
 | Clock transition at the clock pin | sky130 libraries: 0.10 ns; gf180 libraries: 0.20 ns |
 | Clock uncertainty | setup: 10 % of the period; hold: 0.05 ns ([05](../../docs/05_sdc.md#clocks)) |
-| Input delay | 30 % of the period after the clock edge, **every** input except `clk` and `rst_n` |
-| Output delay | 30 % of the period before the next edge, **every** output |
+| Input delay | 30 % of the period after the clock edge, every input except `clk` and `rst_n` |
+| Output delay | 30 % of the period before the next edge, every output |
 | Input driver | the library's `buf_2` (or its equivalent, e.g. `BUFX2`) |
 | Output load | 4 × the input capacitance of the library's `buf_4` (or its equivalent, e.g. `BUFX4`); write the Liberty value in a comment |
 | Max transition | library defaults; reported, not signed off |
@@ -67,11 +67,11 @@ Sign-off rule (your track's checks): setup at `ss`, hold at `ff`, no unconstrain
 
 ## Targets
 
-The Bronze clock target for your library is in your track's `track/README.md`.
+T0 is the shortest clock period that passes setup at `ss` with all `*_PIPE = 0`. Your track's `track/README.md` gives the Bronze clock and the Silver period for each library.
 
-- **Bronze**: everything passes at the clock target.
-- **Silver**: 0.70 × that period at `ss`, hold clean at `ff`, area ≤ 1.25 × Bronze.
-- **Gold**: Silver in a second library, plus `N_ROWS = N_COLS = 8` at the Bronze period.
-- **Leaderboard**: area (µm²) × clock period (ns) at `ss`.
+- Bronze: every check of your track passes at the Bronze clock, which is T0 rounded up to a whole MHz.
+- Silver: setup passes at `ss` with a period of 0.70 × T0, hold is clean at `ff`, and the area is at most 1.25 × your Bronze area.
+- Gold: Silver in a second library, plus `N_ROWS = N_COLS = 8` closed at the Bronze period. If your track has only one library, Gold is the 8 × 8 part.
+- Leaderboard: area (µm²) × clock period (ns) at `ss`, per library. Lower is better; ties go to fewer pipeline registers.
 
 Next: [Lab 2 tasks](README.md#tasks)

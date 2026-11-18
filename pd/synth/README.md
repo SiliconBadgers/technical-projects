@@ -33,7 +33,7 @@ The course (`docs/`, `labs/`, `libs/`) is the same for every track. Each track h
 | B1 | Cadence: Genus, Tempus, Conformal, Xcelium | [`tracks/b1`](tracks/b1/track/README.md) |
 | B2 | Synopsys: Design Compiler, PrimeTime, Formality, VCS | [`tracks/b2`](tracks/b2/track/README.md) |
 
-Track A runs on your own computer. Track B needs a machine with the vendor's licenses. Ask your mentor which one to use.
+Track A runs on your own computer or on UW CAE. Track B needs a machine with the vendor's licenses. Ask your mentor which one to use.
 
 ## Working in a track
 

@@ -4,7 +4,8 @@
 It adds up the delays along every path from a [start point](02_glossary.md#start-point) (input port, flip-flop clock pin)
 to an [endpoint](02_glossary.md#endpoint) (output port, flip-flop data pin), and compares the sum with the [SDC](05_sdc.md).
 
-Analogy: checking a train timetable. You do not ride every train; you add up the travel times on paper and see which connections are missed.
+You can find the missed connections in a train timetable without riding any train, by adding up the travel times on paper.
+STA checks a design the same way.
 
 - Before layout there are no real wires ([wire delay](02_glossary.md#wire-delay) is not known) and the clock is [ideal](02_glossary.md#ideal-clock).
 - Each [corner](02_glossary.md#corner-pvt) is a separate run with its own Liberty file.
@@ -27,7 +28,8 @@ The [setup](02_glossary.md#setup) check: does data arrive before the next clock 
 - **Data required time**: the next clock edge, minus [clock uncertainty](02_glossary.md#clock-uncertainty), minus the capturing flip-flop's setup time.
 - **[Slack](02_glossary.md#slack)** = required − arrival. Negative means the data is too late: the path is violated.
 
-Analogy: slack is how many minutes early you reach the platform. Negative slack: you missed the train.
+Reaching the platform 3 minutes before your train leaves is 3 minutes of slack, and arriving 2 minutes after it leaves is −2 minutes.
+The departure is the required time and your arrival is the arrival time.
 
 - [WNS](02_glossary.md#wns): the worst slack of all paths. [TNS](02_glossary.md#tns): the sum of all negative slacks.
 - The worst path is the [critical path](02_glossary.md#critical-path).

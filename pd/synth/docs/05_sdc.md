@@ -3,9 +3,6 @@
 An [SDC](02_glossary.md#sdc) file tells synthesis and timing analysis about the world around your block:
 the clock, when inputs arrive, when outputs are needed, what drives the inputs and what the outputs drive.
 
-Analogy: a delivery contract. It says when the parcel leaves the warehouse, when the customer must have it, and how heavy it is.
-Without the contract, nobody can say whether the courier is late.
-
 The timing tool checks only what the SDC asks for. A path the SDC does not describe is not checked at all.
 
 - SDC is Tcl: `set`, `expr` and loops work.

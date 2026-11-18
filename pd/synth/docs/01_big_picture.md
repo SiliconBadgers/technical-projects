@@ -7,9 +7,7 @@ This course is about the middle of chip design: turning code into gates, and che
 You describe hardware as [RTL](02_glossary.md#rtl): Verilog or SystemVerilog that says what happens on each clock edge.
 A chip cannot run code. It is built from [standard cells](02_glossary.md#cell): small, pre-designed gates such as inverters, NAND gates and flip-flops.
 [Synthesis](02_glossary.md#synthesis) turns your RTL into a [netlist](02_glossary.md#netlist): a list of those cells and the wires between them.
-
-Analogy: the RTL is a recipe. The [standard-cell library](02_glossary.md#standard-cell-library) is the pantry.
-Synthesis is the cook who makes the dish using only what is in the pantry.
+It can only use the cells in the [standard-cell library](02_glossary.md#standard-cell-library) you give it.
 
 ## The steps
 
@@ -38,9 +36,8 @@ RTL ──► lint ──► simulation ──► synthesis ──► netlist
 A synchronous design moves data from [flip-flop](02_glossary.md#flip-flop) to flip-flop, one step per clock tick.
 Between two flip-flops the data runs through a chain of gates. Each gate takes a little time.
 
-Analogy: a relay race. On each clock tick a flip-flop hands the baton to the next runner (the logic).
-The runner must reach the next flip-flop before the next tick ([setup](02_glossary.md#setup)).
-The runner must also not arrive so early that it bumps into the previous baton handoff ([hold](02_glossary.md#hold)).
+The data must reach the next flip-flop before the next tick ([setup](02_glossary.md#setup)).
+It must also not change so soon after a tick that the next flip-flop captures the new value instead of the old one ([hold](02_glossary.md#hold)).
 
 The slowest path sets the fastest clock you can use. That path is the [critical path](02_glossary.md#critical-path).
 

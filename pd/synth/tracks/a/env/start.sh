@@ -7,7 +7,7 @@ set -euo pipefail
 
 HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 TRACK=$(cd "$HERE/.." && pwd)                    # tracks/a: pdk.lock, requirements.txt, the image build context
-REPO=$(cd "$TRACK/../.." && pwd)                 # the course repo
+REPO=$(cd "$TRACK/../.." && pwd)                 # the course folder
 LOCK="$TRACK/pdk.lock"
 
 # lock_top KEY: value of a top-level "KEY: value" line

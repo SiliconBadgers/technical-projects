@@ -28,7 +28,7 @@ This track has one library, `sky130_fd_sc_hd`, at three corners (tt, ss, ff).
 | Cell simulation models (GLS) | `$SB_PDK/synopsys/sky130_fd_sc_hd/verilog/` |
 
 `<corner>` is `tt_025C_1v80`, `ss_100C_1v60` or `ff_n40C_1v95`: process, temperature, voltage.
-`SB_PDK` not set in your shell? The PDK repo sits next to this one: `export SB_PDK=$PWD/../../../silicon-badgers-sky130-pdk`.
+`SB_PDK` not set in your shell? The PDK repo sits next to the course folder: `export SB_PDK=$PWD/../../../silicon-badgers-sky130-pdk`.
 
 ## 1. Parse a Liberty file
 

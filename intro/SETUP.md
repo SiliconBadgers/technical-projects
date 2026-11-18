@@ -148,6 +148,25 @@ Verilator, Questa, and Xcelium are optional. Set them up on the CAE host, not at
 home directory the first time (about 1.5 GB), and `source verif/env/setup.sh questa xcelium`
 also loads those simulators. [Simulators](../verif/docs/simulators.md) covers the differences.
 
+## Physical design track
+
+The [synthesis course](../pd/synth/README.md) is in `pd/synth`. It runs on one of three tool tracks;
+[Pick a track](../pd/synth/tracks/README.md) explains them, and each track's page has its full setup.
+Do these steps in a CAE host terminal, not at the `synopsys>` prompt.
+
+- **Conda.** `module load conda-forge/26.3.2` gives `mamba`. The tracks use it to install their tools and Python in `~/.conda/envs/`.
+- **Track A (open-source).** One script installs the tools and the open PDKs in your home folder, about 6 GB. It needs no container and no sudo.
+  ```sh
+  module load conda-forge/26.3.2
+  cd pd/synth/tracks/a
+  env/install.sh          # once, about 25 minutes
+  source env/setup.sh     # in every new terminal
+  make env-check
+  ```
+- **Tracks B1 (Cadence) and B2 (Synopsys).** Clone the SiliconBadgers PDK repository into `pd/` as `pd/silicon-badgers-sky130-pdk` (ask a mentor for access).
+  Then build the conda Python that the tool containers use, as in [Track B2 on UW CAE](../pd/synth/tracks/b2/track/README.md#on-uw-cae).
+  B2 runs its `make` commands at the `synopsys>` prompt. B1 runs them on the host with `TOOL_WRAP=cadence-run`.
+
 ## Local simulation (optional)
 
 Use this if you already have a local setup or want to work offline. CAE is the
@@ -195,4 +214,7 @@ gtkwave build/day1/waves.vcd
 | PE simulation fails | The starter is unfinished; follow the [PE guide](README.md#stage-3-implement-a-processing-element). |
 | `UVM is missing` in a verification project | Run `git submodule update --init verif/third_party/uvm-1.2` from the repository root on the CAE host. |
 | `source verif/env/setup.sh` fails with `conda: command not found` | You are at the `synopsys>` prompt. Run it on the CAE host. |
+| `mamba` is unavailable, or `env/install.sh` asks for it | Run `module load conda-forge/26.3.2` on the CAE host first. |
+| A synthesis-course `make sim` cannot find `python3` or cocotb at the `synopsys>` prompt | After `module load synopsys/suite` and before `synopsys-run`, put `~/.conda/envs/sb-py/bin` first on `PATH` ([Track B2 on UW CAE](../pd/synth/tracks/b2/track/README.md#on-uw-cae)). |
+| Home folder quota full after a conda install | Run `module load conda-forge/26.3.2`, then `mamba clean -a -y` to delete the download cache in `~/.conda/pkgs`. |
 | A command acts differently after `synopsys-run` than typed at `synopsys>` | `synopsys-run` reads its arguments as a new shell command line, so quotes and `$` change meaning. Start the container and type the command, or put it in a script. |

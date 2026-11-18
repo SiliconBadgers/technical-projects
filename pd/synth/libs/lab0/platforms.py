@@ -22,7 +22,7 @@ TRACK = (ROOT / "tracks" / os.environ["SB_TRACK"] if os.environ.get("SB_TRACK") 
 LIBRARIES_YAML = TRACK / "track" / "libraries.yaml" if TRACK else None
 CORNERS = ("tt", "ss", "ff")
 
-# SB_PDK: the SiliconBadgers PDK repo, cloned next to this repo unless set
+# SB_PDK: the SiliconBadgers PDK repo, cloned next to the course folder unless set
 os.environ.setdefault("SB_PDK", str(ROOT.parent / "silicon-badgers-sky130-pdk"))
 
 # cell role -> name stem (sky130_scl_9T: <FUNCTION>X<drive>; others: <lib>__<function>_<drive>)

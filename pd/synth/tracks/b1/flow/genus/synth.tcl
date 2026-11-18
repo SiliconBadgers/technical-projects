@@ -62,7 +62,7 @@ if {$adder eq "ripple"} {
         }
     }
     puts "SB: SYNTH_ADDER=ripple set on $n adder instances"
-    if {$n == 0} { puts "SB-WARNING: no adder took SYNTH_ADDER=ripple (see track/README.md, First run checklist)" }
+    if {$n == 0} { puts "SB-WARNING: no adder took SYNTH_ADDER=ripple (this Genus may name the sub_arch attribute differently)" }
 }
 if {$retime} {
     if {[catch {set_db [get_db designs] .retime true} err]} { puts "SB-WARNING: retiming not enabled: $err" }

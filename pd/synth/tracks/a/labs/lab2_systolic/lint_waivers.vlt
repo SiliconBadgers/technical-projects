@@ -5,11 +5,11 @@
 `verilator_config
 
 // File names fixed by the spec; modules carry the sb_ prefix.
-lint_off -rule DECLFILENAME -file "*/rtl/*.sv"
+lint_off -rule DECLFILENAME -file "*/rtl*/*.sv"
 
 // Outputs of the last column (a_h) and last row (w_v) go nowhere.
-lint_off -rule UNUSEDSIGNAL -file "*/rtl/tile_top.sv" -match "*'a_h'*"
-lint_off -rule UNUSEDSIGNAL -file "*/rtl/tile_top.sv" -match "*'w_v'*"
+lint_off -rule UNUSEDSIGNAL -file "*/rtl*/tile_top.sv" -match "*'a_h'*"
+lint_off -rule UNUSEDSIGNAL -file "*/rtl*/tile_top.sv" -match "*'w_v'*"
 
 // SRAM black box: ports only.
 lint_off -rule UNUSEDSIGNAL -file "*/macros/sb_sram_256x8.v"

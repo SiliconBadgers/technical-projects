@@ -12,13 +12,13 @@ make check DESIGN=gcd
 ```
 
 - `make env-check` finds every tool and every library file.
-- `make check` ends with `all checks OK`. If it does not on the first ever run, tell your mentor which check failed (see the [First run checklist](README.md#first-run-checklist)).
+- `make check` ends with `all checks OK`. If it does not on the first ever run, tell your mentor which check failed.
 - `make all` stops at the first failing step. `make -k all` keeps going with the steps that do not depend on it.
 
 ## Finding the library files
 
 The Lab 0 scripts read [libraries.yaml](libraries.yaml): `sky130_scl_9T` (this track's library) and `sky130_fd_sc_hd` (for comparison only).
-`$SB_PDK` is the PDK repo; if you did not set it, it is `silicon-badgers-sky130-pdk` next to this repo (`../../../silicon-badgers-sky130-pdk` from here).
+`$SB_PDK` is the PDK repo; if you did not set it, it is `../../../silicon-badgers-sky130-pdk` from here, next to the course folder.
 
 ```
 python3 ../../libs/lab0/platforms.py                      # every library and corner, with its file

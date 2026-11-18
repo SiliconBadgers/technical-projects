@@ -5,7 +5,7 @@ This page only shows how to run them here. Your clock target: [README.md](README
 
 ## Your SDC
 
-Your SDC goes in **`tracks/b1/labs/lab2_systolic/sdc/sky130_scl_9T.sdc`** (this track's lab folder, not the one at the repo root). Until it exists, `make synth` stops and says so.
+Your SDC goes in **`tracks/b1/labs/lab2_systolic/sdc/sky130_scl_9T.sdc`** (this track's lab folder, not the one in the course's `labs/`). Until it exists, `make synth` stops and says so.
 
 - Plain SDC: Genus (synthesis) and Tempus (timing) both read it.
 - First clock line: `set clk_period <ns>`, then use `$clk_period`. `CLOCK_PERIOD=<ns>` replaces that line for one run.
@@ -13,6 +13,19 @@ Your SDC goes in **`tracks/b1/labs/lab2_systolic/sdc/sky130_scl_9T.sdc`** (this 
 - The Lab 1 SDCs show the syntax: `labs/lab1_reference/*/sdc/sky130_scl_9T.sdc`.
 - `rst_n` is asynchronous and gets no input delay (spec). It reaches only the reset synchronizer: false-path it there, `set_false_path -from [get_ports rst_n]`, with a comment. Do not false-path the flip-flops' reset pins (`all_registers -async_pins`): the synchronized reset is launched by `clk`, and its recovery and removal checks must be timed ([reading_logs.md](reading_logs.md#hold)).
 - Check it: `make sta DESIGN=sb_systolic_tile`, then read `check_timing.rpt` and `sta_check_timing.rpt` before any path ([reading_logs.md](reading_logs.md#constraint-checks)).
+
+## Task 1: the seeded bugs
+
+The bugs are in the copy `labs/lab2_systolic/rtl_bugs/` (in the course folder). Add `BUGS=1` to every `make` line, `make check` included, to build that copy:
+
+```
+make lint  DESIGN=sb_systolic_tile BUGS=1
+make sim   DESIGN=sb_systolic_tile BUGS=1
+make synth DESIGN=sb_systolic_tile BUGS=1
+```
+
+Its outputs go to `build/sb_systolic_tile/sky130_scl_9T_bugs/`. Fix the bugs in `rtl_bugs/`.
+Without `BUGS=1` the flow builds `rtl/`, the working RTL that tasks 2 to 6 start from.
 
 ## Run the steps one at a time
 
@@ -59,7 +72,7 @@ Give `make check` the same `DESIGN_PARAMS` and `CLOCK_PERIOD`, so it reads the s
 
 | Task | Look at |
 |---|---|
-| 1. Make it correct | `lint.log`, the `make sim` output and `results.xml`, `synth.log`, `check_design.rpt`, `lec_run.log`, `gls_results.xml` |
+| 1. Make it correct (`..._bugs/`) | `lint.log`, the `make sim` output and `results.xml`, `synth.log`, `check_design.rpt`, `lec_run.log`, `gls_results.xml` |
 | 2. SDC | `check_timing.rpt`, `sta_check_timing.rpt`, then `sta_ss_setup.rpt` and `sta_ff_hold.rpt` |
 | 3. Bronze | `make check` |
 | 4. Silver | `sta_ss_setup.rpt`, `qor.csv`, `gates.rpt` |

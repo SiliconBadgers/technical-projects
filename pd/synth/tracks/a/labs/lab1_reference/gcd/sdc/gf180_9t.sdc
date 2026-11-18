@@ -2,7 +2,7 @@
 # Author:      Isaac Hagedorn
 # Date:        2026-10-08
 # Description: gcd timing constraints for gf180_9t, from the ORFS sky130hd gcd SDC. Adapted from OpenROAD-flow-scripts (BSD-3).
-# NOTE(spec-mismatch): ORFS has no gf180 gcd SDC; set_clock_latency dropped.
+# ORFS has no gf180 gcd SDC; its set_clock_latency is left out here.
 
 current_design gcd
 

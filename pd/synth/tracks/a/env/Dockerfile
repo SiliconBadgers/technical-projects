@@ -33,13 +33,12 @@ RUN set -eux; \
          "$(sed -n 's/^cocotb==\([^ ]*\).*/\1/p' /tmp/sb-requirements.txt)"
 
 # smoke check: flow tools on PATH, read_slang built in
-# NOTE(spec-mismatch): spec §2(b) yosys-slang is already in Yosys.
 RUN set -eux; \
     for t in yosys eqy sta verilator verible-verilog-lint iverilog vvp; do command -v "$t"; done; \
     yosys -q -p 'help read_slang' > /dev/null; \
     python3 -c 'import cocotb, yaml, liberty, matplotlib'
 
-# NOTE(spec-mismatch): spec §2(c) flow scripts come from the mounted clone, not the image.
+# The flow scripts come from your mounted clone, not from the image.
 # sky130_scl_9T is not in the image: unpack the mentor's tarball next to your clone
 ENV SCL_ROOT=/foss/designs/sky130_scl_9T_0.1.2
 

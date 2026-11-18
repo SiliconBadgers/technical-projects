@@ -4,7 +4,7 @@
 # Description: Lab 2 timing and area targets per platform.
 # T0: min passing period at ss, all *_PIPE = 0 (sweep.py --find-min, 2026-10-08).
 # bronze: all checks pass at bronze_period_ns (T0 rounded up to a whole MHz).
-# silver: setup at ss <= silver_period_ns (0.70 x T0), hold at ff, area <= 1.25 x bronze.
+# silver: setup at ss <= silver_period_ns (0.70 x T0), hold at ff, area <= 1.25 x bronze area.
 # gold: silver on a second PDK, plus 8x8 at the bronze period (mentor-checked).
 platforms:
   sky130hd:

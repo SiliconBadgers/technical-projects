@@ -1,10 +1,10 @@
 # Track B2: Synopsys tools
 
 Track B2 runs every step of the course with Synopsys tools on the open SkyWater 130 nm library `sky130_fd_sc_hd`.
-Track B2 lives in the folder `tracks/b2`. The course itself (concepts, labs, designs) is the same on every track and sits at the repo root; this folder holds Track B2's flow, and these pages say how to do each step here.
+Track B2 lives in the folder `tracks/b2`. The course itself (concepts, labs, designs) is the same on every track and sits in the course folder, two levels up (the folder with `docs/`, `labs/` and `tracks/`); this folder holds Track B2's flow, and these pages say how to do each step here.
 Run every command on these pages from `tracks/b2`; paths are relative to it.
 
-These are commercial tools: they need a **license** (a permission file served by a license server on your network).
+These are commercial tools: they need a license (a permission file served by a license server on your network).
 Work on a machine where your group has the tools installed. Ask your mentor which one.
 
 ## The tools
@@ -18,13 +18,11 @@ Work on a machine where your group has the tools installed. Ask your mentor whic
 | Equivalence | Formality (`fm_shell`) | Proves the netlist does the same as the RTL. |
 | Library compile | Library Compiler (`lc_shell`) | Turns a text Liberty file (`.lib`) into the binary `.db` the other tools read. |
 
-Think of Design Compiler as the translator (RTL into gates), PrimeTime as the inspector with a stopwatch, and Formality as the proofreader who checks the translation line by line.
-
 Words used on these pages:
 
 - **Shell**: each tool is a command prompt that understands Tcl (`dc_shell`, `pt_shell`, ...). The flow gives it a script with `-f <script>`.
-- **`.db`**: a Liberty file compiled to binary. Same content as the `.lib`, but the Synopsys tools only read `.db`. Like a program and its source code.
-- **SVF**: a file Design Compiler writes for Formality, listing what it changed (renamed, merged or moved). A change log for the proofreader.
+- **`.db`**: a Liberty file compiled to binary. Same content as the `.lib`, but the Synopsys tools only read `.db`.
+- **SVF**: a file Design Compiler writes for Formality, listing what it changed (renamed, merged or moved).
 
 ### Versions
 
@@ -39,13 +37,14 @@ The scripts use standard commands of recent releases. Assumed:
 
 ## Setup (once)
 
-1. **Get the PDK repo** (the library files) next to this repo, so the two folders sit side by side:
+1. **Get the PDK repo** (the library files). Clone it next to the course folder (the folder with `docs/`, `labs/` and `tracks/`), three folders up from `tracks/b2`:
    ```
-   cd <the folder that holds this repo>
+   cd ../../..
    git clone <PDK repo URL> silicon-badgers-sky130-pdk     # ask a mentor for the URL; keep this folder name
+   cd -
    ```
    Somewhere else? Set `SB_PDK` to its path (`export SB_PDK=<path>`).
-2. **Load the tools.** Every site does this differently, for example `module load synopsys` or sourcing a setup script. Ask your mentor. Then check:
+2. **Load the tools.** Every site does this differently, for example `module load synopsys` or sourcing a setup script. Ask your mentor (UW CAE: [below](#on-uw-cae)). Then check:
    ```
    which dc_shell pt_shell fm_shell vcs lc_shell
    which vc_static_shell      # optional; without it, make lint uses vcs
@@ -62,12 +61,7 @@ The scripts use standard commands of recent releases. Assumed:
    python3 -m venv ~/venvs/sb && source ~/venvs/sb/bin/activate
    pip install cocotb==2.1.0 pyyaml liberty-parser==0.0.29 numpy matplotlib pytest
    ```
-   **UW CAE machines**, or anywhere the tools run inside a container (`synopsys-run`): `make sim` and `make gls` run `python3` inside the container. It has no Python of its own and cannot use a venv made from the host's Python, and your home folder is small. Build a conda-forge Python on a path the container mounts (local scratch) and put it first on `PATH`:
-   ```
-   mamba create -y -p /var/tmp/$USER/sb-py -c conda-forge python=3.10 pip     # or micromamba; /var/tmp belongs to one machine
-   /var/tmp/$USER/sb-py/bin/pip install cocotb==2.1.0 pyyaml liberty-parser==0.0.29 numpy matplotlib pytest
-   export PATH=/var/tmp/$USER/sb-py/bin:$PATH
-   ```
+   Tools inside a container (UW CAE's `synopsys-run`): `make sim` and `make gls` run `python3` inside the container. It has no Python of its own and cannot use a venv made from the host's Python. Use a conda-forge Python on a path the container mounts instead, as [below](#on-uw-cae).
 5. **Smoke test** (in `tracks/b2`):
    ```
    make all DESIGN=gcd
@@ -76,7 +70,28 @@ The scripts use standard commands of recent releases. Assumed:
 
 | Variable | Meaning | Default |
 |---|---|---|
-| `SB_PDK` | the SiliconBadgers sky130 PDK repo | `silicon-badgers-sky130-pdk` next to this repo (`../../../silicon-badgers-sky130-pdk` from `tracks/b2`) |
+| `SB_PDK` | the SiliconBadgers sky130 PDK repo | `../../../silicon-badgers-sky130-pdk` from `tracks/b2`, next to the course folder |
+
+### On UW CAE
+
+The Synopsys tools run inside a container that `synopsys-run` starts. The container has no `git`, no `module` command and no Python of its own.
+So clone the PDK (step 1) and build the Python (step 4) on the CAE host first:
+
+```
+# on the CAE host, once
+module load conda-forge/26.3.2                        # gives mamba
+export CONDA_PKGS_DIRS=/var/tmp/$USER/conda-pkgs      # download cache on local scratch, not in your home folder
+mamba create -y -p ~/.conda/envs/sb-py -c conda-forge python=3.10 pip      # about 750 MB, a few minutes
+~/.conda/envs/sb-py/bin/pip install --no-cache-dir cocotb==2.1.0 pyyaml liberty-parser==0.0.29 numpy matplotlib pytest
+
+# on the CAE host, in every new terminal
+module load synopsys/suite
+export PATH=$HOME/.conda/envs/sb-py/bin:$PATH        # after the module: it puts its own python3 first
+synopsys-run                                          # the prompt changes to synopsys>
+```
+
+At the `synopsys>` prompt, `cd` to `tracks/b2`, then run steps 2, 3 and 5 and every `make` command there.
+`synopsys-run <command>` also runs one command and returns, but it reads its arguments as a new command line, so quotes and `$` change meaning. Put such commands in a script.
 
 ## Running a step
 
@@ -135,6 +150,7 @@ Add `KNOB=value` to any `make` line.
 |---|---|
 | `CLOCK_PERIOD=<ns>` | replaces the `set clk_period` line of the SDC; output in `build/<design>/sky130_fd_sc_hd_p<ns>/` |
 | `DESIGN_PARAMS="A=1 B=2"` | top-level parameters for synthesis, LEC and simulation; output in a folder named after them |
+| `BUGS=1` | Lab 2 Task 1: build the copy with the seeded bugs (`rtl_bugs/`); output in `build/sb_systolic_tile/sky130_fd_sc_hd_bugs/` |
 | `SYNTH_CORNER` | corner Design Compiler optimizes for (default `ss`) |
 | `DC_COMPILE` | `compile_ultra` (default; strongest optimization) or `compile` (simpler) |
 | `SYNTH_RETIME=1` | `compile_ultra -retime`: Design Compiler may move registers across logic |
@@ -143,18 +159,18 @@ Add `KNOB=value` to any `make` line.
 | `WAVES=1` | VCS writes `waves.vcd` in `sim_rtl/` or `sim_gls/` (open it with Verdi or GTKWave) |
 | `SIM_TIMEOUT=<s>` | wall-clock limit of one `sim` or `gls` run (default 900 s); a run that hits it is killed and fails |
 
-Design Compiler picks adder and multiplier structures itself, from its **DesignWare** library of ready-made arithmetic blocks; `synth_resources.rpt` lists what it picked.
+Design Compiler picks adder and multiplier structures itself, from its DesignWare library of ready-made arithmetic blocks; `synth_resources.rpt` lists what it picked.
 
 ## Clock targets
 
-These were calibrated on the first licensed run, with Design Compiler and PrimeTime Y-2026.03 (checklist item 15): Lab 1 = the shortest period that passes setup at `ss`, plus 5 %; Lab 2 (all `*_PIPE = 0`) Bronze = the shortest passing period (7.5 ns) rounded up to a whole MHz, Silver = 0.70 × that period.
+These were calibrated on the first licensed run, with Design Compiler and PrimeTime Y-2026.03: Lab 1 = the shortest period that passes setup at `ss`, plus 5 %; Lab 2: T0 = 7.5 ns, so Bronze = 133 MHz and Silver = 0.70 × T0 = 5.25 ns ([targets](../../../labs/lab2_systolic/spec.md#targets)).
 Design Compiler and PrimeTime estimate wire delay before layout from the library's wire-load table, so the numbers belong to these tools; after a tool upgrade the team recalibrates them.
 
 | Design | Clock target | Constraint file |
 |---|---|---|
 | gcd (Lab 1) | 3.8 ns | `labs/lab1_reference/gcd/sdc/sky130_fd_sc_hd.sdc` |
 | ibex (Lab 1) | 11.6 ns | `labs/lab1_reference/ibex/sdc/sky130_fd_sc_hd.sdc` |
-| sb_systolic_tile (Lab 2), **Bronze** | **133 MHz** (7.519 ns) | you write `tracks/b2/labs/lab2_systolic/sdc/sky130_fd_sc_hd.sdc` |
+| sb_systolic_tile (Lab 2), Bronze | 133 MHz (7.519 ns) | you write `tracks/b2/labs/lab2_systolic/sdc/sky130_fd_sc_hd.sdc` |
 | sb_systolic_tile (Lab 2), Silver | 5.25 ns at `ss` | the same file |
 
 ## This track's checks
@@ -169,32 +185,19 @@ The labs ask that "your track's checks" pass. Here they are, with where to look 
 | Synthesis is clean | `make synth` passes: no `Error`, every instance linked (no `LINK-5` in `synth.log`) |
 | Setup | worst setup slack at `ss` is ≥ 0 (`sta_ss.txt`, `qor.csv`) |
 | Hold | worst hold slack at `ff` is ≥ 0 (`sta_ff.txt`, `qor.csv`) |
-| No unconstrained endpoints | in every `sta_<corner>.rpt`: `check_timing` lists no unconstrained endpoints and no input without an input delay except `rst_n` (Lab 2: asynchronous, by the spec), and the coverage of the SDC checks shows nothing untested except (a) recovery/removal of the reset synchronizer's two flip-flops, which only `rst_n` reaches (`no_startpoint_clock`, or `false_paths` if you gave `rst_n` an input delay; comment your false path) and (b) pins driven by a constant (`constant_disabled`, `no_paths`: the synchronizer's first `D` input, ibex's constant outputs). The pulse-width checks, in their own section after the coverage, are not part of this check: every flip-flop reset pin is untested there (`no_clock`: a reset is not a clock), as expected |
+| No unconstrained endpoints | in every `sta_<corner>.rpt`: `check_timing` lists no unconstrained endpoints and no input without an input delay except `rst_n` (Lab 2: asynchronous, by the spec), and the coverage of the SDC checks shows nothing untested except (a) and (b) below |
 | Reset synchronizer (Lab 2) | `reset_port_async_pins` in `sta_ss.txt` is at most 2 (the synchronizer's own flip-flops) |
 | Equivalence | `make lec`: `Verification SUCCEEDED` |
 | GLS | `make gls`: the same tests as `make sim`, all passing |
 | QoR | `make qor` writes `qor.csv` |
 
-## First run checklist
+Untested checks that are allowed in the coverage:
 
-For the mentor who runs this track first on a new machine or after a tool upgrade. The scripts were written against the tool documentation; confirm each item once.
+- (a) Recovery/removal of the reset synchronizer's two flip-flops, which only `rst_n` reaches. The reason is `no_startpoint_clock`, or `false_paths` if you gave `rst_n` an input delay. Comment your false path.
+- (b) Pins driven by a constant (`constant_disabled`, `no_paths`): the synchronizer's first `D` input, ibex's constant outputs.
 
-1. `ls $SB_PDK/synopsys/views/*.db` shows the tt, ss and ff files.
-2. `make synth DESIGN=gcd`: `dc_shell` exits by itself; `synth.log` has no `Error`. The `analyze -define` list form works (`make synth DESIGN=ibex`, which defines `SYNTHESIS`).
-3. ibex: `sb_icg` links to `sky130_fd_sc_hd__sdlclkp_1` (no `LINK-5`), and `dw_foundation.sldb` is found.
-4. `read_sdc` in Design Compiler and PrimeTime accepts the Lab 1 SDCs, which use `remove_from_collection`. If it does not, read them with `source` in `synth.tcl` and `sta.tcl`.
-5. `make sta DESIGN=gcd`: three reports, numbers in `sta_<corner>.txt`, no unconstrained endpoints. `report_analysis_coverage -status_details untested` is accepted.
-6. `report_power` either writes `synth_power.rpt` or prints the `SB:` note; in both cases `synth.log` has no `Error` line from it.
-7. `make lec DESIGN=gcd`, then `DESIGN=ibex`: `Verification SUCCEEDED`. Formality accepts `read_sverilog -vcs "+incdir+... +define+..."` (ibex uses both).
-8. `make sim gls DESIGN=gcd`, then `DESIGN=ibex`: cocotb finds VCS, the cell models compile, every test passes. `WAVES=1` writes `waves.vcd` (`+vcs+dumpvars`).
-9. `make lint DESIGN=gcd LINT_TOOL=vc` (if VC SpyGlass is installed: `configure_lint_setup -goal lint_rtl`, `report_lint -file`) and `LINT_TOOL=vcs`.
-10. Lab 2, with a mentor solution SDC: `make macros DESIGN=sb_systolic_tile` writes three `.db` files (read `build/sb_systolic_tile/macros/*.log`). `make all` passes, and with `DESIGN_PARAMS="N_ROWS=8 N_COLS=8"` the netlist's top module is still `sb_systolic_tile` and LEC passes (`set_top -parameter`).
-11. Lab 2 reset check: on a correct tile, `reset_port_async_pins` in `sta_ss.txt` is 2, and the check fails on anything larger.
-12. The Lab 1 ripple-adder snippet in [lab1.md](lab1.md) works with your DesignWare version (`report_synlib dw_foundation.sldb` lists the implementation names).
-13. The message IDs in [reading_logs.md](reading_logs.md) match your version (`man LINK-5` at the `dc_shell` prompt).
-14. Each Lab 2 seeded bug shows up in this track's logs.
-15. Recalibrate the clock targets: sweep `CLOCK_PERIOD` for gcd, ibex and the tile, take the shortest period that passes setup at `ss` plus 5 %, and update the SDCs and the table above.
-    For Lab 2 (all `*_PIPE = 0`): Bronze = the shortest passing period, rounded up to a whole MHz; Silver = 0.70 × the shortest passing period.
+The pulse-width checks, in their own section after the coverage, are not part of this check.
+Every flip-flop reset pin is untested there (`no_clock`: a reset is not a clock), as expected.
 
 ## Pages in this track
 

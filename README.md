@@ -4,7 +4,7 @@ Start with the shared introduction, then choose RTL, verification or physical de
 
 | Read | What is there |
 | --- | --- |
-| **[CAE setup](intro/SETUP.md)** | Connect, get the repository, run VCS, and view waveforms. |
+| **[CAE setup](intro/SETUP.md)** | Connect, get the repository, run VCS, view waveforms, and set up the synthesis tools. |
 | **[Shared introduction](intro/README.md)** | Digital logic, waveform exercises, SystemVerilog, and the PE project. |
 | **[RTL track](rtl/README.md)** | Build the systolic array design. |
 | **[Verification track](verif/README.md)** | Develop tests, follow the verification plan, and complete the testbench. |
