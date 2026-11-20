@@ -17,23 +17,27 @@ module cycle_tables_tb;
     input rst_n, wr_valid, wr_ready, wr_addr, a_valid, a_ready, a_data, r_valid, r_ready, r_data, busy;
   endclocking
 
-  function automatic string vec8(logic [N*DW-1:0] d);
-    string s = "[";
+  function string vec8(logic [N*DW-1:0] d);
+    string s;
+    logic signed [DW-1:0] e;
+    s = "[";
     for (int i = 0; i < N; i++) begin
-      logic signed [DW-1:0] e = d[i*DW +: DW];
+      e = d[i*DW +: DW];
       s = {s, $sformatf("%0d%s", e, i == N-1 ? "]" : ",")};
     end
     return s;
   endfunction
-  function automatic string vec32(logic [N*AW-1:0] d);
-    string s = "[";
+  function string vec32(logic [N*AW-1:0] d);
+    string s;
+    logic signed [AW-1:0] e;
+    s = "[";
     for (int i = 0; i < N; i++) begin
-      logic signed [AW-1:0] e = d[i*AW +: AW];
+      e = d[i*AW +: AW];
       s = {s, $sformatf("%0d%s", e, i == N-1 ? "]" : ",")};
     end
     return s;
   endfunction
-  function automatic string hs(logic v, logic r); return (v && r) ? " **xfer**" : ""; endfunction
+  function string hs(logic v, logic r); return (v && r) ? " **xfer**" : ""; endfunction
 
   always @(cb) if (on) begin
     $display("| %0d | %0b | %0b | %0b%s | %s | %0b | %0b%s | %s | %0b | %0b%s | %s | %0b |",

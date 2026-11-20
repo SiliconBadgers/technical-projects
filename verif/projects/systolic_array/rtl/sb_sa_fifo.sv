@@ -23,19 +23,15 @@ module sb_sa_fifo #(
   logic [PTR_W-1:0] wr_ptr, rd_ptr;
   logic [CNT_W-1:0] count;              // entries stored
 
-  // Pointer increment with wrap at DEPTH-1.
-  function automatic logic [PTR_W-1:0] next_ptr(input logic [PTR_W-1:0] p);
-    return (p == PTR_W'(DEPTH - 1)) ? '0 : p + 1'b1;
-  endfunction
-
+  // Pointers wrap at DEPTH-1.
   always_ff @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
       wr_ptr <= '0;
       rd_ptr <= '0;
       count  <= '0;
     end else begin
-      if (push) wr_ptr <= next_ptr(wr_ptr);
-      if (pop)  rd_ptr <= next_ptr(rd_ptr);
+      if (push) wr_ptr <= (wr_ptr == PTR_W'(DEPTH - 1)) ? '0 : wr_ptr + 1'b1;
+      if (pop)  rd_ptr <= (rd_ptr == PTR_W'(DEPTH - 1)) ? '0 : rd_ptr + 1'b1;
       case ({push, pop})
         2'b10:   count <= count + 1'b1;
         2'b01:   count <= count - 1'b1;

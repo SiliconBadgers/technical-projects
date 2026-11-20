@@ -49,11 +49,6 @@ module sb_fifo #(
   logic             ready_en;      // low during reset and the first edge after
   logic             push, pop;     // transfers at this edge
 
-  // Pointer increment with wrap at DEPTH-1 (DEPTH need not be a power of two).
-  function automatic logic [PTR_W-1:0] next_ptr(input logic [PTR_W-1:0] p);
-    return (p == PTR_W'(DEPTH - 1)) ? '0 : p + 1'b1;
-  endfunction
-
   // Handshakes: in_ready and out_valid depend only on registered state
   assign in_ready  = ready_en && (count < CNT_W'(DEPTH));
   assign out_valid = (count != '0);
@@ -76,8 +71,9 @@ module sb_fifo #(
       rd_ptr <= '0;
       count  <= '0;
     end else begin
-      if (push) wr_ptr <= next_ptr(wr_ptr);
-      if (pop)  rd_ptr <= next_ptr(rd_ptr);
+      // Pointers wrap at DEPTH-1 (DEPTH need not be a power of two)
+      if (push) wr_ptr <= (wr_ptr == PTR_W'(DEPTH - 1)) ? '0 : wr_ptr + 1'b1;
+      if (pop)  rd_ptr <= (rd_ptr == PTR_W'(DEPTH - 1)) ? '0 : rd_ptr + 1'b1;
       case ({push, pop})
         2'b10:   count <= count + 1'b1;
         2'b01:   count <= count - 1'b1;
